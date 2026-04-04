@@ -18,6 +18,7 @@ export const routes: Routes = [
       { path: 'mensalistas', loadComponent: () => import('./pages/mensalistas/mensalistas.component').then(m => m.MensalistasComponent) },
       { path: 'reservas', loadComponent: () => import('./pages/reservas/reservas.component').then(m => m.ReservasComponent) },
       { path: 'perfil', loadComponent: () => import('./pages/perfil/perfil.component').then(m => m.PerfilComponent) },
+      { path: 'planos', loadComponent: () => import('./pages/planos/planos.component').then(m => m.PlanosComponent) },
     ]
   },
   { path: '**', redirectTo: '' }

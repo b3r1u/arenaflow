@@ -172,6 +172,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     { label: 'Relatórios',    path: '/relatorios',   icon: 'bar_chart',         accent: false },
     { label: 'Reservas',      path: '/reservas',     icon: 'shopping_cart',     accent: true  },
     { label: 'Perfil',        path: '/perfil',       icon: 'settings',          accent: false },
+    { label: 'Planos',        path: '/planos',       icon: 'workspace_premium', accent: true  },
   ];
 
   bottomNavItems = [
