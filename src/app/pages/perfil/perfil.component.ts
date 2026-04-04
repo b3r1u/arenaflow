@@ -115,49 +115,74 @@ interface ThemeOption {
       </div>
 
       <!-- Info section -->
-      <div class="card p-6 space-y-4">
-        <h2 class="font-heading font-semibold text-base" style="color:var(--foreground)">Informações</h2>
+      <div class="card p-6">
 
-        <div class="space-y-1">
-          <label class="text-xs font-medium" style="color:var(--muted-foreground)">Nome do estabelecimento *</label>
-          <input [(ngModel)]="form.name"
-                 class="input-field w-full"
-                 placeholder="Ex: Arena Beach Mais" />
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div class="space-y-1">
-            <label class="text-xs font-medium" style="color:var(--muted-foreground)">Telefone</label>
-            <input [(ngModel)]="form.phone"
-                   class="input-field w-full"
-                   placeholder="(00) 00000-0000" />
+        <!-- Section header -->
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+               style="background:hsl(152,69%,40%,0.1);color:var(--primary)">
+            <span class="material-icons" style="font-size:1.1rem">business</span>
           </div>
-          <div class="space-y-1">
-            <label class="text-xs font-medium" style="color:var(--muted-foreground)">E-mail</label>
-            <input [(ngModel)]="form.email"
-                   type="email"
-                   class="input-field w-full"
-                   placeholder="contato@arena.com" />
+          <div>
+            <h2 class="font-heading font-semibold text-base leading-tight" style="color:var(--foreground)">Informações</h2>
+            <p class="text-xs" style="color:var(--muted-foreground)">Dados públicos do estabelecimento</p>
           </div>
         </div>
 
-        <div class="space-y-1">
-          <label class="text-xs font-medium" style="color:var(--muted-foreground)">Endereço</label>
-          <input [(ngModel)]="form.address"
-                 class="input-field w-full"
-                 placeholder="Rua, número, bairro" />
+        <div class="space-y-3">
+
+          <!-- Nome -->
+          <div>
+            <label class="info-label">Nome do estabelecimento <span style="color:var(--destructive)">*</span></label>
+            <div class="info-input-wrap">
+              <span class="material-icons info-icon">storefront</span>
+              <input class="input info-input" [(ngModel)]="form.name" placeholder="Ex: Arena Beach Mais" />
+            </div>
+          </div>
+
+          <!-- Telefone + E-mail -->
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="info-label">Telefone</label>
+              <div class="info-input-wrap">
+                <span class="material-icons info-icon">phone</span>
+                <input class="input info-input" [(ngModel)]="form.phone"
+                       placeholder="(00) 00000-0000" maxlength="15"
+                       (input)="onPhoneInput($event)" />
+              </div>
+            </div>
+            <div>
+              <label class="info-label">E-mail</label>
+              <div class="info-input-wrap">
+                <span class="material-icons info-icon">mail_outline</span>
+                <input class="input info-input" [(ngModel)]="form.email"
+                       type="email" placeholder="contato@arena.com" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div>
+            <label class="info-label">Endereço</label>
+            <div class="info-input-wrap">
+              <span class="material-icons info-icon">location_on</span>
+              <input class="input info-input" [(ngModel)]="form.address" placeholder="Rua, número, bairro" />
+            </div>
+          </div>
+
+          <!-- Cidade -->
+          <div>
+            <label class="info-label">Cidade</label>
+            <div class="info-input-wrap">
+              <span class="material-icons info-icon">map</span>
+              <input class="input info-input" [(ngModel)]="form.city" placeholder="São Paulo - SP" />
+            </div>
+          </div>
+
         </div>
 
-        <div class="space-y-1">
-          <label class="text-xs font-medium" style="color:var(--muted-foreground)">Cidade</label>
-          <input [(ngModel)]="form.city"
-                 class="input-field w-full"
-                 placeholder="São Paulo - SP" />
-        </div>
-
-        <div class="flex justify-end pt-2">
-          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl"
-                  (click)="saveInfo()">
+        <div class="flex justify-end pt-4 mt-2" style="border-top:1px solid var(--border)">
+          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl" (click)="saveInfo()">
             Salvar informações
           </button>
         </div>
@@ -169,6 +194,32 @@ interface ThemeOption {
     .drag-over {
       border-color: var(--primary) !important;
       background-color: rgba(34,197,94,0.05);
+    }
+    .info-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.375rem;
+      color: var(--foreground);
+      opacity: 0.8;
+    }
+    .info-input-wrap {
+      position: relative;
+    }
+    .info-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem !important;
+      color: var(--muted-foreground);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .info-input {
+      padding-left: 2.25rem !important;
+      background-color: var(--input-bg) !important;
+      height: 2.6rem;
     }
   `]
 })
@@ -212,6 +263,19 @@ export class PerfilComponent implements OnInit {
 
   get initials(): string {
     return (this.profile.name || 'AF').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  onPhoneInput(event: Event) {
+    const el = event.target as HTMLInputElement;
+    const d = el.value.replace(/\D/g, '').slice(0, 11);
+    let masked = '';
+    if (d.length === 0)       masked = '';
+    else if (d.length <= 2)   masked = `(${d}`;
+    else if (d.length <= 6)   masked = `(${d.slice(0,2)}) ${d.slice(2)}`;
+    else if (d.length <= 10)  masked = `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+    else                      masked = `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+    el.value = masked;
+    this.form.phone = masked;
   }
 
   saveInfo() {
