@@ -51,7 +51,7 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         <!-- Busca -->
         <div style="position:relative;flex:1">
           <span class="material-icons" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--muted-foreground);pointer-events:none">search</span>
-          <input class="input" style="padding-left:2.25rem" [(ngModel)]="search" placeholder="Buscar por cliente ou quadra...">
+          <input class="input" style="padding-left:2.25rem" [(ngModel)]="search" (ngModelChange)="resetPage()" placeholder="Buscar por cliente ou quadra...">
         </div>
         <!-- Filtro status -->
         <div class="flex gap-1 p-1 rounded-xl flex-shrink-0" style="background-color:var(--muted)">
@@ -60,15 +60,34 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
                   [style.background]="activeFilter === f.value ? 'var(--card)' : 'transparent'"
                   [style.color]="activeFilter === f.value ? 'var(--foreground)' : 'var(--muted-foreground)'"
                   [style.box-shadow]="activeFilter === f.value ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'"
-                  (click)="activeFilter = f.value">
+                  (click)="activeFilter = f.value; resetPage()">
             {{ f.label }}
           </button>
         </div>
       </div>
 
+      <!-- Barra de paginação superior: itens por página + info -->
+      <div *ngIf="filtered.length > 0" class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs" style="color:var(--muted-foreground)">Itens por página:</span>
+          <div class="flex gap-1">
+            <button *ngFor="let s of pageSizes"
+                    class="w-8 h-7 rounded-lg text-xs font-semibold transition-all"
+                    [style.background]="pageSize === s ? 'var(--primary)' : 'var(--muted)'"
+                    [style.color]="pageSize === s ? 'white' : 'var(--muted-foreground)'"
+                    (click)="changePageSize(s)">
+              {{ s }}
+            </button>
+          </div>
+        </div>
+        <span class="text-xs" style="color:var(--muted-foreground)">
+          {{ rangeStart }}–{{ rangeEnd }} de {{ filtered.length }} reserva{{ filtered.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+
       <!-- Lista de reservas -->
       <div class="space-y-2" *ngIf="filtered.length > 0">
-        <div *ngFor="let b of filtered"
+        <div *ngFor="let b of paged"
              class="card p-4 transition-all"
              style="cursor:default">
           <div class="flex items-start gap-3">
@@ -126,6 +145,38 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         </div>
       </div>
 
+      <!-- Navegação de páginas -->
+      <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-1 mt-4">
+        <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                [style.opacity]="currentPage === 1 ? '0.35' : '1'"
+                [disabled]="currentPage === 1"
+                style="background:var(--muted);color:var(--muted-foreground)"
+                (click)="goToPage(currentPage - 1)">
+          <span class="material-icons" style="font-size:1rem">chevron_left</span>
+        </button>
+
+        <ng-container *ngFor="let p of pageNumbers">
+          <span *ngIf="p === '...'"
+                class="w-8 h-8 flex items-center justify-center text-xs"
+                style="color:var(--muted-foreground)">…</span>
+          <button *ngIf="p !== '...'"
+                  class="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
+                  [style.background]="currentPage === p ? 'var(--primary)' : 'var(--muted)'"
+                  [style.color]="currentPage === p ? 'white' : 'var(--muted-foreground)'"
+                  (click)="goToPage(+p)">
+            {{ p }}
+          </button>
+        </ng-container>
+
+        <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                [style.opacity]="currentPage === totalPages ? '0.35' : '1'"
+                [disabled]="currentPage === totalPages"
+                style="background:var(--muted);color:var(--muted-foreground)"
+                (click)="goToPage(currentPage + 1)">
+          <span class="material-icons" style="font-size:1rem">chevron_right</span>
+        </button>
+      </div>
+
       <!-- Empty states -->
       <div *ngIf="filtered.length === 0 && allBookings.length > 0"
            class="text-center py-16" style="color:var(--muted-foreground)">
@@ -180,10 +231,15 @@ export class ReservasComponent implements OnInit {
   activeFilter: FilterStatus = 'todas';
   bookingToDelete: Booking | null = null;
 
+  // Paginação
+  currentPage = 1;
+  pageSize = 10;
+  pageSizes = [10, 15, 20];
+
   filters: { label: string; value: FilterStatus }[] = [
-    { label: 'Todas',     value: 'todas'         },
-    { label: 'Pagas',     value: 'pago'          },
-    { label: 'Pendentes', value: 'pendente'      },
+    { label: 'Todas',     value: 'todas'    },
+    { label: 'Pagas',     value: 'pago'     },
+    { label: 'Pendentes', value: 'pendente' },
   ];
 
   constructor(private data: DataService, private toast: ToastService) {}
@@ -209,6 +265,39 @@ export class ReservasComponent implements OnInit {
       return matchStatus && matchSearch;
     });
   }
+
+  get paged(): Booking[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filtered.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number { return Math.max(1, Math.ceil(this.filtered.length / this.pageSize)); }
+  get rangeStart(): number { return this.filtered.length === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1; }
+  get rangeEnd():   number { return Math.min(this.currentPage * this.pageSize, this.filtered.length); }
+
+  get pageNumbers(): (number | '...')[] {
+    const t = this.totalPages, c = this.currentPage;
+    if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (c > 3) pages.push('...');
+    for (let i = Math.max(2, c - 1); i <= Math.min(t - 1, c + 1); i++) pages.push(i);
+    if (c < t - 2) pages.push('...');
+    pages.push(t);
+    return pages;
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  changePageSize(size: number) {
+    this.pageSize = size;
+    this.currentPage = 1;
+  }
+
+  resetPage() { this.currentPage = 1; }
 
   get totalRevenue(): number {
     return this.allBookings.filter(b => b.payment_status === 'pago').reduce((s, b) => s + b.total_amount, 0);
