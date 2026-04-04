@@ -25,7 +25,7 @@ import { Client, Booking, Court } from '../../models/models';
       <!-- Search -->
       <div class="relative mb-5">
         <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2" style="font-size:1.1rem;color: var(--muted-foreground)">search</span>
-        <input class="input pl-9" [(ngModel)]="search" placeholder="Buscar por nome ou telefone...">
+        <input class="input" style="padding-left:2.25rem" [(ngModel)]="search" placeholder="Buscar por nome ou telefone...">
       </div>
 
       <!-- Two-column layout -->
