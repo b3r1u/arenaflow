@@ -26,6 +26,27 @@
   --sidebar-border: hsl(160, 15%, 18%);
 }
 
+[data-theme="dark"] {
+  --background: hsl(160, 15%, 8%);
+  --foreground: hsl(150, 10%, 92%);
+  --card: hsl(160, 14%, 11%);
+  --primary: hsl(152, 60%, 45%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(160, 12%, 16%);
+  --muted: hsl(160, 12%, 15%);
+  --muted-foreground: hsl(160, 8%, 55%);
+  --accent: hsl(36, 90%, 52%);
+  --accent-foreground: hsl(36, 95%, 15%);
+  --destructive: hsl(0, 75%, 58%);
+  --border: hsl(160, 12%, 18%);
+  --ring: hsl(152, 60%, 45%);
+  --sidebar-background: hsl(160, 18%, 6%);
+  --sidebar-foreground: hsl(150, 10%, 88%);
+  --sidebar-primary: hsl(152, 60%, 42%);
+  --sidebar-accent: hsl(160, 14%, 12%);
+  --sidebar-border: hsl(160, 14%, 14%);
+}
+
 * { box-sizing: border-box; }
 
 body {

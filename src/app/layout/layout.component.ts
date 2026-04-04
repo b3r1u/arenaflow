@@ -4,6 +4,7 @@ import { RouterModule, RouterLink, RouterLinkActive, Router, NavigationEnd } fro
 import { ToastService } from '../services/toast.service';
 import { ProfileService } from '../services/profile.service';
 import { AuthService } from '../services/auth.service';
+import { ThemeService } from '../services/theme.service';
 import { EstablishmentProfile } from '../models/models';
 import { Subscription, filter } from 'rxjs';
 
@@ -102,6 +103,16 @@ import { Subscription, filter } from 'rxjs';
           <span class="ml-auto text-xs font-medium lg:hidden" style="color:var(--muted-foreground)">
             {{ currentPageLabel }}
           </span>
+
+          <!-- Dark mode toggle -->
+          <button (click)="themeService.toggle()"
+                  class="flex items-center justify-center w-9 h-9 rounded-xl btn-ghost flex-shrink-0"
+                  [class.ml-auto]="true"
+                  [class.lg\:ml-0]="true"
+                  [title]="themeService.dark() ? 'Modo claro' : 'Modo escuro'">
+            <span *ngIf="!themeService.dark()" class="material-icons" style="font-size:1.2rem">dark_mode</span>
+            <span *ngIf="themeService.dark()" class="material-icons" style="font-size:1.2rem;color:var(--accent)">light_mode</span>
+          </button>
         </header>
 
         <!-- Page content -->
@@ -185,7 +196,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   googleUser = this.authService.user;
 
-  constructor(private toast: ToastService, private router: Router, private profileService: ProfileService, private authService: AuthService) {}
+  constructor(private toast: ToastService, private router: Router, private profileService: ProfileService, private authService: AuthService, public themeService: ThemeService) {}
 
   async logout() {
     await this.authService.logout();
