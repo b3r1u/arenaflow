@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Fundo verde (quadra) -->
+  <rect width="64" height="64" rx="12" fill="#1a7a3f"/>
+  <!-- Borda da quadra -->
+  <rect x="8" y="10" width="48" height="44" rx="2" stroke="white" stroke-width="2.5" fill="none"/>
+  <!-- Linha central horizontal -->
+  <line x1="8" y1="32" x2="56" y2="32" stroke="white" stroke-width="2"/>
+  <!-- Círculo central -->
+  <circle cx="32" cy="32" r="7" stroke="white" stroke-width="2" fill="none"/>
+  <!-- Área de 3 pontos esquerda -->
+  <path d="M8 20 Q20 32 8 44" stroke="white" stroke-width="2" fill="none"/>
+  <!-- Área de 3 pontos direita -->
+  <path d="M56 20 Q44 32 56 44" stroke="white" stroke-width="2" fill="none"/>
+</svg>
