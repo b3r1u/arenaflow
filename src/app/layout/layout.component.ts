@@ -78,7 +78,7 @@ import { Subscription, filter } from 'rxjs';
 
         <!-- Top header -->
         <header class="flex-shrink-0 h-14 flex items-center px-4 gap-3 z-20"
-                style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.85);backdrop-filter:blur(12px)">
+                style="border-bottom:1px solid var(--border);background:var(--header-bg);backdrop-filter:blur(12px)">
           <!-- Hamburger (mobile only) -->
           <button class="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl btn-ghost"
                   (click)="sidebarOpen = !sidebarOpen" aria-label="Menu">

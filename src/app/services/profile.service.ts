@@ -4,13 +4,11 @@ import { EstablishmentProfile, ThemeId } from '../models/models';
 
 const STORAGE_KEY = 'arenaflow_profile';
 
+// Only accent/primary vars — surface vars (background, card, muted, border)
+// are controlled exclusively by CSS [data-theme] to keep dark mode working.
 const DEFAULT_VARS: Record<string, string> = {
   '--primary':            'hsl(152, 69%, 40%)',
   '--ring':               'hsl(152, 69%, 40%)',
-  '--background':         'hsl(150, 10%, 97%)',
-  '--muted':              'hsl(150, 10%, 94%)',
-  '--muted-foreground':   'hsl(160, 10%, 45%)',
-  '--border':             'hsl(150, 12%, 89%)',
   '--sidebar-background': 'hsl(160, 20%, 8%)',
   '--sidebar-primary':    'hsl(152, 69%, 45%)',
   '--sidebar-accent':     'hsl(160, 15%, 15%)',

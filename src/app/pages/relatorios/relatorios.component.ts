@@ -90,7 +90,7 @@ import { Booking } from '../../models/models';
                     <rect [attr.x]="i * rBarW + 2" [attr.y]="115 - getRBarH(h.count)"
                           [attr.width]="rBarW - 4" [attr.height]="getRBarH(h.count)"
                           rx="4" ry="4"
-                          [attr.fill]="h.count > 0 ? 'url(#rBarGrad)' : 'hsl(150,12%,91%)'"/>
+                          [attr.fill]="h.count > 0 ? 'url(#rBarGrad)' : svgEmpty"/>
                     <text *ngIf="h.count > 0"
                           [attr.x]="i * rBarW + rBarW / 2" y="112"
                           text-anchor="middle" fill="white"
@@ -164,6 +164,9 @@ import { Booking } from '../../models/models';
 })
 export class RelatoriosComponent implements OnInit {
   period = 30;
+  get svgEmpty(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--svg-empty').trim() || 'hsl(150,12%,88%)';
+  }
   totalRevenue = 0;
   avgDaily = 0;
   totalBookings = 0;

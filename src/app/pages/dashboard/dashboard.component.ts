@@ -112,7 +112,7 @@ import { Court, Booking } from '../../models/models';
         <div class="card p-5">
           <h2 class="font-heading font-semibold text-base mb-3" style="color:var(--foreground)">Reservas de Hoje</h2>
           <div class="space-y-2">
-            <div *ngFor="let booking of todayBookings" class="flex items-center gap-3 p-3 rounded-xl" style="background-color:hsl(150,10%,95%)">
+            <div *ngFor="let booking of todayBookings" class="flex items-center gap-3 p-3 rounded-xl" style="background-color:var(--surface-raised)">
               <div class="w-9 h-9 rounded-xl flex items-center justify-center font-heading font-bold text-sm flex-shrink-0"
                    style="background-color:hsl(152,69%,40%,0.12);color:var(--primary)">
                 {{ booking.client_name.charAt(0) }}
@@ -147,7 +147,7 @@ import { Court, Booking } from '../../models/models';
                   <rect [attr.x]="i * barW + 2" [attr.y]="120 - getBarH(h.count)"
                         [attr.width]="barW - 4" [attr.height]="getBarH(h.count)"
                         rx="4" ry="4"
-                        [attr.fill]="h.count > 0 ? 'url(#barGrad)' : 'hsl(150,12%,91%)'"/>
+                        [attr.fill]="h.count > 0 ? 'url(#barGrad)' : svgEmpty"/>
                   <text *ngIf="h.count > 0"
                         [attr.x]="i * barW + barW/2" y="115"
                         text-anchor="middle" fill="white"
@@ -170,6 +170,9 @@ import { Court, Booking } from '../../models/models';
 })
 export class DashboardComponent implements OnInit {
   courts: Court[] = [];
+  get svgEmpty(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--svg-empty').trim() || 'hsl(150,12%,88%)';
+  }
   todayBookings: Booking[] = [];
   paidToday = 0;
   pendingToday = 0;
