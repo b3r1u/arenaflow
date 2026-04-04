@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { ProfileService } from '../services/profile.service';
+import { AuthService } from '../services/auth.service';
 import { EstablishmentProfile } from '../models/models';
 import { Subscription, filter } from 'rxjs';
 
@@ -55,14 +56,19 @@ import { Subscription, filter } from 'rxjs';
              (click)="sidebarOpen = false">
             <div class="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center font-bold text-white text-xs font-heading flex-shrink-0"
                  style="background-color:var(--sidebar-primary)">
-              <img *ngIf="profile?.logoUrl" [src]="profile!.logoUrl" alt="Logo" class="w-full h-full object-cover" />
-              <span *ngIf="!profile?.logoUrl">{{ profileInitials }}</span>
+              <img *ngIf="googleUser()?.photoURL" [src]="googleUser()!.photoURL!" alt="Avatar" class="w-full h-full object-cover" />
+              <span *ngIf="!googleUser()?.photoURL">{{ profileInitials }}</span>
             </div>
-            <div>
-              <div class="font-heading font-semibold text-xs" style="color:var(--sidebar-foreground)">{{ profile?.name || 'Minha Arena' }}</div>
-              <div class="text-xs" style="color:var(--sidebar-foreground);opacity:0.5">Configurar perfil</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-heading font-semibold text-xs truncate" style="color:var(--sidebar-foreground)">{{ googleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+              <div class="text-xs truncate" style="color:var(--sidebar-foreground);opacity:0.5">{{ googleUser()?.email || 'Configurar perfil' }}</div>
             </div>
           </a>
+          <button (click)="logout()"
+                  class="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-xs transition-all duration-150 mt-1 nav-item">
+            <span class="material-icons" style="font-size:1rem">logout</span>
+            <span>Sair</span>
+          </button>
         </div>
       </aside>
 
@@ -176,7 +182,14 @@ export class LayoutComponent implements OnInit, OnDestroy {
     { label: 'Reservas',     shortLabel: 'Reservar', path: '/reservas',     icon: 'shopping_cart'     },
   ];
 
-  constructor(private toast: ToastService, private router: Router, private profileService: ProfileService) {}
+  googleUser = this.authService.user;
+
+  constructor(private toast: ToastService, private router: Router, private profileService: ProfileService, private authService: AuthService) {}
+
+  async logout() {
+    await this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
   ngOnInit() {
     this.checkDesktop();
