@@ -4,6 +4,8 @@
 
 Gerencie quadras, reservas, clientes, mensalistas, promoções e relatórios em um painel moderno e responsivo.
 
+**Demo ao vivo:** [arenaflow-alpha.vercel.app](https://arenaflow-alpha.vercel.app)
+
 ---
 
 ## Funcionalidades
@@ -22,17 +24,57 @@ Gerencie quadras, reservas, clientes, mensalistas, promoções e relatórios em 
 
 ## Stack
 
-| Tecnologia | Versão |
-|---|---|
-| Angular | 17 |
-| Tailwind CSS | 3 |
-| ApexCharts | 3 |
-| Lucide Angular | 1 |
-| TypeScript | 5.4 |
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| Angular | 17 | Framework principal |
+| Tailwind CSS | 3 | Estilização |
+| Firebase | 11 | Autenticação |
+| ApexCharts | 3 | Gráficos |
+| TypeScript | 5.4 | Linguagem |
 
 ---
 
-## Como rodar
+## Autenticação
+
+O ArenaFlow usa **Firebase Authentication** com login via **Google OAuth 2.0**.
+
+### Como funciona
+
+1. O usuário acessa qualquer rota do app
+2. O `AuthGuard` verifica se há uma sessão ativa no Firebase
+3. Se não estiver autenticado, é redirecionado para `/login`
+4. Na tela de login, ao clicar em "Entrar com Google", abre um popup do Google para seleção de conta
+5. Após autenticação, o Firebase retorna o `User` com nome, email e foto
+6. O avatar e o email do usuário são exibidos no rodapé da sidebar
+7. O botão "Sair" encerra a sessão via `signOut()` e redireciona para `/login`
+
+### Serviços envolvidos
+
+- **`AuthService`** (`src/app/services/auth.service.ts`) — encapsula `signInWithPopup`, `signOut` e `onAuthStateChanged`, expondo o usuário atual via Angular `signal`
+- **`AuthGuard`** (`src/app/guards/auth.guard.ts`) — guard funcional que protege todas as rotas filhas do layout
+- **`firebase.config.ts`** (`src/app/firebase.config.ts`) — inicializa o app Firebase e exporta a instância de `Auth`
+
+### Configuração do Firebase
+
+O projeto está vinculado ao Firebase Console em:
+[console.firebase.google.com/project/arenaflow-f0dac](https://console.firebase.google.com/project/arenaflow-f0dac)
+
+> Para que o login funcione em outros domínios, adicione o domínio em **Authentication → Settings → Authorized domains** no Firebase Console.
+
+---
+
+## Deploy
+
+O projeto é hospedado na **Vercel** com deploy contínuo a partir deste repositório.
+
+- **URL de produção:** [arenaflow-alpha.vercel.app](https://arenaflow-alpha.vercel.app)
+- **Dashboard Vercel:** [vercel.com/b3r1us-projects/arenaflow](https://vercel.com/b3r1us-projects/arenaflow)
+
+Cada push na branch `master` dispara um novo deploy automático na Vercel.
+
+---
+
+## Como rodar localmente
 
 ```bash
 # Instalar dependências
@@ -52,9 +94,12 @@ npm run build
 ```
 src/
 ├── app/
-│   ├── layout/          # Layout principal com sidebar e navegação
-│   ├── models/          # Interfaces e tipos (Court, Booking, Client...)
-│   ├── pages/           # Páginas da aplicação
+│   ├── firebase.config.ts   # Inicialização do Firebase
+│   ├── layout/              # Layout principal com sidebar e navegação
+│   ├── models/              # Interfaces e tipos (Court, Booking, Client...)
+│   ├── guards/              # AuthGuard — proteção de rotas
+│   ├── pages/               # Páginas da aplicação
+│   │   ├── login/           # Tela de login com Google
 │   │   ├── dashboard/
 │   │   ├── agendamentos/
 │   │   ├── quadras/
@@ -64,8 +109,8 @@ src/
 │   │   ├── promocoes/
 │   │   ├── relatorios/
 │   │   └── perfil/
-│   └── services/        # DataService, ProfileService, ToastService
-└── styles.css           # Design system com variáveis CSS
+│   └── services/            # AuthService, DataService, ProfileService, ToastService
+└── styles.css               # Design system com variáveis CSS
 ```
 
 ---
