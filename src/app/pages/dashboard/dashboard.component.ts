@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexFill, ApexStroke,
-         ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers } from 'ng-apexcharts';
+         ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers,
+         ApexPlotOptions } from 'ng-apexcharts';
 import { DataService } from '../../services/data.service';
 import { Court, Booking } from '../../models/models';
 
@@ -131,48 +132,29 @@ import { Court, Booking } from '../../models/models';
       </div>
 
       <!-- Popular hours bar chart -->
-      <div class="card p-5">
-        <h2 class="font-heading font-semibold text-base mb-4" style="color:var(--foreground)">Horários Populares</h2>
-        <div class="overflow-x-auto mobile-scroll">
-          <div style="min-width:420px">
-            <div style="height:130px">
-              <svg width="100%" height="100%" viewBox="0 0 760 120" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stop-color="hsl(152,69%,42%)"/>
-                    <stop offset="100%" stop-color="hsl(152,69%,55%)"/>
-                  </linearGradient>
-                </defs>
-                <ng-container *ngFor="let h of popularHours; let i = index">
-                  <rect [attr.x]="i * barW + 2" [attr.y]="120 - getBarH(h.count)"
-                        [attr.width]="barW - 4" [attr.height]="getBarH(h.count)"
-                        rx="4" ry="4"
-                        [attr.fill]="h.count > 0 ? 'url(#barGrad)' : svgEmpty"/>
-                  <text *ngIf="h.count > 0"
-                        [attr.x]="i * barW + barW/2" y="115"
-                        text-anchor="middle" fill="white"
-                        font-size="7.5" font-weight="700" font-family="Space Grotesk,sans-serif">
-                    {{ h.count }}
-                  </text>
-                </ng-container>
-              </svg>
-            </div>
-            <div class="flex" style="min-width:420px">
-              <div *ngFor="let h of popularHours" class="flex-1 text-center" style="font-size:9px;color:var(--muted-foreground)">
-                {{ h.hour.replace(':00','h') }}
-              </div>
-            </div>
-          </div>
+      <div class="card" style="padding:1.25rem 1.25rem 0.5rem">
+        <div class="mb-0">
+          <h2 class="font-heading font-semibold text-base" style="color:var(--foreground)">Horários Populares</h2>
+          <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">Distribuição de reservas por horário (últimos 60 dias)</p>
         </div>
+        <apx-chart
+          [series]="popularSeries"
+          [chart]="popularChart"
+          [plotOptions]="popularPlot"
+          [colors]="popularColors"
+          [fill]="popularFill"
+          [grid]="popularGrid"
+          [xaxis]="popularXAxis"
+          [yaxis]="popularYAxis"
+          [tooltip]="popularTooltip"
+          [dataLabels]="popularDataLabels">
+        </apx-chart>
       </div>
     </div>
   `
 })
 export class DashboardComponent implements OnInit {
   courts: Court[] = [];
-  get svgEmpty(): string {
-    return getComputedStyle(document.documentElement).getPropertyValue('--svg-empty').trim() || 'hsl(150,12%,88%)';
-  }
   todayBookings: Booking[] = [];
   paidToday = 0;
   pendingToday = 0;
@@ -183,8 +165,53 @@ export class DashboardComponent implements OnInit {
   totalLast7 = 0;
   last7Days: { day: string; revenue: number }[] = [];
   popularHours: { hour: string; count: number }[] = [];
-  maxCount = 1;
-  barW = 760 / 16;
+
+  // Popular hours ApexCharts
+  popularSeries: ApexAxisChartSeries = [];
+  popularChart: ApexChart = {
+    type: 'bar',
+    height: 180,
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    fontFamily: 'Inter, sans-serif',
+    animations: { enabled: true, speed: 500 }
+  };
+  popularPlot: ApexPlotOptions = {
+    bar: { borderRadius: 4, columnWidth: '68%' }
+  };
+  popularColors = ['#22a55c'];
+  popularFill: ApexFill = {
+    type: 'gradient',
+    gradient: { shadeIntensity: 0.4, opacityFrom: 1, opacityTo: 0.75, stops: [0, 100] }
+  };
+  popularGrid: ApexGrid = {
+    borderColor: 'hsl(150,12%,90%)',
+    strokeDashArray: 4,
+    xaxis: { lines: { show: false } },
+    yaxis: { lines: { show: true } },
+    padding: { top: 0, right: 0, bottom: 0, left: 4 }
+  };
+  popularXAxis: ApexXAxis = {
+    categories: [],
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    labels: { style: { colors: 'hsl(160,10%,55%)', fontSize: '10px', fontFamily: 'Inter, sans-serif' } }
+  };
+  popularYAxis: ApexYAxis = {
+    min: 0,
+    tickAmount: 4,
+    labels: {
+      formatter: (val: number) => Math.round(val).toString(),
+      style: { colors: 'hsl(160,10%,55%)', fontSize: '11px', fontFamily: 'Inter, sans-serif' }
+    }
+  };
+  popularTooltip: ApexTooltip = {
+    theme: 'dark',
+    x: { show: true },
+    y: { formatter: (val: number) => `${val} reserva${val !== 1 ? 's' : ''}` },
+    marker: { show: false }
+  };
+  popularDataLabels: ApexDataLabels = { enabled: false };
 
   // ApexCharts options
   chartSeries: ApexAxisChartSeries = [];
@@ -266,22 +293,19 @@ export class DashboardComponent implements OnInit {
     this.last7Days = this.data.getLast7DaysRevenue();
     this.popularHours = this.data.getPopularHours();
     this.totalLast7 = this.last7Days.reduce((s, d) => s + d.revenue, 0);
-    this.maxCount = Math.max(...this.popularHours.map(h => h.count), 1);
     this.buildChart();
   }
 
   buildChart() {
-    this.chartSeries = [{
-      name: 'Faturamento',
-      data: this.last7Days.map(d => d.revenue)
-    }];
-    this.chartXAxis = {
-      ...this.chartXAxis,
-      categories: this.last7Days.map(d => d.day)
+    this.chartSeries = [{ name: 'Faturamento', data: this.last7Days.map(d => d.revenue) }];
+    this.chartXAxis = { ...this.chartXAxis, categories: this.last7Days.map(d => d.day) };
+
+    this.popularSeries = [{ name: 'Reservas', data: this.popularHours.map(h => h.count) }];
+    this.popularXAxis = {
+      ...this.popularXAxis,
+      categories: this.popularHours.map(h => h.hour.replace(':00', 'h'))
     };
   }
-
-  getBarH(count: number): number { return Math.max(4, (count / this.maxCount) * 105); }
   getCourtName(id: string): string { return this.courts.find(c => c.id === id)?.name || 'Quadra'; }
   getCourtStatusClass(s: string) { return s === 'disponível' ? 'badge-primary' : s === 'bloqueada' ? 'badge-destructive' : 'badge-accent'; }
   getPaymentStatusClass(s: string) { return s === 'pago' ? 'badge-primary' : s === 'pendente' ? 'badge-accent' : 'badge-muted'; }

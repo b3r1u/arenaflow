@@ -10,13 +10,7 @@ export class DataService {
     { id: '3', name: 'Quadra 3', sport_type: 'ambos',     status: 'bloqueada',  hourly_rate: 75, description: 'Em manutenção' },
   ]);
 
-  private bookingsSubject = new BehaviorSubject<Booking[]>([
-    { id: '1', client_name: 'Lucas Silva',   client_phone: '(11) 99999-1111', court_id: '1', date: new Date().toISOString().split('T')[0], start_hour: '09:00', end_hour: '10:00', payment_method: 'pix',     payment_status: 'pago',     total_amount: 80,  duration_hours: 1 },
-    { id: '2', client_name: 'Ana Costa',     client_phone: '(11) 98888-2222', court_id: '2', date: new Date().toISOString().split('T')[0], start_hour: '11:00', end_hour: '13:00', payment_method: 'cartão',  payment_status: 'pago',     total_amount: 180, duration_hours: 2 },
-    { id: '3', client_name: 'Pedro Rocha',   client_phone: '(11) 97777-3333', court_id: '1', date: new Date().toISOString().split('T')[0], start_hour: '14:00', end_hour: '15:00', payment_method: '',        payment_status: 'pendente', total_amount: 80,  duration_hours: 1 },
-    { id: '4', client_name: 'Maria Santos',  client_phone: '(11) 96666-4444', court_id: '2', date: this.yesterday(),                       start_hour: '10:00', end_hour: '11:00', payment_method: 'dinheiro',payment_status: 'pago',     total_amount: 90,  duration_hours: 1 },
-    { id: '5', client_name: 'João Oliveira', client_phone: '(11) 95555-5555', court_id: '1', date: this.yesterday(),                       start_hour: '16:00', end_hour: '18:00', payment_method: 'pix',     payment_status: 'pago',     total_amount: 160, duration_hours: 2 },
-  ]);
+  private bookingsSubject = new BehaviorSubject<Booking[]>(this.generateMockBookings());
 
   private clientsSubject = new BehaviorSubject<Client[]>([
     { id: '1', name: 'Lucas Silva',   phone: '(11) 99999-1111', email: 'lucas@email.com' },
@@ -47,6 +41,69 @@ export class DataService {
   clients$     = this.clientsSubject.asObservable();
   promotions$  = this.promotionsSubject.asObservable();
   mensalistas$ = this.mensalistasSubject.asObservable();
+
+  // ─── Mock data generator ───────────────────────────────────────────────────
+
+  private generateMockBookings(): Booking[] {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const yd = new Date(); yd.setDate(yd.getDate() - 1);
+    const yesterdayStr = yd.toISOString().split('T')[0];
+
+    const base: Booking[] = [
+      { id: '1', client_name: 'Lucas Silva',   client_phone: '(11) 99999-1111', court_id: '1', date: todayStr,     start_hour: '09:00', end_hour: '10:00', payment_method: 'pix',      payment_status: 'pago',     total_amount: 80,  duration_hours: 1 },
+      { id: '2', client_name: 'Ana Costa',     client_phone: '(11) 98888-2222', court_id: '2', date: todayStr,     start_hour: '11:00', end_hour: '13:00', payment_method: 'cartão',   payment_status: 'pago',     total_amount: 180, duration_hours: 2 },
+      { id: '3', client_name: 'Pedro Rocha',   client_phone: '(11) 97777-3333', court_id: '1', date: todayStr,     start_hour: '14:00', end_hour: '15:00', payment_method: '',         payment_status: 'pendente', total_amount: 80,  duration_hours: 1 },
+      { id: '4', client_name: 'Maria Santos',  client_phone: '(11) 96666-4444', court_id: '2', date: yesterdayStr, start_hour: '10:00', end_hour: '11:00', payment_method: 'dinheiro', payment_status: 'pago',     total_amount: 90,  duration_hours: 1 },
+      { id: '5', client_name: 'João Oliveira', client_phone: '(11) 95555-5555', court_id: '1', date: yesterdayStr, start_hour: '16:00', end_hour: '18:00', payment_method: 'pix',      payment_status: 'pago',     total_amount: 160, duration_hours: 2 },
+    ];
+
+    // Slots with realistic weights (higher = more popular)
+    // Peaks: 18h-19h (8), 19h-20h (9), 20h-21h (7), 17h-18h (6)
+    const slots: [string, string, number][] = [
+      ['07:00', '08:00', 1], ['08:00', '09:00', 2], ['09:00', '10:00', 4],
+      ['10:00', '11:00', 3], ['11:00', '12:00', 2], ['12:00', '13:00', 1],
+      ['13:00', '14:00', 1], ['14:00', '15:00', 2], ['15:00', '16:00', 3],
+      ['16:00', '17:00', 4], ['17:00', '18:00', 6], ['18:00', '19:00', 8],
+      ['19:00', '20:00', 9], ['20:00', '21:00', 7], ['21:00', '22:00', 3],
+    ];
+    const totalWeight = slots.reduce((s, [,, w]) => s + w, 0);
+
+    const names = ['Carlos Lima', 'Fernanda Dias', 'Rafael Souza', 'Camila Torres',
+                   'Bruno Melo', 'Patrícia Nunes', 'Diego Alves', 'Juliana Ferreira'];
+    const methods: Booking['payment_method'][] = ['pix', 'cartão', 'dinheiro', 'pix', 'pix'];
+    const statuses: Booking['payment_status'][] = ['pago', 'pago', 'pago', 'pendente'];
+
+    let id = 6;
+    for (let dayOffset = 2; dayOffset <= 60; dayOffset++) {
+      const d = new Date();
+      d.setDate(d.getDate() - dayOffset);
+      const dateStr = d.toISOString().split('T')[0];
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const numBookings = isWeekend ? 5 + (dayOffset % 4) : 2 + (dayOffset % 3);
+
+      for (let b = 0; b < numBookings; b++) {
+        const seed = (dayOffset * 7 + b * 13) % totalWeight;
+        let cum = 0, chosen = slots[0];
+        for (const slot of slots) { cum += slot[2]; if (seed < cum) { chosen = slot; break; } }
+
+        const courtId = String(((dayOffset + b) % 2) + 1);
+        base.push({
+          id: String(id++),
+          client_name: names[(dayOffset + b) % names.length],
+          client_phone: '',
+          court_id: courtId,
+          date: dateStr,
+          start_hour: chosen[0],
+          end_hour: chosen[1],
+          payment_method: methods[(dayOffset + b) % methods.length],
+          payment_status: statuses[(dayOffset + b) % statuses.length],
+          total_amount: courtId === '1' ? 80 : 90,
+          duration_hours: 1,
+        });
+      }
+    }
+    return base;
+  }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
