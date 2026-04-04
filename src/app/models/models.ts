@@ -1,0 +1,74 @@
+export interface Court {
+  id: string;
+  name: string;
+  sport_type: 'ambos' | 'futevôlei' | 'vôlei';
+  status: 'disponível' | 'ocupada' | 'bloqueada';
+  hourly_rate: number;
+  description?: string;
+}
+
+export interface Booking {
+  id: string;
+  client_name: string;
+  client_phone?: string;
+  court_id: string;
+  date: string;
+  start_hour: string;
+  end_hour: string;
+  payment_method?: 'pix' | 'cartão' | 'dinheiro' | '';
+  payment_status: 'pago' | 'pendente' | 'não informado';
+  total_amount: number;
+  paid_amount?: number;
+  notes?: string;
+  status?: string;
+  duration_hours?: number;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  notes?: string;
+}
+
+export type ThemeId = 'base' | 'lima' | 'sage' | 'dark-red';
+
+export type DiaSemana = 'domingo' | 'segunda' | 'terca' | 'quarta' | 'quinta' | 'sexta' | 'sabado';
+
+export interface Mensalista {
+  id: string;
+  group_name: string;
+  court_id: string;
+  day_of_week: DiaSemana;
+  start_hour: string;
+  end_hour: string;
+  active: boolean;
+  payment_status: 'confirmado' | 'pendente';
+  monthly_amount?: number;
+  contact_phone?: string;
+  notes?: string;
+}
+
+export interface EstablishmentProfile {
+  name: string;
+  logoUrl?: string; // base64 ou URL
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  theme?: ThemeId;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  description?: string;
+  type: 'desconto' | 'evento' | 'campeonato';
+  discount_percent?: number;
+  start_date?: string;
+  end_date?: string;
+  start_hour?: string;
+  end_hour?: string;
+  active: boolean;
+}
