@@ -51,14 +51,15 @@ import { Subscription, filter } from 'rxjs';
         </nav>
 
         <!-- Footer -->
-        <div class="px-3 pb-5" style="border-top:1px solid var(--sidebar-border);padding-top:0.75rem">
+        <div class="px-3 pb-20 lg:pb-5" style="border-top:1px solid var(--sidebar-border);padding-top:0.75rem">
           <a routerLink="/perfil"
              class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs transition-all duration-150 cursor-pointer nav-item"
              (click)="sidebarOpen = false">
             <div class="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center font-bold text-white text-xs font-heading flex-shrink-0"
                  style="background-color:var(--sidebar-primary)">
-              <img *ngIf="googleUser()?.photoURL" [src]="googleUser()!.photoURL!" alt="Avatar" class="w-full h-full object-cover" />
-              <span *ngIf="!googleUser()?.photoURL">{{ profileInitials }}</span>
+              <img *ngIf="profile?.logoUrl" [src]="profile!.logoUrl" alt="Logo" class="w-full h-full object-cover" />
+              <img *ngIf="!profile?.logoUrl && googleUser()?.photoURL" [src]="googleUser()!.photoURL!" alt="Avatar" class="w-full h-full object-cover" />
+              <span *ngIf="!profile?.logoUrl && !googleUser()?.photoURL">{{ profileInitials }}</span>
             </div>
             <div class="flex-1 min-w-0">
               <div class="font-heading font-semibold text-xs truncate" style="color:var(--sidebar-foreground)">{{ googleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
@@ -99,10 +100,6 @@ import { Subscription, filter } from 'rxjs';
             <span class="font-heading font-semibold text-sm" style="color:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
           </div>
 
-          <!-- Current page title (mobile) -->
-          <span class="ml-auto text-xs font-medium lg:hidden" style="color:var(--muted-foreground)">
-            {{ currentPageLabel }}
-          </span>
 
           <!-- Dark mode toggle -->
           <button (click)="themeService.toggle()"
