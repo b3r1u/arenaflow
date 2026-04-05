@@ -19,99 +19,99 @@ type Mode = 'login' | 'register' | 'reset';
       padding: 1.5rem;
       position: relative;
       overflow: hidden;
-      background: #0a0f0d;
+      background: #050e09;
     }
 
     .blob {
       position: absolute;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.55;
+      filter: blur(90px);
+      opacity: 0.6;
       pointer-events: none;
     }
     .blob-1 {
-      width: 520px; height: 520px;
-      background: radial-gradient(circle, #1a7a3f, #0d3d20);
-      top: -160px; left: -160px;
-      animation: float1 10s ease-in-out infinite;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, #1a7a3f, #0a2e18);
+      top: -180px; left: -180px;
+      animation: float1 11s ease-in-out infinite;
     }
     .blob-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, #22a55c, #145c34);
-      bottom: -120px; right: -120px;
-      animation: float2 13s ease-in-out infinite;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, #16a34a, #0d3d1e);
+      bottom: -140px; right: -140px;
+      animation: float2 14s ease-in-out infinite;
     }
     .blob-3 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, #4ade80, #16a34a);
-      top: 40%; left: 55%;
-      animation: float3 9s ease-in-out infinite;
-      opacity: 0.25;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, #86efac, #22c55e);
+      top: 50%; left: 60%;
+      opacity: 0.18;
+      animation: float3 8s ease-in-out infinite;
     }
 
     @keyframes float1 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50%       { transform: translate(60px, 50px) scale(1.08); }
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50%       { transform: translate(70px, 55px) scale(1.1); }
     }
     @keyframes float2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50%       { transform: translate(-50px, -60px) scale(1.1); }
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50%       { transform: translate(-55px, -65px) scale(1.08); }
     }
     @keyframes float3 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33%       { transform: translate(-40px, 30px) scale(1.05); }
-      66%       { transform: translate(30px, -40px) scale(0.95); }
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(-35px, 25px) scale(1.06); }
+      66%       { transform: translate(25px, -35px) scale(0.94); }
     }
 
     .glass-card {
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 400px;
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
-      animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+      max-width: 390px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1.75rem;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+      animation: cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;
     }
 
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(28px) scale(0.98); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
     }
 
     .tab-bar {
       display: flex;
       border-radius: 0.75rem;
       padding: 0.25rem;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.07);
       margin-bottom: 1.25rem;
     }
     .tab-btn {
       flex: 1;
-      padding: 0.375rem 0;
-      border-radius: 0.5rem;
+      padding: 0.4rem 0;
+      border-radius: 0.55rem;
       font-size: 0.875rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
       transition: all 0.2s;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.45);
       background: transparent;
     }
     .tab-btn.active {
-      background: rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.13);
       color: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.25);
     }
 
     .glass-input {
       width: 100%;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 0.75rem;
       padding: 0.7rem 0.9rem 0.7rem 2.4rem;
       color: #fff;
@@ -120,100 +120,74 @@ type Mode = 'login' | 'register' | 'reset';
       transition: border-color 0.2s, background 0.2s;
       box-sizing: border-box;
     }
-    .glass-input::placeholder { color: rgba(255,255,255,0.35); }
+    .glass-input::placeholder { color: rgba(255,255,255,0.3); }
     .glass-input:focus {
       border-color: #22a55c;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.09);
     }
 
-    .input-wrap {
-      position: relative;
-      margin-bottom: 0.75rem;
-    }
+    .input-wrap { position: relative; margin-bottom: 0.75rem; }
     .input-icon {
       position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1rem;
-      color: rgba(255,255,255,0.4);
+      left: 0.75rem; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: rgba(255,255,255,0.35);
       pointer-events: none;
     }
     .eye-btn {
       position: absolute;
-      right: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: rgba(255,255,255,0.4);
-      padding: 0;
-      display: flex;
+      right: 0.75rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.35); padding: 0; display: flex;
     }
 
     .btn-primary {
       width: 100%;
-      padding: 0.7rem;
+      padding: 0.72rem;
       border-radius: 0.75rem;
-      background: #22a55c;
+      background: linear-gradient(135deg, #22a55c, #16a34a);
       color: #fff;
       font-weight: 700;
       font-size: 0.9rem;
       border: none;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s, opacity 0.2s;
-      margin-top: 1rem;
-    }
-    .btn-primary:hover:not(:disabled) { background: #1a8f4e; transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin: 1rem 0;
-    }
-    .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
-    .divider-text { font-size: 0.75rem; color: rgba(255,255,255,0.35); }
-
-    .btn-google {
-      width: 100%;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-top: 0.9rem;
+      box-shadow: 0 4px 16px rgba(34,165,92,0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.75rem;
+      gap: 0.4rem;
+    }
+    .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .divider { display:flex; align-items:center; gap:0.75rem; margin:1rem 0; }
+    .divider-line { flex:1; height:1px; background:rgba(255,255,255,0.1); }
+    .divider-text { font-size:0.75rem; color:rgba(255,255,255,0.3); }
+
+    .btn-google {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 0.75rem;
       padding: 0.65rem;
       border-radius: 0.75rem;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.92);
       color: #3c4043;
       font-weight: 600;
       font-size: 0.875rem;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
     }
     .btn-google:hover:not(:disabled) { background: #fff; transform: translateY(-1px); }
-    .btn-google:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-google:disabled { opacity: 0.55; cursor: not-allowed; }
 
     .forgot-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #4ade80;
-      font-size: 0.75rem;
-      padding: 0;
+      background: none; border: none; cursor: pointer;
+      color: #4ade80; font-size: 0.75rem; padding: 0;
     }
     .back-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.875rem;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.45); font-size: 0.875rem;
+      padding: 0; display: flex; align-items: center; gap: 0.25rem;
       margin-bottom: 0.75rem;
     }
 
@@ -232,14 +206,8 @@ type Mode = 'login' | 'register' | 'reset';
 
         <!-- Logo -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:1.75rem">
-          <div style="width:3.5rem;height:3.5rem;border-radius:1rem;background:#22a55c;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;box-shadow:0 8px 24px rgba(34,165,92,0.4)">
-            <svg viewBox="0 0 64 64" width="30" height="30" fill="none">
-              <rect x="6" y="8" width="52" height="48" rx="3" stroke="white" stroke-width="3" fill="none"/>
-              <line x1="6" y1="32" x2="58" y2="32" stroke="white" stroke-width="2.5"/>
-              <circle cx="32" cy="32" r="8" stroke="white" stroke-width="2.5" fill="none"/>
-              <path d="M6 20 Q18 32 6 44" stroke="white" stroke-width="2.5" fill="none"/>
-              <path d="M58 20 Q46 32 58 44" stroke="white" stroke-width="2.5" fill="none"/>
-            </svg>
+          <div style="width:3.5rem;height:3.5rem;border-radius:1rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;box-shadow:0 8px 28px rgba(34,165,92,0.45)">
+            <span class="material-icons" style="color:white;font-size:1.75rem">sports_volleyball</span>
           </div>
           <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.35rem;color:#fff;margin:0">ArenaFlow</h1>
           <p style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin:0.2rem 0 0">Gestão de arenas esportivas</p>
@@ -315,7 +283,7 @@ type Mode = 'login' | 'register' | 'reset';
           </button>
         </ng-container>
 
-        <p style="font-size:0.7rem;text-align:center;color:rgba(255,255,255,0.25);margin-top:1.25rem;margin-bottom:0">
+        <p style="font-size:0.7rem;text-align:center;color:rgba(255,255,255,0.22);margin-top:1.25rem;margin-bottom:0">
           Ao entrar, você concorda com os termos de uso da plataforma.
         </p>
       </div>
