@@ -66,8 +66,25 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         </div>
       </div>
 
+      <!-- Skeleton de loading -->
+      <div *ngIf="loading" class="space-y-2">
+        <div *ngFor="let s of skeletonRows" class="card p-4">
+          <div class="flex items-start gap-3">
+            <div class="sk-box w-9 h-9 rounded-xl flex-shrink-0"></div>
+            <div class="flex-1 min-w-0 space-y-2 pt-1">
+              <div class="sk-box h-3.5 rounded-lg w-2/5"></div>
+              <div class="sk-box h-3 rounded-lg w-3/4"></div>
+            </div>
+            <div class="flex flex-col items-end gap-2 flex-shrink-0">
+              <div class="sk-box h-3.5 rounded-lg w-12"></div>
+              <div class="sk-box h-6 rounded-lg w-20"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Lista de reservas -->
-      <div class="space-y-2" *ngIf="filtered.length > 0">
+      <div class="space-y-2" *ngIf="!loading && filtered.length > 0">
         <div *ngFor="let b of paged"
              class="card p-4 transition-all"
              style="cursor:default">
@@ -127,13 +144,16 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
       </div>
 
       <!-- Rodapé: paginador + itens por página (alinhado à direita) -->
-      <div *ngIf="filtered.length > 0" class="flex items-center justify-end gap-3 mt-4 flex-wrap">
+      <div *ngIf="filtered.length > 0"
+           class="flex items-center justify-end gap-3 mt-4 flex-wrap"
+           [style.opacity]="loading ? '0.45' : '1'"
+           style="transition:opacity 0.2s">
 
         <!-- Navegação de páginas -->
         <div *ngIf="totalPages > 1" class="flex items-center gap-1">
           <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                  [style.opacity]="currentPage === 1 ? '0.35' : '1'"
-                  [disabled]="currentPage === 1"
+                  [style.opacity]="currentPage === 1 || loading ? '0.35' : '1'"
+                  [disabled]="currentPage === 1 || loading"
                   style="background:var(--muted);color:var(--muted-foreground)"
                   (click)="goToPage(currentPage - 1)">
             <span class="material-icons" style="font-size:1rem">chevron_left</span>
@@ -147,14 +167,15 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
                     class="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
                     [style.background]="currentPage === p ? 'var(--primary)' : 'var(--muted)'"
                     [style.color]="currentPage === p ? 'white' : 'var(--muted-foreground)'"
+                    [disabled]="loading"
                     (click)="goToPage(+p)">
               {{ p }}
             </button>
           </ng-container>
 
           <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                  [style.opacity]="currentPage === totalPages ? '0.35' : '1'"
-                  [disabled]="currentPage === totalPages"
+                  [style.opacity]="currentPage === totalPages || loading ? '0.35' : '1'"
+                  [disabled]="currentPage === totalPages || loading"
                   style="background:var(--muted);color:var(--muted-foreground)"
                   (click)="goToPage(currentPage + 1)">
             <span class="material-icons" style="font-size:1rem">chevron_right</span>
@@ -169,6 +190,7 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
                     class="w-8 h-7 rounded-lg text-xs font-semibold transition-all"
                     [style.background]="pageSize === s ? 'var(--primary)' : 'var(--muted)'"
                     [style.color]="pageSize === s ? 'white' : 'var(--muted-foreground)'"
+                    [disabled]="loading"
                     (click)="changePageSize(s)">
               {{ s }}
             </button>
@@ -222,7 +244,23 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         </div>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    @keyframes sk-shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .sk-box {
+      background: linear-gradient(
+        90deg,
+        var(--muted) 25%,
+        var(--surface-raised) 50%,
+        var(--muted) 75%
+      );
+      background-size: 1200px 100%;
+      animation: sk-shimmer 1.4s ease-in-out infinite;
+    }
+  `]
 })
 export class ReservasComponent implements OnInit {
   allBookings: Booking[] = [];
@@ -235,6 +273,10 @@ export class ReservasComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   pageSizes = [10, 15, 20];
+  loading = false;
+  private loadTimer?: ReturnType<typeof setTimeout>;
+
+  get skeletonRows(): number[] { return Array.from({ length: this.pageSize }, (_, i) => i); }
 
   filters: { label: string; value: FilterStatus }[] = [
     { label: 'Todas',     value: 'todas'    },
@@ -286,15 +328,29 @@ export class ReservasComponent implements OnInit {
     return pages;
   }
 
+  private triggerLoad(fn: () => void) {
+    clearTimeout(this.loadTimer);
+    this.loading = true;
+    this.loadTimer = setTimeout(() => {
+      fn();
+      this.loading = false;
+    }, 1500);
+  }
+
   goToPage(page: number) {
-    if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (page < 1 || page > this.totalPages || this.loading) return;
+    this.triggerLoad(() => {
+      this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   }
 
   changePageSize(size: number) {
-    this.pageSize = size;
-    this.currentPage = 1;
+    if (size === this.pageSize || this.loading) return;
+    this.triggerLoad(() => {
+      this.pageSize = size;
+      this.currentPage = 1;
+    });
   }
 
   resetPage() { this.currentPage = 1; }
