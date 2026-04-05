@@ -66,25 +66,6 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         </div>
       </div>
 
-      <!-- Barra de paginação superior: itens por página + info -->
-      <div *ngIf="filtered.length > 0" class="flex items-center justify-between mb-3 flex-wrap gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xs" style="color:var(--muted-foreground)">Itens por página:</span>
-          <div class="flex gap-1">
-            <button *ngFor="let s of pageSizes"
-                    class="w-8 h-7 rounded-lg text-xs font-semibold transition-all"
-                    [style.background]="pageSize === s ? 'var(--primary)' : 'var(--muted)'"
-                    [style.color]="pageSize === s ? 'white' : 'var(--muted-foreground)'"
-                    (click)="changePageSize(s)">
-              {{ s }}
-            </button>
-          </div>
-        </div>
-        <span class="text-xs" style="color:var(--muted-foreground)">
-          {{ rangeStart }}–{{ rangeEnd }} de {{ filtered.length }} reserva{{ filtered.length !== 1 ? 's' : '' }}
-        </span>
-      </div>
-
       <!-- Lista de reservas -->
       <div class="space-y-2" *ngIf="filtered.length > 0">
         <div *ngFor="let b of paged"
@@ -145,36 +126,55 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         </div>
       </div>
 
-      <!-- Navegação de páginas -->
-      <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-1 mt-4">
-        <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                [style.opacity]="currentPage === 1 ? '0.35' : '1'"
-                [disabled]="currentPage === 1"
-                style="background:var(--muted);color:var(--muted-foreground)"
-                (click)="goToPage(currentPage - 1)">
-          <span class="material-icons" style="font-size:1rem">chevron_left</span>
-        </button>
+      <!-- Rodapé: paginador + itens por página (alinhado à direita) -->
+      <div *ngIf="filtered.length > 0" class="flex items-center justify-end gap-3 mt-4 flex-wrap">
 
-        <ng-container *ngFor="let p of pageNumbers">
-          <span *ngIf="p === '...'"
-                class="w-8 h-8 flex items-center justify-center text-xs"
-                style="color:var(--muted-foreground)">…</span>
-          <button *ngIf="p !== '...'"
-                  class="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
-                  [style.background]="currentPage === p ? 'var(--primary)' : 'var(--muted)'"
-                  [style.color]="currentPage === p ? 'white' : 'var(--muted-foreground)'"
-                  (click)="goToPage(+p)">
-            {{ p }}
+        <!-- Navegação de páginas -->
+        <div *ngIf="totalPages > 1" class="flex items-center gap-1">
+          <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                  [style.opacity]="currentPage === 1 ? '0.35' : '1'"
+                  [disabled]="currentPage === 1"
+                  style="background:var(--muted);color:var(--muted-foreground)"
+                  (click)="goToPage(currentPage - 1)">
+            <span class="material-icons" style="font-size:1rem">chevron_left</span>
           </button>
-        </ng-container>
 
-        <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                [style.opacity]="currentPage === totalPages ? '0.35' : '1'"
-                [disabled]="currentPage === totalPages"
-                style="background:var(--muted);color:var(--muted-foreground)"
-                (click)="goToPage(currentPage + 1)">
-          <span class="material-icons" style="font-size:1rem">chevron_right</span>
-        </button>
+          <ng-container *ngFor="let p of pageNumbers">
+            <span *ngIf="p === '...'"
+                  class="w-8 h-8 flex items-center justify-center text-xs"
+                  style="color:var(--muted-foreground)">…</span>
+            <button *ngIf="p !== '...'"
+                    class="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
+                    [style.background]="currentPage === p ? 'var(--primary)' : 'var(--muted)'"
+                    [style.color]="currentPage === p ? 'white' : 'var(--muted-foreground)'"
+                    (click)="goToPage(+p)">
+              {{ p }}
+            </button>
+          </ng-container>
+
+          <button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                  [style.opacity]="currentPage === totalPages ? '0.35' : '1'"
+                  [disabled]="currentPage === totalPages"
+                  style="background:var(--muted);color:var(--muted-foreground)"
+                  (click)="goToPage(currentPage + 1)">
+            <span class="material-icons" style="font-size:1rem">chevron_right</span>
+          </button>
+        </div>
+
+        <!-- Separador + itens por página -->
+        <div class="flex items-center gap-1.5" style="border-left:1px solid var(--border);padding-left:0.75rem">
+          <span class="text-xs" style="color:var(--muted-foreground)">por página:</span>
+          <div class="flex gap-1">
+            <button *ngFor="let s of pageSizes"
+                    class="w-8 h-7 rounded-lg text-xs font-semibold transition-all"
+                    [style.background]="pageSize === s ? 'var(--primary)' : 'var(--muted)'"
+                    [style.color]="pageSize === s ? 'white' : 'var(--muted-foreground)'"
+                    (click)="changePageSize(s)">
+              {{ s }}
+            </button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Empty states -->
