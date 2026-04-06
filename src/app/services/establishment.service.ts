@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
 import { ProfileService } from './profile.service';
+import { CourtService, ApiCourt } from './court.service';
 
 export interface ApiEstablishment {
   id: string;
@@ -18,6 +19,7 @@ export interface ApiEstablishment {
   logo_url?: string | null;
   price_from?: number;
   price_to?: number;
+  courts?: ApiCourt[];
 }
 
 export interface CreateEstablishmentDto {
@@ -44,7 +46,11 @@ export class EstablishmentService {
   readonly initialized      = this._initialized.asReadonly();
   readonly hasEstablishment = computed(() => this._establishment() !== null);
 
-  constructor(private api: ApiService, private profileService: ProfileService) {}
+  constructor(
+    private api: ApiService,
+    private profileService: ProfileService,
+    private courtService: CourtService,
+  ) {}
 
   /**
    * Chama POST /auth/me para registrar/atualizar o usuário no banco,
@@ -67,6 +73,11 @@ export class EstablishmentService {
         );
         const est = res.establishment;
         this._establishment.set(est);
+
+        // Popula CourtService com as quadras já embutidas na resposta (evita chamada extra)
+        if (est.courts) {
+          this.courtService.seed(est.courts);
+        }
 
         // Se a API tem um logo cadastrado, sincroniza com o perfil local (sidebar)
         if (est.logo_url) {

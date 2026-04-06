@@ -4,7 +4,7 @@ import { ApiService } from './api.service';
 import { Court } from '../models/models';
 
 /** Formato retornado pela API */
-interface ApiCourt {
+export interface ApiCourt {
   id: string;
   name: string;
   sport_type: string;
@@ -51,6 +51,12 @@ export class CourtService {
   readonly error   = this._error.asReadonly();
 
   constructor(private api: ApiService) {}
+
+  /** Popula as quadras a partir da resposta embutida no estabelecimento */
+  seed(rawCourts: ApiCourt[]): void {
+    this._courts.set(rawCourts.map(fromApi));
+    this._error.set(null);
+  }
 
   async load(): Promise<void> {
     this._loading.set(true);

@@ -1,4 +1,4 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast.service';
@@ -258,24 +258,11 @@ export class QuadrasComponent implements OnInit {
     { value: 'beach tennis', label: 'Beach Tennis' },
   ];
 
-  private courtsLoaded = false;
-
   constructor(
     public establishment: EstablishmentService,
     public courts: CourtService,
     private toast: ToastService,
-  ) {
-    // Quando o serviço de estabelecimento terminar de inicializar e existir um
-    // estabelecimento, carrega as quadras automaticamente (uma única vez).
-    effect(() => {
-      const ready    = this.establishment.initialized();
-      const hasEst   = this.establishment.hasEstablishment();
-      if (ready && hasEst && !this.courtsLoaded) {
-        this.courtsLoaded = true;
-        this.courts.load();
-      }
-    });
-  }
+  ) {}
 
   ngOnInit() {}
 
