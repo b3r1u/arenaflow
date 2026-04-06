@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { ToastService } from '../../services/toast.service';
-import { EstablishmentProfile, ThemeId } from '../../models/models';
+import { EstablishmentProfile, ThemeId, CancellationPolicy } from '../../models/models';
 
 interface ThemeOption {
   id: ThemeId;
@@ -188,6 +188,65 @@ interface ThemeOption {
         </div>
       </div>
 
+      <!-- Política de Cancelamento -->
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+               style="background:hsl(0,84%,60%,0.1);color:var(--destructive)">
+            <span class="material-icons" style="font-size:1.1rem">policy</span>
+          </div>
+          <div>
+            <h2 class="font-heading font-semibold text-base leading-tight" style="color:var(--foreground)">Política de Cancelamento</h2>
+            <p class="text-xs" style="color:var(--muted-foreground)">Define as regras para cancelamento de reservas pelos clientes</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+
+          <!-- Tempo limite -->
+          <div>
+            <label class="info-label">Cancelamento gratuito até</label>
+            <select class="input" [(ngModel)]="cancelPolicy.limit_hours">
+              <option [ngValue]="0">Sempre gratuito (sem limite de tempo)</option>
+              <option [ngValue]="1">1 hora antes do horário</option>
+              <option [ngValue]="2">2 horas antes do horário</option>
+              <option [ngValue]="3">3 horas antes do horário</option>
+              <option [ngValue]="6">6 horas antes do horário</option>
+              <option [ngValue]="12">12 horas antes do horário</option>
+              <option [ngValue]="24">24 horas antes do horário</option>
+            </select>
+          </div>
+
+          <!-- Taxa após o limite -->
+          <div *ngIf="cancelPolicy.limit_hours > 0">
+            <label class="info-label">Taxa cobrada após o limite</label>
+            <div class="grid grid-cols-4 gap-2">
+              <button *ngFor="let fee of feePcts"
+                      (click)="cancelPolicy.fee_percent = fee"
+                      class="py-2.5 rounded-xl text-sm font-heading font-bold border-2 transition-all"
+                      [style.border-color]="cancelPolicy.fee_percent === fee ? 'var(--primary)' : 'var(--border)'"
+                      [style.background]="cancelPolicy.fee_percent === fee ? 'hsl(152,69%,40%,0.08)' : 'var(--card)'"
+                      [style.color]="cancelPolicy.fee_percent === fee ? 'var(--primary)' : 'var(--muted-foreground)'">
+                {{ fee === 0 ? 'Grátis' : fee + '%' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumo -->
+          <div class="rounded-xl p-3 flex items-start gap-2" style="background:var(--muted)">
+            <span class="material-icons flex-shrink-0" style="font-size:0.95rem;color:var(--primary);margin-top:1px">info</span>
+            <p class="text-xs leading-relaxed" style="color:var(--muted-foreground)">{{ cancelPolicySummary }}</p>
+          </div>
+
+        </div>
+
+        <div class="flex justify-end pt-4 mt-2" style="border-top:1px solid var(--border)">
+          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl" (click)="saveCancelPolicy()">
+            Salvar política
+          </button>
+        </div>
+      </div>
+
     </div>
   `,
   styles: [`
@@ -231,6 +290,22 @@ export class PerfilComponent implements OnInit {
   isDragging = false;
   errorMsg = '';
 
+  cancelPolicy: CancellationPolicy = { limit_hours: 1, fee_percent: 0 };
+  feePcts = [0, 25, 50, 100];
+
+  get cancelPolicySummary(): string {
+    const h = this.cancelPolicy.limit_hours;
+    const f = this.cancelPolicy.fee_percent;
+    if (h === 0) return 'Clientes podem cancelar a qualquer momento sem custo.';
+    if (f === 0) return `Cancelamento gratuito até ${h}h antes do horário. Após esse prazo, o cancelamento ainda é gratuito.`;
+    return `Cancelamento gratuito até ${h}h antes do horário. Após esse prazo, será cobrada uma taxa de ${f}% do valor já pago.`;
+  }
+
+  saveCancelPolicy(): void {
+    localStorage.setItem('arenaflow_cancel_policy', JSON.stringify(this.cancelPolicy));
+    this.toast.show('Política de cancelamento salva!');
+  }
+
   themes: ThemeOption[] = [
     { id: 'base',     name: 'Verde Padrão', primary: '#22a55c', secondary: '#f0fdf4', sidebarBg: '#111c15', background: '#f5faf6' },
     { id: 'lima',     name: 'Lima',         primary: '#A2D729', secondary: '#FAFFFD', sidebarBg: '#1c280a', background: '#FAFFFD' },
@@ -259,6 +334,8 @@ export class PerfilComponent implements OnInit {
       city: this.profile.city || '',
     };
     this.profileService.profile$.subscribe(p => this.profile = p);
+    const stored = localStorage.getItem('arenaflow_cancel_policy');
+    if (stored) this.cancelPolicy = { ...this.cancelPolicy, ...JSON.parse(stored) };
   }
 
   get initials(): string {

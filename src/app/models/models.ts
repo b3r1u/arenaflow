@@ -16,7 +16,7 @@ export interface Booking {
   start_hour: string;
   end_hour: string;
   payment_method?: 'pix' | 'cartão' | 'dinheiro' | '';
-  payment_status: 'pago' | 'pendente' | 'não informado';
+  payment_status: 'pago' | 'pendente' | 'não informado' | 'cancelado';
   total_amount: number;
   paid_amount?: number;
   notes?: string;
@@ -48,6 +48,11 @@ export interface Mensalista {
   monthly_amount?: number;
   contact_phone?: string;
   notes?: string;
+}
+
+export interface CancellationPolicy {
+  limit_hours: number;  // 0 = sem limite (sempre grátis)
+  fee_percent: number;  // % cobrada do paid_amount após o limite
 }
 
 export interface EstablishmentProfile {

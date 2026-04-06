@@ -5,7 +5,7 @@ import { DataService } from '../../services/data.service';
 import { ToastService } from '../../services/toast.service';
 import { Booking, Court } from '../../models/models';
 
-type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
+type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado' | 'cancelado';
 
 @Component({
   selector: 'app-reservas',
@@ -43,6 +43,10 @@ type FilterStatus = 'todas' | 'pago' | 'pendente' | 'não informado';
         <div class="card p-4">
           <div class="text-xs font-medium mb-1" style="color:var(--muted-foreground)">Receita total</div>
           <div class="font-heading font-bold text-xl" style="color:var(--foreground)">R\${{ totalRevenue | number:'1.0-0' }}</div>
+        </div>
+        <div class="card p-4 col-span-2 sm:col-span-1">
+          <div class="text-xs font-medium mb-1" style="color:var(--muted-foreground)">Canceladas</div>
+          <div class="font-heading font-bold text-2xl" style="color:var(--destructive)">{{ countByStatus('cancelado') }}</div>
         </div>
       </div>
 
@@ -279,9 +283,10 @@ export class ReservasComponent implements OnInit {
   get skeletonRows(): number[] { return Array.from({ length: this.pageSize }, (_, i) => i); }
 
   filters: { label: string; value: FilterStatus }[] = [
-    { label: 'Todas',     value: 'todas'    },
-    { label: 'Pagas',     value: 'pago'     },
-    { label: 'Pendentes', value: 'pendente' },
+    { label: 'Todas',      value: 'todas'     },
+    { label: 'Pagas',      value: 'pago'      },
+    { label: 'Pendentes',  value: 'pendente'  },
+    { label: 'Canceladas', value: 'cancelado' },
   ];
 
   constructor(private data: DataService, private toast: ToastService) {}
@@ -389,5 +394,10 @@ export class ReservasComponent implements OnInit {
   }
 
   getCourtName(id: string): string { return this.courts.find(c => c.id === id)?.name || 'Quadra'; }
-  statusClass(s: string) { return s === 'pago' ? 'badge-primary' : s === 'pendente' ? 'badge-accent' : 'badge-muted'; }
+  statusClass(s: string) {
+    if (s === 'pago')      return 'badge-primary';
+    if (s === 'pendente')  return 'badge-accent';
+    if (s === 'cancelado') return 'badge-destructive';
+    return 'badge-muted';
+  }
 }
