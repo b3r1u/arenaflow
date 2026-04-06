@@ -371,12 +371,17 @@ export class PerfilComponent implements OnInit {
       return;
     }
     this.savingInfo = true;
-    // Salva localmente (sidebar, tema, etc.)
-    this.profileService.updateProfile({ ...this.form });
-    // Sincroniza com a API: nome + logo atual
-    await this.establishmentService.syncLogo(this.profile.logoUrl ?? null);
-    this.savingInfo = false;
-    this.toast.show('Informações salvas com sucesso!');
+    try {
+      // Salva localmente (sidebar, tema, etc.)
+      this.profileService.updateProfile({ ...this.form });
+      // Sincroniza com a API: logo atual
+      await this.establishmentService.syncLogo(this.profile.logoUrl ?? null);
+      this.toast.show('Informações salvas com sucesso!');
+    } catch {
+      this.toast.show('Erro ao salvar. Tente novamente.');
+    } finally {
+      this.savingInfo = false;
+    }
   }
 
   onFileSelected(event: Event) {
