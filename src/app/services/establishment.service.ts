@@ -97,9 +97,14 @@ export class EstablishmentService {
 
   /**
    * Sincroniza o logo com o banco.
-   * Chamado pelo PerfilComponent ao subir ou remover uma foto.
+   * Chamado pelo PerfilComponent ao clicar em "Salvar informações".
+   * Se o estabelecimento ainda não foi carregado, aguarda a inicialização.
    */
   async syncLogo(logoUrl: string | null): Promise<void> {
+    // Aguarda init se ainda não concluiu
+    if (!this._initialized()) {
+      await this.init();
+    }
     if (!this.hasEstablishment()) return;
     try {
       const res = await firstValueFrom(
@@ -111,6 +116,7 @@ export class EstablishmentService {
       this._establishment.set(res.establishment);
     } catch (err) {
       console.error('[EstablishmentService] syncLogo error', err);
+      throw err; // propaga para o componente poder exibir feedback
     }
   }
 

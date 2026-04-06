@@ -183,8 +183,11 @@ interface ThemeOption {
         </div>
 
         <div class="flex justify-end pt-4 mt-2" style="border-top:1px solid var(--border)">
-          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl" (click)="saveInfo()">
-            Salvar informações
+          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl"
+                  [disabled]="savingInfo"
+                  (click)="saveInfo()">
+            <span *ngIf="savingInfo" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite;vertical-align:middle;margin-right:4px">refresh</span>
+            {{ savingInfo ? 'Salvando...' : 'Salvar informações' }}
           </button>
         </div>
       </div>
@@ -360,12 +363,19 @@ export class PerfilComponent implements OnInit {
     this.form.phone = masked;
   }
 
-  saveInfo() {
+  savingInfo = false;
+
+  async saveInfo() {
     if (!this.form.name.trim()) {
       this.toast.show('O nome do estabelecimento é obrigatório.');
       return;
     }
+    this.savingInfo = true;
+    // Salva localmente (sidebar, tema, etc.)
     this.profileService.updateProfile({ ...this.form });
+    // Sincroniza com a API: nome + logo atual
+    await this.establishmentService.syncLogo(this.profile.logoUrl ?? null);
+    this.savingInfo = false;
     this.toast.show('Informações salvas com sucesso!');
   }
 
@@ -402,16 +412,15 @@ export class PerfilComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
+      // Salva apenas localmente — a sync com a API ocorre no botão Salvar
       this.profileService.updateLogo(base64);
-      this.establishmentService.syncLogo(base64);
-      this.toast.show('Foto atualizada com sucesso!');
+      this.toast.show('Foto carregada! Clique em "Salvar informações" para confirmar.');
     };
     reader.readAsDataURL(file);
   }
 
   removeLogo() {
     this.profileService.removeLogo();
-    this.establishmentService.syncLogo(null);
-    this.toast.show('Foto removida.');
+    this.toast.show('Foto removida. Clique em "Salvar informações" para confirmar.');
   }
 }
