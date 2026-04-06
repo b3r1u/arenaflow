@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
+import { ProfileService } from './profile.service';
 
 export interface ApiEstablishment {
   id: string;
@@ -14,6 +15,7 @@ export interface ApiEstablishment {
   open_hours?: string;
   logo_color: string;
   logo_initials: string;
+  logo_url?: string | null;
   price_from?: number;
   price_to?: number;
 }
@@ -28,6 +30,7 @@ export interface CreateEstablishmentDto {
   sports?: string[];
   open_hours?: string;
   logo_color?: string;
+  logo_url?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,7 +44,7 @@ export class EstablishmentService {
   readonly initialized      = this._initialized.asReadonly();
   readonly hasEstablishment = computed(() => this._establishment() !== null);
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private profileService: ProfileService) {}
 
   /**
    * Chama POST /auth/me para registrar/atualizar o usuário no banco,
@@ -62,7 +65,13 @@ export class EstablishmentService {
         const res = await firstValueFrom(
           this.api.get<{ establishment: ApiEstablishment }>('/establishments/me')
         );
-        this._establishment.set(res.establishment);
+        const est = res.establishment;
+        this._establishment.set(est);
+
+        // Se a API tem um logo cadastrado, sincroniza com o perfil local (sidebar)
+        if (est.logo_url) {
+          this.profileService.updateLogo(est.logo_url);
+        }
       } catch (e: any) {
         if (e?.status === 404) {
           this._establishment.set(null);
@@ -84,6 +93,25 @@ export class EstablishmentService {
     );
     this._establishment.set(res.establishment);
     return res.establishment;
+  }
+
+  /**
+   * Sincroniza o logo com o banco.
+   * Chamado pelo PerfilComponent ao subir ou remover uma foto.
+   */
+  async syncLogo(logoUrl: string | null): Promise<void> {
+    if (!this.hasEstablishment()) return;
+    try {
+      const res = await firstValueFrom(
+        this.api.patch<{ establishment: ApiEstablishment }>(
+          '/establishments/me',
+          { logo_url: logoUrl }
+        )
+      );
+      this._establishment.set(res.establishment);
+    } catch (err) {
+      console.error('[EstablishmentService] syncLogo error', err);
+    }
   }
 
   /** Chamado no logout para limpar o estado */

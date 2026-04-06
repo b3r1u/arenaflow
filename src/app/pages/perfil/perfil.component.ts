@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { ToastService } from '../../services/toast.service';
+import { EstablishmentService } from '../../services/establishment.service';
 import { EstablishmentProfile, ThemeId, CancellationPolicy } from '../../models/models';
 
 interface ThemeOption {
@@ -322,7 +323,11 @@ export class PerfilComponent implements OnInit {
     this.toast.show('Tema atualizado!');
   }
 
-  constructor(private profileService: ProfileService, private toast: ToastService) {}
+  constructor(
+    private profileService: ProfileService,
+    private toast: ToastService,
+    private establishmentService: EstablishmentService,
+  ) {}
 
   ngOnInit() {
     this.profile = this.profileService.getProfile();
@@ -398,6 +403,7 @@ export class PerfilComponent implements OnInit {
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
       this.profileService.updateLogo(base64);
+      this.establishmentService.syncLogo(base64);
       this.toast.show('Foto atualizada com sucesso!');
     };
     reader.readAsDataURL(file);
@@ -405,6 +411,7 @@ export class PerfilComponent implements OnInit {
 
   removeLogo() {
     this.profileService.removeLogo();
+    this.establishmentService.syncLogo(null);
     this.toast.show('Foto removida.');
   }
 }
