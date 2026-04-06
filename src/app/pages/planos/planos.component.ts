@@ -45,7 +45,7 @@ interface Plan {
       </div>
 
       <!-- Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
         <div *ngFor="let plan of plans"
              class="relative flex flex-col rounded-2xl p-6 transition-all duration-200"
              [style.background]="plan.highlight ? 'var(--sidebar-background)' : 'var(--card)'"
@@ -146,18 +146,40 @@ export class PlanosComponent {
       name: 'Free',
       price: 0,
       period: 'mês',
-      description: 'Para começar a organizar sua arena sem custo.',
+      description: 'Para testar a plataforma sem compromisso.',
       highlight: false,
       badge: null,
       cta: 'Começar grátis',
       features: [
-        { label: '1 quadra cadastrada',              included: true  },
+        { label: '1 quadra incluída',                 included: true  },
         { label: 'Agendamentos ilimitados',           included: true  },
         { label: 'Cadastro de clientes',              included: true  },
         { label: 'Dashboard básico',                  included: true  },
-        { label: 'Até 5 quadras',                     included: false },
-        { label: 'Relatórios avançados',              included: false },
         { label: 'Agendamento online público',        included: false },
+        { label: 'Relatórios avançados',              included: false },
+        { label: 'Quadra extra (+R$39/quadra)',        included: false },
+        { label: 'Notificações WhatsApp/e-mail',      included: false },
+        { label: 'Multi-usuário',                     included: false },
+        { label: 'Suporte prioritário',               included: false },
+      ]
+    },
+    {
+      id: 'essencial',
+      name: 'Essencial',
+      price: 89,
+      period: 'mês',
+      description: 'Para arenas iniciando com até 2 quadras.',
+      highlight: false,
+      badge: null,
+      cta: 'Assinar Essencial',
+      features: [
+        { label: 'Até 2 quadras incluídas',           included: true  },
+        { label: 'Agendamentos ilimitados',           included: true  },
+        { label: 'Cadastro de clientes',              included: true  },
+        { label: 'Dashboard básico',                  included: true  },
+        { label: 'Agendamento online público',        included: true  },
+        { label: 'Relatórios avançados',              included: false },
+        { label: 'Quadra extra (+R$39/quadra)',        included: false },
         { label: 'Notificações WhatsApp/e-mail',      included: false },
         { label: 'Multi-usuário',                     included: false },
         { label: 'Suporte prioritário',               included: false },
@@ -166,20 +188,20 @@ export class PlanosComponent {
     {
       id: 'pro',
       name: 'Pro',
-      price: 97,
+      price: 159,
       period: 'mês',
-      description: 'Para arenas em crescimento que precisam de mais controle.',
+      description: 'Para arenas em crescimento com até 5 quadras.',
       highlight: true,
       badge: 'Mais popular',
       cta: 'Assinar Pro',
       features: [
-        { label: '1 quadra cadastrada',              included: true  },
+        { label: 'Até 5 quadras incluídas',           included: true  },
         { label: 'Agendamentos ilimitados',           included: true  },
         { label: 'Cadastro de clientes',              included: true  },
-        { label: 'Dashboard básico',                  included: true  },
-        { label: 'Até 5 quadras',                     included: true  },
-        { label: 'Relatórios avançados',              included: true  },
+        { label: 'Dashboard completo',                included: true  },
         { label: 'Agendamento online público',        included: true  },
+        { label: 'Relatórios avançados',              included: true  },
+        { label: 'Quadra extra (+R$39/quadra)',        included: true  },
         { label: 'Notificações WhatsApp/e-mail',      included: false },
         { label: 'Multi-usuário',                     included: false },
         { label: 'Suporte prioritário',               included: false },
@@ -188,20 +210,20 @@ export class PlanosComponent {
     {
       id: 'business',
       name: 'Business',
-      price: 197,
+      price: 269,
       period: 'mês',
-      description: 'Para complexos esportivos com múltiplas arenas e equipes.',
+      description: 'Para complexos esportivos com quadras ilimitadas.',
       highlight: false,
       badge: null,
       cta: 'Assinar Business',
       features: [
-        { label: '1 quadra cadastrada',              included: true  },
+        { label: 'Quadras ilimitadas',                included: true  },
         { label: 'Agendamentos ilimitados',           included: true  },
         { label: 'Cadastro de clientes',              included: true  },
-        { label: 'Dashboard básico',                  included: true  },
-        { label: 'Quadras ilimitadas',                included: true  },
-        { label: 'Relatórios avançados',              included: true  },
+        { label: 'Dashboard completo',                included: true  },
         { label: 'Agendamento online público',        included: true  },
+        { label: 'Relatórios avançados',              included: true  },
+        { label: 'Quadra extra (+R$39/quadra)',        included: true  },
         { label: 'Notificações WhatsApp/e-mail',      included: true  },
         { label: 'Multi-usuário',                     included: true  },
         { label: 'Suporte prioritário',               included: true  },
@@ -228,6 +250,11 @@ export class PlanosComponent {
     {
       question: 'O plano anual tem desconto?',
       answer: 'Sim, ao assinar o plano anual você garante 20% de desconto em relação ao valor mensal, além de travar o preço por 12 meses.',
+      open: false
+    },
+    {
+      question: 'Posso adicionar mais quadras sem trocar de plano?',
+      answer: 'Sim! Nos planos Pro e Business você pode adicionar quadras extras por R$ 39/quadra/mês, sem precisar fazer upgrade. É a forma mais flexível de crescer no seu ritmo.',
       open: false
     }
   ];
