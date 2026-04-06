@@ -5,6 +5,7 @@ import { ToastService } from '../services/toast.service';
 import { ProfileService } from '../services/profile.service';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
+import { EstablishmentService } from '../services/establishment.service';
 import { EstablishmentProfile } from '../models/models';
 import { Subscription, filter } from 'rxjs';
 
@@ -193,9 +194,17 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   googleUser = this.authService.user;
 
-  constructor(private toast: ToastService, private router: Router, private profileService: ProfileService, private authService: AuthService, public themeService: ThemeService) {}
+  constructor(
+    private toast: ToastService,
+    private router: Router,
+    private profileService: ProfileService,
+    private authService: AuthService,
+    public themeService: ThemeService,
+    private establishmentService: EstablishmentService,
+  ) {}
 
   async logout() {
+    this.establishmentService.reset();
     await this.authService.logout();
     this.router.navigate(['/login']);
   }
@@ -203,6 +212,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.checkDesktop();
     this.profile = this.profileService.getProfile();
+    // Registra usuário no banco e verifica estabelecimento
+    this.establishmentService.init();
     this.subs.push(this.profileService.profile$.subscribe(p => this.profile = p));
     this.subs.push(this.toast.message$.subscribe(msg => this.toastMessage = msg));
     this.subs.push(
