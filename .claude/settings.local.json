@@ -6,7 +6,21 @@
       "Bash(npx tsc:*)",
       "Bash(npm start:*)",
       "Bash(gh auth:*)",
-      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI\")"
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI\")",
+      "Bash(gh repo:*)",
+      "Bash(vercel:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Read(//c/Desenvolvimento/ArenaFlow.claude/**)",
+      "Bash(npx @angular/cli@17 new arenaflow-booking --routing=false --style=css --skip-git --skip-tests --defaults)",
+      "Bash(curl -s http://localhost:4201/favicon.svg)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(npm list:*)",
+      "Bash(ng build:*)",
+      "Bash(xargs grep:*)",
+      "Bash(start:*)"
     ]
   }
 }
