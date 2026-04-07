@@ -156,7 +156,7 @@ import { Court } from '../../models/models';
             <h3 class="font-heading font-bold text-lg mb-1" style="color:var(--foreground)">{{ court.name }}</h3>
             <p class="text-sm mb-2" style="color:var(--muted-foreground)">{{ court.sport_type | titlecase }}</p>
             <div class="flex items-center justify-between mt-3 pt-3" style="border-top:1px solid var(--border)">
-              <span class="font-heading font-bold" style="color:var(--primary)">R\${{ court.hourly_rate }}/h</span>
+              <span class="font-heading font-bold" style="color:var(--primary)">{{ court.hourly_rate | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/h</span>
               <button class="btn-ghost p-1.5" (click)="editCourt(court); $event.stopPropagation()">
                 <span class="material-icons" style="font-size:1.1rem">edit</span>
               </button>
@@ -214,7 +214,10 @@ import { Court } from '../../models/models';
           </div>
           <div>
             <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Valor/hora (R$)</label>
-            <input class="input" type="number" [(ngModel)]="form.hourly_rate" min="1">
+            <input class="input" type="text" inputmode="numeric"
+                   [value]="hourlyRateDisplay"
+                   (input)="onHourlyRateInput($event)"
+                   placeholder="R$ 0,00">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Descrição</label>
@@ -253,6 +256,7 @@ export class QuadrasComponent implements OnInit {
   editingId: string | null = null;
   modalError: string | null = null;
   savingSetup = false;
+  hourlyRateDisplay = 'R$ 80,00';
 
   form = this.emptyForm();
 
@@ -340,12 +344,27 @@ export class QuadrasComponent implements OnInit {
     return s === 'disponível' ? 'badge-primary' : 'badge-destructive';
   }
 
+  formatBRL(value: number): string {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  onHourlyRateInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const cents = parseInt(digits || '0', 10);
+    const value = cents / 100;
+    this.hourlyRateDisplay = this.formatBRL(value);
+    this.form.hourly_rate = value;
+    input.value = this.hourlyRateDisplay;
+  }
+
   openModal() {
     if (this.atLimit()) return;
-    this.form       = this.emptyForm();
-    this.editingId  = null;
-    this.modalError = null;
-    this.showModal  = true;
+    this.form              = this.emptyForm();
+    this.hourlyRateDisplay = this.formatBRL(this.form.hourly_rate);
+    this.editingId         = null;
+    this.modalError        = null;
+    this.showModal         = true;
   }
 
   editCourt(c: Court) {
@@ -356,13 +375,18 @@ export class QuadrasComponent implements OnInit {
       hourly_rate: c.hourly_rate,
       description: c.description || '',
     };
-    this.editingId  = c.id;
-    this.modalError = null;
-    this.showModal  = true;
+    this.hourlyRateDisplay = this.formatBRL(c.hourly_rate);
+    this.editingId         = c.id;
+    this.modalError        = null;
+    this.showModal         = true;
   }
 
   async saveCourt() {
     if (!this.form.name) return;
+    if (this.form.hourly_rate < 0.01) {
+      this.modalError = 'Informe um valor por hora maior que R$ 0,00';
+      return;
+    }
     this.modalError = null;
     try {
       if (this.editingId) {
