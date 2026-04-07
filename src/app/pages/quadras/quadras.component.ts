@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast.service';
@@ -98,17 +98,29 @@ import { Court } from '../../models/models';
       <div *ngIf="establishment.initialized() && establishment.hasEstablishment()">
 
         <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4">
           <div>
             <h1 class="font-heading font-bold text-2xl lg:text-3xl" style="color:var(--foreground)">Quadras</h1>
             <p class="text-sm mt-1" style="color:var(--muted-foreground)">
               {{ establishment.establishment()?.name }} ·
-              {{ courts.courts().length }} quadra{{ courts.courts().length !== 1 ? 's' : '' }}
+              {{ courts.courts().length }}
+              <ng-container *ngIf="courtLimit() !== null">/ {{ courtLimit() }}</ng-container>
+              quadra{{ courts.courts().length !== 1 ? 's' : '' }}
             </p>
           </div>
-          <button class="btn-primary" (click)="openModal()">
+          <button class="btn-primary" (click)="openModal()" [disabled]="atLimit()">
             <span>+</span> Nova Quadra
           </button>
+        </div>
+
+        <!-- Banner: limite atingido -->
+        <div *ngIf="atLimit()" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+             style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.25);color:hsl(38,92%,50%)">
+          <span class="material-icons" style="font-size:1.1rem;flex-shrink:0;margin-top:0.05rem">lock</span>
+          <div>
+            <span class="font-semibold">Limite do plano {{ planName() }} atingido.</span>
+            <span style="color:hsl(38,92%,50%,0.75)"> Você pode cadastrar até {{ courtLimit() }} quadra{{ courtLimit() !== 1 ? 's' : '' }} neste plano. Faça upgrade para adicionar mais.</span>
+          </div>
         </div>
 
         <!-- Loading quadras -->
@@ -244,6 +256,26 @@ export class QuadrasComponent implements OnInit {
 
   form = this.emptyForm();
 
+  /** Limite de quadras do plano atual (null = ilimitado) */
+  readonly courtLimit = computed(() => {
+    const sub = this.establishment.subscription();
+    if (!sub) return 1; // sem assinatura → trata como Free
+    return sub.plan.max_courts; // null = ilimitado
+  });
+
+  /** Nome do plano atual para exibição */
+  readonly planName = computed(() => {
+    const sub = this.establishment.subscription();
+    return sub?.plan.name ?? 'Free';
+  });
+
+  /** true quando o usuário já atingiu o limite de quadras do plano */
+  readonly atLimit = computed(() => {
+    const limit = this.courtLimit();
+    if (limit === null) return false; // ilimitado
+    return this.courts.courts().length >= limit;
+  });
+
   setupForm = {
     name:         '',
     city:         '',
@@ -309,6 +341,7 @@ export class QuadrasComponent implements OnInit {
   }
 
   openModal() {
+    if (this.atLimit()) return;
     this.form       = this.emptyForm();
     this.editingId  = null;
     this.modalError = null;
