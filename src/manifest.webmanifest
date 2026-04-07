@@ -1,0 +1,24 @@
+{
+  "name": "ArenaFlow Admin",
+  "short_name": "ArenaFlow",
+  "description": "Gestão de quadras esportivas",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1a7a3f",
+  "background_color": "#0a2e18",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
