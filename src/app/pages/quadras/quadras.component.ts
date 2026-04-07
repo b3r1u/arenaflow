@@ -156,7 +156,7 @@ import { Court } from '../../models/models';
             <h3 class="font-heading font-bold text-lg mb-1" style="color:var(--foreground)">{{ court.name }}</h3>
             <p class="text-sm mb-2" style="color:var(--muted-foreground)">{{ court.sport_type | titlecase }}</p>
             <div class="flex items-center justify-between mt-3 pt-3" style="border-top:1px solid var(--border)">
-              <span class="font-heading font-bold" style="color:var(--primary)">{{ court.hourly_rate | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/h</span>
+              <span class="font-heading font-bold" style="color:var(--primary)">{{ formatBRL(court.hourly_rate) }}/h</span>
               <button class="btn-ghost p-1.5" (click)="editCourt(court); $event.stopPropagation()">
                 <span class="material-icons" style="font-size:1.1rem">edit</span>
               </button>
