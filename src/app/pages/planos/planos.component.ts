@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { EstablishmentService } from '../../services/establishment.service';
 
 interface Plan {
   id: string;
@@ -20,12 +21,69 @@ interface Plan {
   template: `
     <div>
       <!-- Header -->
-      <div class="mb-8 text-center">
+      <div class="mb-6 text-center">
         <h1 class="font-heading font-bold text-2xl lg:text-3xl" style="color:var(--foreground)">Planos & Preços</h1>
         <p class="text-sm mt-1.5" style="color:var(--muted-foreground)">Escolha o plano ideal para a sua arena</p>
+      </div>
 
-        <!-- Toggle mensal/anual -->
-        <div class="inline-flex items-center gap-2 mt-5 p-1 rounded-xl" style="background:var(--muted)">
+      <!-- Banner de assinatura atual -->
+      <div *ngIf="subscription()" class="max-w-6xl mx-auto mb-6">
+
+        <!-- TRIAL ativo -->
+        <div *ngIf="subscription()!.status === 'TRIAL'"
+             class="flex items-center justify-between gap-4 rounded-2xl px-5 py-4"
+             style="background:rgba(34,165,92,0.08);border:1.5px solid rgba(34,165,92,0.25)">
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                 style="background:rgba(34,165,92,0.15)">
+              <span class="material-icons" style="color:var(--primary);font-size:1.2rem">verified</span>
+            </div>
+            <div>
+              <p class="font-heading font-semibold text-sm" style="color:var(--foreground);margin:0">
+                Período de teste gratuito — Plano {{ subscription()!.plan.name }}
+              </p>
+              <p class="text-xs mt-0.5" style="color:var(--muted-foreground);margin:0">
+                <ng-container *ngIf="trialDaysRemaining() !== null && trialDaysRemaining()! > 0">
+                  Restam <strong style="color:var(--primary)">{{ trialDaysRemaining() }} {{ trialDaysRemaining() === 1 ? 'dia' : 'dias' }}</strong> de acesso completo gratuito
+                </ng-container>
+                <ng-container *ngIf="trialDaysRemaining() === 0">
+                  Seu período de teste encerrou hoje
+                </ng-container>
+              </p>
+            </div>
+          </div>
+          <div class="flex-shrink-0">
+            <div class="px-4 py-2 rounded-xl text-xs font-semibold"
+                 style="background:rgba(34,165,92,0.12);color:var(--primary);border:1px solid rgba(34,165,92,0.25)">
+              Em breve: Assinar
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVE -->
+        <div *ngIf="subscription()!.status === 'ACTIVE'"
+             class="flex items-center gap-3 rounded-2xl px-5 py-4"
+             style="background:rgba(34,165,92,0.08);border:1.5px solid rgba(34,165,92,0.25)">
+          <span class="material-icons" style="color:var(--primary)">check_circle</span>
+          <p class="text-sm font-medium" style="color:var(--foreground);margin:0">
+            Assinatura ativa — Plano <strong>{{ subscription()!.plan.name }}</strong>
+          </p>
+        </div>
+
+        <!-- EXPIRED ou CANCELLED -->
+        <div *ngIf="subscription()!.status === 'EXPIRED' || subscription()!.status === 'CANCELLED'"
+             class="flex items-center gap-3 rounded-2xl px-5 py-4"
+             style="background:rgba(239,68,68,0.07);border:1.5px solid rgba(239,68,68,0.2)">
+          <span class="material-icons" style="color:#f87171">warning</span>
+          <p class="text-sm font-medium" style="color:var(--foreground);margin:0">
+            Sua assinatura está inativa. Escolha um plano abaixo para reativar.
+          </p>
+        </div>
+      </div>
+
+      <!-- Toggle mensal/anual -->
+      <div class="text-center mb-7">
+        <div class="inline-flex items-center gap-2 p-1 rounded-xl" style="background:var(--muted)">
           <button (click)="annual = false"
                   class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150"
                   [style.background]="!annual ? 'white' : 'transparent'"
@@ -44,7 +102,7 @@ interface Plan {
         </div>
       </div>
 
-      <!-- Cards -->
+      <!-- Cards de planos -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
         <div *ngFor="let plan of plans"
              class="relative flex flex-col rounded-2xl p-6 transition-all duration-200"
@@ -57,6 +115,13 @@ interface Plan {
                class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold font-heading"
                style="background:var(--primary);color:white;white-space:nowrap">
             {{ plan.badge }}
+          </div>
+
+          <!-- Plano ativo indicator -->
+          <div *ngIf="isCurrentPlan(plan.id)"
+               class="absolute -top-3 right-4 px-2.5 py-1 rounded-full text-xs font-semibold"
+               style="background:var(--primary);color:white">
+            Atual
           </div>
 
           <!-- Plan name & description -->
@@ -89,11 +154,18 @@ interface Plan {
                   [style.background]="plan.highlight ? 'var(--primary)' : 'transparent'"
                   [style.color]="plan.highlight ? 'white' : 'var(--foreground)'"
                   [style.border]="plan.highlight ? 'none' : '1.5px solid var(--border)'"
-                  [class.cursor-default]="plan.id === 'free' && currentPlan === 'free'"
+                  [style.opacity]="isCurrentPlan(plan.id) ? '0.6' : '1'"
+                  [style.cursor]="isCurrentPlan(plan.id) || plan.id === 'free' ? 'default' : 'pointer'"
                   onmouseover="this.style.opacity='0.88'"
                   onmouseout="this.style.opacity='1'">
-            <span *ngIf="plan.id === currentPlan">Plano atual</span>
-            <span *ngIf="plan.id !== currentPlan">{{ plan.cta }}</span>
+            <ng-container *ngIf="isCurrentPlan(plan.id)">Plano atual</ng-container>
+            <ng-container *ngIf="!isCurrentPlan(plan.id) && plan.id === 'free'">Começar grátis</ng-container>
+            <ng-container *ngIf="!isCurrentPlan(plan.id) && plan.id !== 'free'">
+              <span class="flex items-center justify-center gap-1.5">
+                <span class="material-icons" style="font-size:0.9rem">lock</span>
+                Em breve
+              </span>
+            </ng-container>
           </button>
 
           <!-- Divider -->
@@ -136,9 +208,23 @@ interface Plan {
   `
 })
 export class PlanosComponent {
+  private establishmentService = inject(EstablishmentService);
+
   annual = false;
-  currentPlan = 'free';
   Math = Math;
+
+  readonly subscription       = this.establishmentService.subscription;
+  readonly trialDaysRemaining = this.establishmentService.trialDaysRemaining;
+
+  isCurrentPlan(planId: string): boolean {
+    const sub = this.subscription();
+    if (!sub) return planId === 'free';
+    // Durante o TRIAL nenhum card de plano pago é marcado como atual
+    if (sub.status === 'TRIAL') return false;
+    // Só marca quando há assinatura ativa/paga no plano correspondente
+    if (sub.status === 'ACTIVE') return sub.plan.slug === planId;
+    return false;
+  }
 
   plans: Plan[] = [
     {

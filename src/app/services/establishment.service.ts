@@ -4,6 +4,22 @@ import { ApiService } from './api.service';
 import { ProfileService } from './profile.service';
 import { CourtService, ApiCourt } from './court.service';
 
+export interface ApiSubscription {
+  id: string;
+  status: 'TRIAL' | 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
+  trial_ends_at?: string | null;
+  days_remaining?: number | null;  // calculado pelo servidor
+  starts_at: string;
+  ends_at?: string | null;
+  plan: {
+    slug: string;
+    name: string;
+    price: number;
+    max_courts: number | null;
+    features: string[];
+  };
+}
+
 export interface ApiEstablishment {
   id: string;
   name: string;
@@ -38,13 +54,29 @@ export interface CreateEstablishmentDto {
 @Injectable({ providedIn: 'root' })
 export class EstablishmentService {
   private _establishment = signal<ApiEstablishment | null>(null);
+  private _subscription  = signal<ApiSubscription | null>(null);
   private _loading       = signal(false);
   private _initialized   = signal(false);
 
+  /** Plano escolhido na tela de cadastro — consumido uma vez pelo init() */
+  private _pendingPlanSlug: string | null = null;
+
+  setPendingPlan(slug: string) {
+    this._pendingPlanSlug = slug;
+  }
+
   readonly establishment    = this._establishment.asReadonly();
+  readonly subscription     = this._subscription.asReadonly();
   readonly loading          = this._loading.asReadonly();
   readonly initialized      = this._initialized.asReadonly();
   readonly hasEstablishment = computed(() => this._establishment() !== null);
+
+  // Usa o valor calculado pelo servidor — imune ao relógio do cliente
+  readonly trialDaysRemaining = computed(() => {
+    const sub = this._subscription();
+    if (!sub || sub.status !== 'TRIAL') return null;
+    return sub.days_remaining ?? null;
+  });
 
   constructor(
     private api: ApiService,
@@ -62,9 +94,17 @@ export class EstablishmentService {
     this._loading.set(true);
     try {
       // Registra/retorna o usuário como ADMIN no banco
-      await firstValueFrom(
-        this.api.post<{ user: unknown }>('/auth/me', { role: 'ADMIN' })
+      const planSlug = this._pendingPlanSlug;
+      this._pendingPlanSlug = null; // consome e descarta
+      const authRes = await firstValueFrom(
+        this.api.post<{ user: { subscription?: ApiSubscription } }>('/auth/me', {
+          role: 'ADMIN',
+          ...(planSlug ? { plan_slug: planSlug } : {}),
+        })
       );
+      if (authRes.user?.subscription) {
+        this._subscription.set(authRes.user.subscription);
+      }
 
       // Verifica se estabelecimento existe
       try {
@@ -134,6 +174,7 @@ export class EstablishmentService {
   /** Chamado no logout para limpar o estado */
   reset(): void {
     this._establishment.set(null);
+    this._subscription.set(null);
     this._initialized.set(false);
   }
 }
