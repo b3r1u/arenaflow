@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { EstablishmentProfile, ThemeId } from '../models/models';
 
-const STORAGE_KEY = 'arenaflow_profile';
+const STORAGE_KEY = (uid: string) => `arenaflow_profile_${uid}`;
 
 // Only accent/primary vars — surface vars (background, card, muted, border)
 // are controlled exclusively by CSS [data-theme] to keep dark mode working.
@@ -61,6 +61,8 @@ const THEME_VARS: Record<ThemeId, Record<string, string>> = {
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
+  private uid: string | null = null;
+
   private defaultProfile: EstablishmentProfile = {
     name: 'Minha Arena',
     logoUrl: undefined,
@@ -71,20 +73,28 @@ export class ProfileService {
     theme: 'base',
   };
 
-  private profileSubject = new BehaviorSubject<EstablishmentProfile>(this.load());
+  private profileSubject = new BehaviorSubject<EstablishmentProfile>({ ...this.defaultProfile });
   profile$ = this.profileSubject.asObservable();
 
-  constructor() {
-    this.applyTheme(this.profileSubject.getValue().theme ?? 'base');
+  constructor() {}
+
+  /** Chamado pelo AuthService ao confirmar o usuário logado */
+  init(uid: string): void {
+    this.uid = uid;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY(uid));
+      const profile = raw ? { ...this.defaultProfile, ...JSON.parse(raw) } : { ...this.defaultProfile };
+      this.profileSubject.next(profile);
+      this.applyTheme(profile.theme ?? 'base');
+    } catch {
+      this.profileSubject.next({ ...this.defaultProfile });
+    }
   }
 
-  private load(): EstablishmentProfile {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? { ...this.defaultProfile, ...JSON.parse(raw) } : { ...this.defaultProfile };
-    } catch {
-      return { ...this.defaultProfile };
-    }
+  /** Chamado pelo AuthService no logout */
+  clear(): void {
+    this.uid = null;
+    this.profileSubject.next({ ...this.defaultProfile });
   }
 
   getProfile(): EstablishmentProfile {
@@ -92,8 +102,9 @@ export class ProfileService {
   }
 
   updateProfile(updates: Partial<EstablishmentProfile>): void {
+    if (!this.uid) return;
     const updated = { ...this.getProfile(), ...updates };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    localStorage.setItem(STORAGE_KEY(this.uid), JSON.stringify(updated));
     this.profileSubject.next(updated);
     if (updates.theme !== undefined) {
       this.applyTheme(updates.theme ?? 'base');

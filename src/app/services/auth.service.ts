@@ -11,14 +11,20 @@ import {
   User
 } from 'firebase/auth';
 import { firebaseAuth } from '../firebase.config';
+import { ProfileService } from './profile.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   user = signal<User | null>(null);
   loading = signal(true);
 
-  constructor() {
+  constructor(private profileService: ProfileService) {
     onAuthStateChanged(firebaseAuth, (u) => {
+      if (u) {
+        this.profileService.init(u.uid);
+      } else {
+        this.profileService.clear();
+      }
       this.user.set(u);
       this.loading.set(false);
     });
