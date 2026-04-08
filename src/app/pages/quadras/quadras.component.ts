@@ -1,16 +1,18 @@
 import { Component, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { EstablishmentService } from '../../services/establishment.service';
 import { CourtService, CourtFormData } from '../../services/court.service';
 import { ProfileService } from '../../services/profile.service';
+import { FinancialService } from '../../services/financial.service';
 import { Court } from '../../models/models';
 
 @Component({
   selector: 'app-quadras',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div>
 
@@ -109,9 +111,20 @@ import { Court } from '../../models/models';
               quadra{{ courts.courts().length !== 1 ? 's' : '' }}
             </p>
           </div>
-          <button class="btn-primary" (click)="openModal()" [disabled]="atLimit()">
+          <button class="btn-primary" (click)="openModal()" [disabled]="atLimit() || !financialService.hasFinancial()">
             <span>+</span> Nova Quadra
           </button>
+        </div>
+
+        <!-- Banner: financeiro não configurado -->
+        <div *ngIf="!financialService.loading() && !financialService.hasFinancial()" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+             style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.25);color:hsl(38,92%,50%)">
+          <span class="material-icons" style="font-size:1.1rem;flex-shrink:0;margin-top:0.05rem">account_balance</span>
+          <div>
+            <span class="font-semibold">Dados financeiros não configurados.</span>
+            <span style="color:hsl(38,92%,50%,0.75)"> Para habilitar reservas pagas, configure seus dados de recebimento na aba </span>
+            <a routerLink="/financeiro" style="color:hsl(38,92%,50%);text-decoration:underline;font-weight:600">Financeiro</a>.
+          </div>
         </div>
 
         <!-- Banner: limite atingido -->
@@ -300,9 +313,12 @@ export class QuadrasComponent implements OnInit {
     public courts: CourtService,
     private toast: ToastService,
     private profile: ProfileService,
+    public financialService: FinancialService,
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.financialService.load();
+  }
 
   // ─── Onboarding ────────────────────────────────────────────────────────────
 
