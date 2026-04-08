@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast.service';
 import { EstablishmentService } from '../../services/establishment.service';
 import { CourtService, CourtFormData } from '../../services/court.service';
+import { ProfileService } from '../../services/profile.service';
 import { Court } from '../../models/models';
 
 @Component({
@@ -298,6 +299,7 @@ export class QuadrasComponent implements OnInit {
     public establishment: EstablishmentService,
     public courts: CourtService,
     private toast: ToastService,
+    private profile: ProfileService,
   ) {}
 
   ngOnInit() {}
@@ -317,12 +319,14 @@ export class QuadrasComponent implements OnInit {
     if (!this.setupForm.name) return;
     this.savingSetup = true;
     try {
+      const logoUrl = this.profile.getProfile().logoUrl;
       await this.establishment.create({
         name:         this.setupForm.name,
         city:         this.setupForm.city  || undefined,
         neighborhood: this.setupForm.neighborhood || undefined,
         open_hours:   this.setupForm.open_hours   || undefined,
         sports:       this.setupForm.sports.length ? this.setupForm.sports : undefined,
+        logo_url:     logoUrl || undefined,
       });
       this.toast.show('Estabelecimento criado com sucesso!');
       // O effect vai detectar hasEstablishment() = true e chamar courts.load()
