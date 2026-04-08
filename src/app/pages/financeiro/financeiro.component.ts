@@ -101,6 +101,18 @@ import { ToastService } from '../../services/toast.service';
               <input class="input" [(ngModel)]="form.account_holder" placeholder="Nome completo ou razão social">
             </div>
 
+            <!-- E-mail e Telefone -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">E-mail *</label>
+                <input class="input" type="email" [(ngModel)]="form.email" placeholder="email@exemplo.com">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Celular</label>
+                <input class="input" [(ngModel)]="form.phone" placeholder="(81) 99999-9999">
+              </div>
+            </div>
+
             <!-- CPF / CNPJ -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -178,6 +190,8 @@ export class FinanceiroComponent implements OnInit {
 
   form = {
     account_holder: '',
+    email:          '',
+    phone:          '',
     document_type:  'CPF',
     document_value: '',
     pix_key_type:   'CPF',
@@ -214,6 +228,7 @@ export class FinanceiroComponent implements OnInit {
   canSave(): boolean {
     return !!(
       this.form.account_holder &&
+      this.form.email          &&
       this.form.document_value &&
       this.form.pix_key_value  &&
       this.form.lgpd_consent
@@ -236,7 +251,7 @@ export class FinanceiroComponent implements OnInit {
   }
 
   resetForm() {
-    this.form = { account_holder: '', document_type: 'CPF', document_value: '', pix_key_type: 'CPF', pix_key_value: '', lgpd_consent: false };
+    this.form = { account_holder: '', email: '', phone: '', document_type: 'CPF', document_value: '', pix_key_type: 'CPF', pix_key_value: '', lgpd_consent: false };
   }
 
   pixPlaceholder(): string {

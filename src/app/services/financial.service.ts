@@ -23,6 +23,8 @@ export interface SaveFinancialDto {
   pix_key_type: string;
   pix_key_value: string;
   lgpd_consent: boolean;
+  email: string;
+  phone?: string;
 }
 
 @Injectable({ providedIn: 'root' })
