@@ -36,7 +36,7 @@ import { ToastService } from '../../services/toast.service';
           <span class="text-xs px-2.5 py-1 rounded-full font-semibold"
                 [style.background]="statusBg() + '22'"
                 [style.color]="statusBg()">
-            {{ financialService.financial()?.status }}
+            {{ statusBadge() }}
           </span>
         </div>
 
@@ -283,17 +283,24 @@ export class FinanceiroComponent implements OnInit {
     return 'hourglass_top';
   }
 
+  statusBadge(): string {
+    const s = this.financialService.financial()?.status;
+    if (s === 'ACTIVE')    return 'Ativo';
+    if (s === 'SUSPENDED') return 'Suspenso';
+    return 'Em análise';
+  }
+
   statusLabel(): string {
     const s = this.financialService.financial()?.status;
     if (s === 'ACTIVE')    return 'Conta ativa — recebendo pagamentos';
     if (s === 'SUSPENDED') return 'Conta suspensa';
-    return 'Aguardando análise';
+    return 'Verificação em andamento';
   }
 
   statusDesc(): string {
     const s = this.financialService.financial()?.status;
     if (s === 'ACTIVE')    return 'Seus clientes já podem pagar via app.';
-    if (s === 'SUSPENDED') return 'Entre em contato com o suporte.';
-    return 'Seus dados foram recebidos e estão em análise. Em breve você poderá receber pagamentos.';
+    if (s === 'SUSPENDED') return 'Entre em contato com o suporte ArenaFlow.';
+    return 'Seus dados foram enviados para verificação. A ASAAS valida CPF/CNPJ automaticamente e ativa a conta em até 1 dia útil.';
   }
 }
