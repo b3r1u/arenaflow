@@ -109,7 +109,7 @@ import { ToastService } from '../../services/toast.service';
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Celular</label>
-                <input class="input" [(ngModel)]="form.phone" placeholder="(81) 99999-9999">
+                <input class="input" [value]="form.phone" (input)="form.phone = maskPhone($any($event.target).value)" placeholder="(81) 99999-9999">
               </div>
             </div>
 
@@ -124,7 +124,8 @@ import { ToastService } from '../../services/toast.service';
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">{{ form.document_type }} *</label>
-                <input class="input" [(ngModel)]="form.document_value"
+                <input class="input" [value]="form.document_value"
+                       (input)="form.document_value = maskDocument($any($event.target).value)"
                        [placeholder]="form.document_type === 'CPF' ? '000.000.000-00' : '00.000.000/0001-00'">
               </div>
             </div>
@@ -165,7 +166,7 @@ import { ToastService } from '../../services/toast.service';
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">CEP</label>
-                <input class="input" [(ngModel)]="form.postal_code" placeholder="89223-005">
+                <input class="input" [value]="form.postal_code" (input)="form.postal_code = maskCep($any($event.target).value)" placeholder="89223-005">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Complemento</label>
@@ -274,6 +275,37 @@ export class FinanceiroComponent implements OnInit {
     this.editing = false;
     this.error   = null;
     this.resetForm();
+  }
+
+  maskPhone(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2)  return `(${d}`;
+    if (d.length <= 7)  return `(${d.slice(0,2)}) ${d.slice(2)}`;
+    return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  }
+
+  maskDocument(v: string): string {
+    const d = v.replace(/\D/g, '');
+    if (this.form.document_type === 'CPF') {
+      const c = d.slice(0, 11);
+      if (c.length <= 3) return c;
+      if (c.length <= 6) return `${c.slice(0,3)}.${c.slice(3)}`;
+      if (c.length <= 9) return `${c.slice(0,3)}.${c.slice(3,6)}.${c.slice(6)}`;
+      return `${c.slice(0,3)}.${c.slice(3,6)}.${c.slice(6,9)}-${c.slice(9)}`;
+    } else {
+      const c = d.slice(0, 14);
+      if (c.length <= 2)  return c;
+      if (c.length <= 5)  return `${c.slice(0,2)}.${c.slice(2)}`;
+      if (c.length <= 8)  return `${c.slice(0,2)}.${c.slice(2,5)}.${c.slice(5)}`;
+      if (c.length <= 12) return `${c.slice(0,2)}.${c.slice(2,5)}.${c.slice(5,8)}/${c.slice(8)}`;
+      return `${c.slice(0,2)}.${c.slice(2,5)}.${c.slice(5,8)}/${c.slice(8,12)}-${c.slice(12)}`;
+    }
+  }
+
+  maskCep(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 8);
+    if (d.length <= 5) return d;
+    return `${d.slice(0,5)}-${d.slice(5)}`;
   }
 
   onDocTypeChange() {
