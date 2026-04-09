@@ -599,6 +599,6 @@ export class FinanceiroComponent implements OnInit {
     const s = this.financialService.financial()?.status;
     if (s === 'ACTIVE')    return 'Seus clientes já podem pagar via app.';
     if (s === 'SUSPENDED') return 'Entre em contato com o suporte ArenaFlow.';
-    return 'Seus dados foram enviados para verificação. A ASAAS valida CPF/CNPJ automaticamente e ativa a conta em até 1 dia útil.';
+    return 'Seus dados foram enviados para verificação. A ativação ocorre automaticamente em até 1 dia útil.';
   }
 }
