@@ -101,7 +101,7 @@ import { ToastService } from '../../services/toast.service';
               <input class="input" [(ngModel)]="form.account_holder" placeholder="Nome completo ou razão social">
             </div>
 
-            <!-- E-mail e Telefone -->
+            <!-- E-mail e Celular -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">E-mail *</label>
@@ -117,15 +117,59 @@ import { ToastService } from '../../services/toast.service';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Tipo de documento *</label>
-                <select class="select" [(ngModel)]="form.document_type">
-                  <option value="CPF">CPF</option>
-                  <option value="CNPJ">CNPJ</option>
+                <select class="select" [(ngModel)]="form.document_type" (ngModelChange)="onDocTypeChange()">
+                  <option value="CPF">CPF (Pessoa física)</option>
+                  <option value="CNPJ">CNPJ (Pessoa jurídica)</option>
                 </select>
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">{{ form.document_type }} *</label>
                 <input class="input" [(ngModel)]="form.document_value"
                        [placeholder]="form.document_type === 'CPF' ? '000.000.000-00' : '00.000.000/0001-00'">
+              </div>
+            </div>
+
+            <!-- Data de nascimento (CPF) ou Tipo de empresa (CNPJ) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div *ngIf="form.document_type === 'CPF'">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Data de nascimento *</label>
+                <input class="input" type="date" [(ngModel)]="form.birth_date">
+              </div>
+              <div *ngIf="form.document_type === 'CNPJ'">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Tipo de empresa *</label>
+                <select class="select" [(ngModel)]="form.company_type">
+                  <option value="MEI">MEI</option>
+                  <option value="LIMITED">Ltda</option>
+                  <option value="INDIVIDUAL">Empresário Individual</option>
+                  <option value="ASSOCIATION">Associação</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Endereço -->
+            <p class="text-xs font-semibold uppercase tracking-wide mt-2" style="color:var(--muted-foreground)">Endereço</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Logradouro</label>
+                <input class="input" [(ngModel)]="form.address" placeholder="Av. Rolf Wiest">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Número</label>
+                <input class="input" [(ngModel)]="form.address_number" placeholder="277">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Bairro</label>
+                <input class="input" [(ngModel)]="form.province" placeholder="Bom Retiro">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">CEP</label>
+                <input class="input" [(ngModel)]="form.postal_code" placeholder="89223-005">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Complemento</label>
+                <input class="input" [(ngModel)]="form.complement" placeholder="Sala 502">
               </div>
             </div>
 
@@ -194,6 +238,13 @@ export class FinanceiroComponent implements OnInit {
     phone:          '',
     document_type:  'CPF',
     document_value: '',
+    birth_date:     '',
+    company_type:   'MEI',
+    address:        '',
+    address_number: '',
+    complement:     '',
+    province:       '',
+    postal_code:    '',
     pix_key_type:   'CPF',
     pix_key_value:  '',
     lgpd_consent:   false,
@@ -225,13 +276,22 @@ export class FinanceiroComponent implements OnInit {
     this.resetForm();
   }
 
+  onDocTypeChange() {
+    this.form.document_value = '';
+    this.form.birth_date     = '';
+    this.form.company_type   = 'MEI';
+  }
+
   canSave(): boolean {
+    const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date;
+    const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
     return !!(
       this.form.account_holder &&
       this.form.email          &&
       this.form.document_value &&
       this.form.pix_key_value  &&
-      this.form.lgpd_consent
+      this.form.lgpd_consent   &&
+      (cpfOk || cnpjOk)
     );
   }
 
@@ -251,7 +311,14 @@ export class FinanceiroComponent implements OnInit {
   }
 
   resetForm() {
-    this.form = { account_holder: '', email: '', phone: '', document_type: 'CPF', document_value: '', pix_key_type: 'CPF', pix_key_value: '', lgpd_consent: false };
+    this.form = {
+      account_holder: '', email: '', phone: '',
+      document_type: 'CPF', document_value: '',
+      birth_date: '', company_type: 'MEI',
+      address: '', address_number: '', complement: '', province: '', postal_code: '',
+      pix_key_type: 'CPF', pix_key_value: '',
+      lgpd_consent: false,
+    };
   }
 
   pixPlaceholder(): string {

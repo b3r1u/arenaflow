@@ -25,6 +25,13 @@ export interface SaveFinancialDto {
   lgpd_consent: boolean;
   email: string;
   phone?: string;
+  birth_date?: string;
+  company_type?: string;
+  address?: string;
+  address_number?: string;
+  complement?: string;
+  province?: string;
+  postal_code?: string;
 }
 
 @Injectable({ providedIn: 'root' })
