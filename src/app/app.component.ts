@@ -11,26 +11,61 @@ import { LoadingService } from './services/loading.service';
     <router-outlet />
 
     <!-- Loading overlay global -->
-    <div *ngIf="loading.isLoading()"
-         style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px)">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem">
-        <svg width="56" height="56" viewBox="0 0 56 56" style="animation:vb-spin 0.9s linear infinite">
-          <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4"/>
-          <circle cx="28" cy="28" r="24" fill="none" stroke="#22c55e" stroke-width="4"
-                  stroke-dasharray="38 113" stroke-linecap="round"
-                  style="animation:vb-dash 1.4s ease-in-out infinite"/>
-          <!-- linhas do vôlei -->
-          <line x1="28" y1="4"  x2="28" y2="52" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
-          <path d="M4 28 Q16 18 28 28 Q40 38 52 28" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
-          <path d="M4 28 Q16 38 28 28 Q40 18 52 28" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
-        </svg>
-        <span style="color:white;font-size:0.75rem;opacity:0.7;letter-spacing:0.05em">Carregando...</span>
+    <div *ngIf="loading.isLoading()" class="vb-overlay">
+      <div class="vb-center">
+        <div class="vb-ball-wrap">
+          <div class="vb-glow"></div>
+          <svg class="vb-ball" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="43" fill="none" stroke="var(--primary)" stroke-width="3"/>
+            <circle cx="50" cy="50" r="43" fill="var(--primary)" opacity="0.08"/>
+            <path d="M 7,50 C 7,22 93,22 93,50" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 7,50 C 7,78 93,78 93,50" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 31,9 C 12,38 12,62 31,91"  fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 69,9 C 88,38 88,62 69,91"  fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="vb-label">Carregando...</p>
       </div>
     </div>
 
     <style>
-      @keyframes vb-spin { to { transform: rotate(360deg); } }
-      @keyframes vb-dash  { 0%,100% { stroke-dashoffset: 0; } 50% { stroke-dashoffset: -75; } }
+      .vb-overlay {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        background: color-mix(in srgb, var(--background) 82%, transparent);
+        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        animation: vb-fade-in 0.18s ease;
+      }
+      .vb-center { display: flex; flex-direction: column; align-items: center; gap: 1.1rem; }
+      .vb-ball-wrap {
+        position: relative;
+        width: clamp(4rem, 12vw, 6rem);
+        height: clamp(4rem, 12vw, 6rem);
+      }
+      .vb-glow {
+        position: absolute; inset: -0.6rem; border-radius: 50%;
+        background: radial-gradient(circle, var(--primary), transparent 70%);
+        animation: vb-glow-pulse 1.6s ease-in-out infinite;
+      }
+      .vb-ball {
+        width: 100%; height: 100%;
+        animation: vb-spin-open 2s ease-in-out infinite;
+        position: relative; z-index: 1;
+      }
+      .vb-label {
+        font-size: clamp(0.7rem, 2vw, 0.82rem); font-weight: 600;
+        letter-spacing: 0.06em; color: var(--muted-foreground);
+        text-transform: uppercase; margin: 0;
+      }
+      @keyframes vb-fade-in    { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes vb-glow-pulse { 0%,100% { transform:scale(1);   opacity:0.18; } 50% { transform:scale(1.4); opacity:0.06; } }
+      @keyframes vb-spin-open  {
+        0%   { transform: rotate(0deg)   scale(1);    }
+        25%  { transform: rotate(90deg)  scale(1.14); }
+        50%  { transform: rotate(180deg) scale(1);    }
+        75%  { transform: rotate(270deg) scale(1.14); }
+        100% { transform: rotate(360deg) scale(1);    }
+      }
     </style>
   `
 })
