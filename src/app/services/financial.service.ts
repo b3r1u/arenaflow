@@ -63,12 +63,12 @@ export class FinancialService {
     }
   }
 
-  async save(data: SaveFinancialDto): Promise<FinancialInfo> {
+  async save(data: SaveFinancialDto): Promise<{ financial: FinancialInfo; asaas_warning: string | null }> {
     const res = await firstValueFrom(
-      this.api.post<{ financial: FinancialInfo }>('/financial/me', data)
+      this.api.post<{ financial: FinancialInfo; asaas_warning: string | null }>('/financial/me', data)
     );
     this._financial.set(res.financial);
-    return res.financial;
+    return res;
   }
 
   reset(): void {

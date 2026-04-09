@@ -21,6 +21,13 @@ import { ToastService } from '../../services/toast.service';
         <span class="material-icons" style="font-size:2.5rem;color:var(--border);animation:spin 1s linear infinite">refresh</span>
       </div>
 
+      <!-- Aviso ASAAS (CPF já em uso, etc.) -->
+      <div *ngIf="warning" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+           style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.3);color:hsl(38,92%,50%)">
+        <span class="material-icons flex-shrink-0" style="font-size:1.1rem;margin-top:0.05rem">warning</span>
+        <span>{{ warning }}</span>
+      </div>
+
       <ng-container *ngIf="!financialService.loading()">
 
         <!-- Status atual (se já configurado) -->
@@ -229,9 +236,10 @@ import { ToastService } from '../../services/toast.service';
   `
 })
 export class FinanceiroComponent implements OnInit {
-  editing = false;
-  saving  = false;
-  error: string | null = null;
+  editing  = false;
+  saving   = false;
+  error:   string | null = null;
+  warning: string | null = null;
 
   form = {
     account_holder: '',
@@ -328,13 +336,18 @@ export class FinanceiroComponent implements OnInit {
   }
 
   async save() {
-    this.saving = true;
-    this.error  = null;
+    this.saving  = true;
+    this.error   = null;
+    this.warning = null;
     try {
-      await this.financialService.save(this.form);
-      this.toast.show('Dados financeiros salvos com sucesso!');
+      const { asaas_warning } = await this.financialService.save(this.form);
       this.editing = false;
       this.resetForm();
+      if (asaas_warning) {
+        this.warning = `Dados salvos, mas houve um problema ao criar a conta de recebimento: ${asaas_warning} Entre em contato com o suporte para regularizar.`;
+      } else {
+        this.toast.show('Dados financeiros salvos com sucesso!');
+      }
     } catch (e: any) {
       this.error = e?.error?.error || 'Erro ao salvar dados financeiros';
     } finally {
