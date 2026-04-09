@@ -141,8 +141,12 @@ import { ToastService } from '../../services/toast.service';
 
               <!-- Via upload direto (sem onboardingUrl) -->
               <div *ngIf="!doc.onboardingUrl && isDocPending(doc.status)" class="space-y-2">
-                <p class="text-xs" style="color:var(--muted-foreground)">
-                  {{ doc.type === 'IDENTIFICATION_SELFIE' ? 'Envie uma foto sua (selfie).' : 'Envie a frente e o verso do documento.' }}
+                <p *ngIf="doc.description" class="text-xs px-3 py-2 rounded-lg"
+                   style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.25);color:hsl(38,92%,50%)">
+                  {{ doc.description }}
+                </p>
+                <p *ngIf="!doc.description" class="text-xs" style="color:var(--muted-foreground)">
+                  {{ doc.type === 'IDENTIFICATION_SELFIE' ? 'Envie uma foto sua (selfie). Em smartphones, você poderá usar a câmera.' : 'Envie a frente e o verso do documento (foto ou PDF).' }}
                 </p>
 
                 <!-- Selfie: 1 arquivo -->
@@ -497,18 +501,18 @@ export class FinanceiroComponent implements OnInit {
     try {
       if (mode === 'selfie') {
         const fd = new FormData();
-        fd.append('doc_type', doc.type);
+        fd.append('doc_type', 'IDENTIFICATION_SELFIE');
         fd.append('documentFile', this.docFiles[doc.id].front!);
         await this.financialService.uploadDocumentById(doc.id, fd);
       } else {
         // frente
         const fdFront = new FormData();
-        fdFront.append('doc_type', doc.type);
+        fdFront.append('doc_type', 'IDENTIFICATION');
         fdFront.append('documentFile', this.docFiles[doc.id].front!);
         await this.financialService.uploadDocumentById(doc.id, fdFront);
-        // verso
+        // verso (mesmo type — ASAAS não possui IDENTIFICATION_BACK no enum)
         const fdBack = new FormData();
-        fdBack.append('doc_type', doc.type);
+        fdBack.append('doc_type', 'IDENTIFICATION');
         fdBack.append('documentFile', this.docFiles[doc.id].back!);
         await this.financialService.uploadDocumentById(doc.id, fdBack);
       }
@@ -516,7 +520,12 @@ export class FinanceiroComponent implements OnInit {
       this.toast.show('Documento enviado com sucesso!');
       await this.loadDocumentLinks(); // atualiza status
     } catch (e: any) {
-      this.docError = e?.error?.error || 'Erro ao enviar documento';
+      const raw = e?.error?.error || e?.message || 'Erro ao enviar documento';
+      if (raw.toLowerCase().includes('não pode ser enviado via api')) {
+        this.docError = 'Este documento deve ser enviado pelo app ASAAS ou pelo link de onboarding. Entre em contato com o suporte ArenaFlow para receber o link de verificação.';
+      } else {
+        this.docError = raw;
+      }
     } finally {
       this.uploadingDoc = null;
     }

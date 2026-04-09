@@ -22,6 +22,7 @@ export interface DocumentLink {
   id: string;
   type: string;
   title: string;
+  description: string | null;
   status: string;
   onboardingUrl: string | null;
 }
