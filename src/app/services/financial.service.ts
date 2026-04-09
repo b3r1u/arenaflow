@@ -111,6 +111,14 @@ export class FinancialService {
     return res.links;
   }
 
+  async uploadDocumentById(groupId: string, formData: FormData): Promise<void> {
+    await firstValueFrom(
+      this.api.http.post<{ financial: FinancialInfo }>(
+        `${this.api.baseUrl}/financial/document/${groupId}`, formData
+      )
+    );
+  }
+
   reset(): void {
     this._financial.set(undefined);
   }

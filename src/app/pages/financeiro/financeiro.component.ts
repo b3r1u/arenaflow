@@ -108,34 +108,96 @@ import { ToastService } from '../../services/toast.service';
             </button>
           </div>
 
-          <!-- Links de onboarding -->
-          <div *ngIf="documentLinks.length > 0" class="space-y-3">
-            <div *ngFor="let doc of documentLinks"
-                 class="flex items-center justify-between p-3 rounded-xl"
-                 style="background:var(--muted)">
-              <div class="flex items-center gap-3">
+          <!-- Grupos de documentos -->
+          <div *ngIf="documentLinks.length > 0" class="space-y-4">
+            <div *ngFor="let doc of documentLinks" class="rounded-xl p-4" style="border:1px solid var(--border)">
+
+              <!-- Cabeçalho do grupo -->
+              <div class="flex items-center gap-3 mb-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background:hsl(38,92%,50%,0.15)">
-                  <span class="material-icons" style="font-size:1rem;color:hsl(38,92%,50%)">badge</span>
+                     [style.background]="docStatusBg(doc.status)">
+                  <span class="material-icons" style="font-size:1rem;color:white">
+                    {{ doc.type === 'IDENTIFICATION_SELFIE' ? 'face' : 'badge' }}
+                  </span>
                 </div>
-                <div>
+                <div class="flex-1">
                   <p class="text-sm font-medium" style="color:var(--foreground)">{{ doc.title }}</p>
-                  <p class="text-xs" style="color:var(--muted-foreground)">
-                    {{ doc.status === 'PENDING' ? 'Aguardando envio' : doc.status === 'AWAITING_APPROVAL' ? 'Em análise' : doc.status }}
-                  </p>
+                  <p class="text-xs" style="color:var(--muted-foreground)">{{ docStatusLabel(doc.status) }}</p>
                 </div>
+                <span class="text-xs px-2.5 py-1 rounded-full font-medium"
+                      [style.background]="docStatusBg(doc.status) + '22'"
+                      [style.color]="docStatusBg(doc.status)">
+                  {{ docStatusLabel(doc.status) }}
+                </span>
               </div>
-              <a *ngIf="doc.onboardingUrl"
+
+              <!-- Via link externo (onboardingUrl presente) -->
+              <a *ngIf="doc.onboardingUrl && isDocPending(doc.status)"
                  [href]="doc.onboardingUrl" target="_blank"
-                 class="btn-primary text-xs px-3 py-1.5 flex items-center gap-1">
-                <span class="material-icons" style="font-size:0.85rem">open_in_new</span>
-                Enviar
+                 class="btn-primary text-sm w-full flex items-center justify-center gap-1.5">
+                <span class="material-icons" style="font-size:0.9rem">open_in_new</span>
+                Abrir página de envio
               </a>
-              <span *ngIf="!doc.onboardingUrl"
-                    class="text-xs px-2.5 py-1 rounded-full"
-                    style="background:hsl(142,71%,45%,0.15);color:hsl(142,71%,45%)">
-                Enviado
-              </span>
+
+              <!-- Via upload direto (sem onboardingUrl) -->
+              <div *ngIf="!doc.onboardingUrl && isDocPending(doc.status)" class="space-y-2">
+                <p class="text-xs" style="color:var(--muted-foreground)">
+                  {{ doc.type === 'IDENTIFICATION_SELFIE' ? 'Envie uma foto sua (selfie).' : 'Envie a frente e o verso do documento.' }}
+                </p>
+
+                <!-- Selfie: 1 arquivo -->
+                <ng-container *ngIf="doc.type === 'IDENTIFICATION_SELFIE'">
+                  <label class="flex items-center gap-2 input cursor-pointer" style="padding:0.5rem 0.75rem">
+                    <span class="material-icons" style="font-size:1.1rem;color:var(--muted-foreground)">photo_camera</span>
+                    <span class="text-sm flex-1 truncate" style="color:var(--muted-foreground)">
+                      {{ getFile(doc.id, 'front')?.name || 'Selecionar selfie...' }}
+                    </span>
+                    <input type="file" class="hidden" accept="image/*"
+                           (change)="onDocFile($event, doc.id, 'front')">
+                  </label>
+                  <button class="btn-primary text-sm w-full"
+                          [disabled]="!getFile(doc.id, 'front') || uploadingDoc === doc.id"
+                          (click)="uploadDocument(doc, 'selfie')">
+                    <span *ngIf="uploadingDoc === doc.id" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+                    <span *ngIf="uploadingDoc !== doc.id">Enviar selfie</span>
+                  </button>
+                </ng-container>
+
+                <!-- Documento: frente + verso -->
+                <ng-container *ngIf="doc.type !== 'IDENTIFICATION_SELFIE'">
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <p class="text-xs mb-1" style="color:var(--muted-foreground)">Frente</p>
+                      <label class="flex items-center gap-1.5 input cursor-pointer" style="padding:0.4rem 0.6rem">
+                        <span class="material-icons" style="font-size:1rem;color:var(--muted-foreground)">upload_file</span>
+                        <span class="text-xs flex-1 truncate" style="color:var(--muted-foreground)">
+                          {{ getFile(doc.id, 'front')?.name || 'Frente...' }}
+                        </span>
+                        <input type="file" class="hidden" accept="image/*,application/pdf"
+                               (change)="onDocFile($event, doc.id, 'front')">
+                      </label>
+                    </div>
+                    <div>
+                      <p class="text-xs mb-1" style="color:var(--muted-foreground)">Verso</p>
+                      <label class="flex items-center gap-1.5 input cursor-pointer" style="padding:0.4rem 0.6rem">
+                        <span class="material-icons" style="font-size:1rem;color:var(--muted-foreground)">upload_file</span>
+                        <span class="text-xs flex-1 truncate" style="color:var(--muted-foreground)">
+                          {{ getFile(doc.id, 'back')?.name || 'Verso...' }}
+                        </span>
+                        <input type="file" class="hidden" accept="image/*,application/pdf"
+                               (change)="onDocFile($event, doc.id, 'back')">
+                      </label>
+                    </div>
+                  </div>
+                  <button class="btn-primary text-sm w-full"
+                          [disabled]="!getFile(doc.id, 'front') || !getFile(doc.id, 'back') || uploadingDoc === doc.id"
+                          (click)="uploadDocument(doc, 'id')">
+                    <span *ngIf="uploadingDoc === doc.id" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+                    <span *ngIf="uploadingDoc !== doc.id">Enviar documento</span>
+                  </button>
+                </ng-container>
+              </div>
+
             </div>
           </div>
 
@@ -371,10 +433,13 @@ export class FinanceiroComponent implements OnInit {
   completionMode = false;
   saving         = false;
   loadingDocs    = false;
+  uploadingDoc:  string | null = null;
   error:         string | null = null;
   warning:       string | null = null;
   docError:      string | null = null;
   documentLinks: DocumentLink[] = [];
+  // mapa groupId → { front?: File, back?: File }
+  docFiles: Record<string, { front?: File; back?: File }> = {};
 
   form = {
     account_holder: '',
@@ -413,6 +478,70 @@ export class FinanceiroComponent implements OnInit {
     } finally {
       this.loadingDocs = false;
     }
+  }
+
+  onDocFile(event: Event, groupId: string, side: 'front' | 'back') {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (!this.docFiles[groupId]) this.docFiles[groupId] = {};
+    this.docFiles[groupId][side] = file;
+  }
+
+  getFile(groupId: string, side: 'front' | 'back'): File | undefined {
+    return this.docFiles[groupId]?.[side];
+  }
+
+  async uploadDocument(doc: DocumentLink, mode: 'selfie' | 'id') {
+    this.uploadingDoc = doc.id;
+    this.docError     = null;
+    try {
+      if (mode === 'selfie') {
+        const fd = new FormData();
+        fd.append('doc_type', doc.type);
+        fd.append('documentFile', this.docFiles[doc.id].front!);
+        await this.financialService.uploadDocumentById(doc.id, fd);
+      } else {
+        // frente
+        const fdFront = new FormData();
+        fdFront.append('doc_type', doc.type);
+        fdFront.append('documentFile', this.docFiles[doc.id].front!);
+        await this.financialService.uploadDocumentById(doc.id, fdFront);
+        // verso
+        const fdBack = new FormData();
+        fdBack.append('doc_type', doc.type);
+        fdBack.append('documentFile', this.docFiles[doc.id].back!);
+        await this.financialService.uploadDocumentById(doc.id, fdBack);
+      }
+      this.docFiles[doc.id] = {};
+      this.toast.show('Documento enviado com sucesso!');
+      await this.loadDocumentLinks(); // atualiza status
+    } catch (e: any) {
+      this.docError = e?.error?.error || 'Erro ao enviar documento';
+    } finally {
+      this.uploadingDoc = null;
+    }
+  }
+
+  isDocPending(status: string): boolean {
+    return ['NOT_SENT', 'PENDING', 'REJECTED'].includes(status);
+  }
+
+  docStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      NOT_SENT:          'Aguardando envio',
+      PENDING:           'Aguardando envio',
+      AWAITING_APPROVAL: 'Em análise',
+      APPROVED:          'Aprovado',
+      REJECTED:          'Reprovado',
+    };
+    return map[status] ?? status;
+  }
+
+  docStatusBg(status: string): string {
+    if (status === 'APPROVED')          return 'hsl(142,71%,45%)';
+    if (status === 'AWAITING_APPROVAL') return 'hsl(217,91%,60%)';
+    if (status === 'REJECTED')          return 'hsl(0,72%,51%)';
+    return 'hsl(38,92%,50%)';
   }
 
   startEdit() {
