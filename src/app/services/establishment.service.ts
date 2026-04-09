@@ -119,9 +119,12 @@ export class EstablishmentService {
           this.courtService.seed(est.courts);
         }
 
-        // Se a API tem um logo cadastrado, sincroniza com o perfil local (sidebar)
-        if (est.logo_url) {
-          this.profileService.updateLogo(est.logo_url);
+        // Sincroniza nome e logo da API com o perfil local (sidebar)
+        const profileUpdates: { name?: string; logoUrl?: string } = {};
+        if (est.name)    profileUpdates.name    = est.name;
+        if (est.logo_url) profileUpdates.logoUrl = est.logo_url;
+        if (Object.keys(profileUpdates).length) {
+          this.profileService.updateProfile(profileUpdates);
         }
       } catch (e: any) {
         if (e?.status === 404) {

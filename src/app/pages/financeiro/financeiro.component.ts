@@ -28,6 +28,13 @@ import { ToastService } from '../../services/toast.service';
         <span>{{ warning }}</span>
       </div>
 
+      <!-- Erro ao carregar dados financeiros -->
+      <div *ngIf="!financialService.loading() && financialService.loadError()" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+           style="background:hsl(0,72%,51%,0.08);border:1px solid hsl(0,72%,51%,0.3);color:hsl(0,72%,51%)">
+        <span class="material-icons flex-shrink-0" style="font-size:1.1rem;margin-top:0.05rem">error_outline</span>
+        <span>Erro ao carregar dados financeiros: {{ financialService.loadError() }}</span>
+      </div>
+
       <ng-container *ngIf="!financialService.loading()">
 
         <!-- Status atual (se já configurado) -->

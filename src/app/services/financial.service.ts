@@ -49,9 +49,11 @@ export interface SaveFinancialDto {
 export class FinancialService {
   private _financial = signal<FinancialInfo | null | undefined>(undefined);
   private _loading   = signal(false);
+  private _loadError = signal<string | null>(null);
 
-  readonly financial   = this._financial.asReadonly();
-  readonly loading     = this._loading.asReadonly();
+  readonly financial    = this._financial.asReadonly();
+  readonly loading      = this._loading.asReadonly();
+  readonly loadError    = this._loadError.asReadonly();
   readonly hasFinancial = computed(() => !!this._financial());
   readonly isConfigured = computed(() => {
     const f = this._financial();
@@ -62,12 +64,16 @@ export class FinancialService {
 
   async load(): Promise<void> {
     this._loading.set(true);
+    this._loadError.set(null);
     try {
       const res = await firstValueFrom(
         this.api.get<{ financial: FinancialInfo | null }>('/financial/me')
       );
       this._financial.set(res.financial);
-    } catch {
+    } catch (err: any) {
+      const msg = err?.error?.error || err?.message || `Erro ${err?.status ?? 'desconhecido'}`;
+      console.error('[FinancialService] load error:', err);
+      this._loadError.set(msg);
       this._financial.set(null);
     } finally {
       this._loading.set(false);
