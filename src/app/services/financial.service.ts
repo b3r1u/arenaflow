@@ -18,6 +18,14 @@ export interface FinancialInfo {
   updated_at: string;
 }
 
+export interface DocumentLink {
+  id: string;
+  type: string;
+  title: string;
+  status: string;
+  onboardingUrl: string | null;
+}
+
 export interface SaveBankDto {
   bank_code: string;
   account_type: string;
@@ -96,14 +104,11 @@ export class FinancialService {
     return res.financial;
   }
 
-  async saveDocument(formData: FormData): Promise<FinancialInfo> {
+  async getDocumentLinks(): Promise<DocumentLink[]> {
     const res = await firstValueFrom(
-      this.api.http.post<{ financial: FinancialInfo }>(
-        `${this.api.baseUrl}/financial/document`, formData
-      )
+      this.api.get<{ links: DocumentLink[] }>('/financial/document-links')
     );
-    this._financial.set(res.financial);
-    return res.financial;
+    return res.links;
   }
 
   reset(): void {

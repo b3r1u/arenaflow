@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FinancialService, FinancialInfo, SaveBankDto } from '../../services/financial.service';
+import { FinancialService, FinancialInfo, SaveBankDto, DocumentLink } from '../../services/financial.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -86,6 +86,71 @@ import { ToastService } from '../../services/toast.service';
               <strong>{{ financialService.financial()?.lgpd_consent_at | date:'dd/MM/yyyy HH:mm' }}</strong>.
               Seus dados sensíveis são armazenados criptografados (AES-256-GCM) e nunca exibidos em texto puro.
             </span>
+          </div>
+        </div>
+
+        <!-- Documentos de identidade -->
+        <div *ngIf="financialService.hasFinancial() && !editing && financialService.financial()?.bank_registered && financialService.financial()?.status !== 'ACTIVE'"
+             class="card p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-heading font-semibold text-base" style="color:var(--foreground)">Documentos de identidade</h2>
+              <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">
+                Envie seus documentos para concluir a verificação da conta
+              </p>
+            </div>
+            <button class="btn-outline text-sm px-3 py-1.5 flex items-center gap-1.5"
+                    (click)="loadDocumentLinks()"
+                    [disabled]="loadingDocs">
+              <span *ngIf="loadingDocs" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+              <span *ngIf="!loadingDocs" class="material-icons" style="font-size:0.9rem">refresh</span>
+              {{ documentLinks.length ? 'Atualizar' : 'Verificar pendências' }}
+            </button>
+          </div>
+
+          <!-- Links de onboarding -->
+          <div *ngIf="documentLinks.length > 0" class="space-y-3">
+            <div *ngFor="let doc of documentLinks"
+                 class="flex items-center justify-between p-3 rounded-xl"
+                 style="background:var(--muted)">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background:hsl(38,92%,50%,0.15)">
+                  <span class="material-icons" style="font-size:1rem;color:hsl(38,92%,50%)">badge</span>
+                </div>
+                <div>
+                  <p class="text-sm font-medium" style="color:var(--foreground)">{{ doc.title }}</p>
+                  <p class="text-xs" style="color:var(--muted-foreground)">
+                    {{ doc.status === 'PENDING' ? 'Aguardando envio' : doc.status === 'AWAITING_APPROVAL' ? 'Em análise' : doc.status }}
+                  </p>
+                </div>
+              </div>
+              <a *ngIf="doc.onboardingUrl"
+                 [href]="doc.onboardingUrl" target="_blank"
+                 class="btn-primary text-xs px-3 py-1.5 flex items-center gap-1">
+                <span class="material-icons" style="font-size:0.85rem">open_in_new</span>
+                Enviar
+              </a>
+              <span *ngIf="!doc.onboardingUrl"
+                    class="text-xs px-2.5 py-1 rounded-full"
+                    style="background:hsl(142,71%,45%,0.15);color:hsl(142,71%,45%)">
+                Enviado
+              </span>
+            </div>
+          </div>
+
+          <!-- Estado vazio -->
+          <div *ngIf="documentLinks.length === 0 && !loadingDocs" class="text-center py-6">
+            <span class="material-icons" style="font-size:2rem;color:var(--border)">task_alt</span>
+            <p class="text-sm mt-2" style="color:var(--muted-foreground)">
+              Clique em "Verificar pendências" para ver os documentos necessários.
+            </p>
+          </div>
+
+          <!-- Erro -->
+          <div *ngIf="docError" class="mt-3 px-3 py-2 rounded-lg text-sm"
+               style="background:hsl(0,72%,51%,0.1);color:hsl(0,72%,51%)">
+            {{ docError }}
           </div>
         </div>
 
@@ -305,8 +370,11 @@ export class FinanceiroComponent implements OnInit {
   editing        = false;
   completionMode = false;
   saving         = false;
-  error:   string | null = null;
-  warning: string | null = null;
+  loadingDocs    = false;
+  error:         string | null = null;
+  warning:       string | null = null;
+  docError:      string | null = null;
+  documentLinks: DocumentLink[] = [];
 
   form = {
     account_holder: '',
@@ -333,6 +401,18 @@ export class FinanceiroComponent implements OnInit {
 
   ngOnInit() {
     this.financialService.load();
+  }
+
+  async loadDocumentLinks() {
+    this.loadingDocs = true;
+    this.docError    = null;
+    try {
+      this.documentLinks = await this.financialService.getDocumentLinks();
+    } catch (e: any) {
+      this.docError = e?.error?.error || 'Erro ao buscar documentos pendentes';
+    } finally {
+      this.loadingDocs = false;
+    }
   }
 
   startEdit() {
