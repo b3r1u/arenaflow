@@ -85,8 +85,17 @@ import { ToastService } from '../../services/toast.service';
         <!-- Formulário (cadastro ou edição) -->
         <div *ngIf="!financialService.hasFinancial() || editing" class="card p-6">
           <h2 class="font-heading font-semibold text-base mb-5" style="color:var(--foreground)">
-            {{ financialService.hasFinancial() ? 'Editar dados financeiros' : 'Cadastrar dados de recebimento' }}
+            {{ completionMode ? 'Completar dados de recebimento' : financialService.hasFinancial() ? 'Editar dados financeiros' : 'Cadastrar dados de recebimento' }}
           </h2>
+
+          <!-- Modo completar: dados pessoais já salvos, só banco + documentos pendentes -->
+          <div *ngIf="completionMode" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+               style="background:hsl(152,69%,40%,0.07);border:1px solid hsl(152,69%,40%,0.2)">
+            <span class="material-icons flex-shrink-0" style="font-size:1rem;color:var(--primary);margin-top:0.1rem">check_circle</span>
+            <span style="color:var(--muted-foreground)">
+              Seus dados pessoais já estão salvos. Preencha apenas os dados bancários e o documento de identidade para concluir o cadastro.
+            </span>
+          </div>
 
           <!-- Aviso LGPD -->
           <div class="mb-5 px-4 py-3 rounded-xl text-sm flex items-start gap-2.5"
@@ -102,6 +111,10 @@ import { ToastService } from '../../services/toast.service';
           </div>
 
           <div class="space-y-4">
+
+            <!-- ── Dados pessoais (ocultados no modo completar) ── -->
+            <ng-container *ngIf="!completionMode">
+
             <!-- Titular -->
             <div>
               <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Nome do titular *</label>
@@ -200,6 +213,7 @@ import { ToastService } from '../../services/toast.service';
               </div>
             </div>
 
+            </ng-container>
             <!-- ── Dados Bancários ── -->
             <p class="text-xs font-semibold uppercase tracking-wide mt-2" style="color:var(--muted-foreground)">Dados Bancários</p>
 
@@ -316,8 +330,9 @@ import { ToastService } from '../../services/toast.service';
   `
 })
 export class FinanceiroComponent implements OnInit {
-  editing  = false;
-  saving   = false;
+  editing        = false;
+  completionMode = false;
+  saving         = false;
   error:   string | null = null;
   warning: string | null = null;
 
@@ -349,19 +364,25 @@ export class FinanceiroComponent implements OnInit {
   }
 
   startEdit() {
-    this.editing = true;
     const f = this.financialService.financial();
-    if (f) {
+    // Se já tem subconta criada mas faltam banco ou docs → modo completar
+    this.completionMode = !!(f?.asaas_account_id && (!f.bank_registered || f.docs_uploaded === 0));
+    this.editing = true;
+    if (f && !this.completionMode) {
       this.form.account_holder = f.account_holder;
       this.form.document_type  = f.document_type;
       this.form.pix_key_type   = f.pix_key_type;
       this.form.lgpd_consent   = true;
     }
+    if (this.completionMode) {
+      this.form.lgpd_consent = true;
+    }
   }
 
   cancelEdit() {
-    this.editing = false;
-    this.error   = null;
+    this.editing        = false;
+    this.completionMode = false;
+    this.error          = null;
     this.resetForm();
   }
 
@@ -449,11 +470,16 @@ export class FinanceiroComponent implements OnInit {
   }
 
   canSave(): boolean {
+    const bankOk   = !!(this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account && this.bankForm.account_digit);
+    const needBack = this.docForm.doc_type !== 'PASSPORT';
+    const docOk    = !!(this.docForm.frontFile && (needBack ? this.docForm.backFile : true));
+
+    if (this.completionMode) {
+      return bankOk && docOk;
+    }
+
     const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date;
     const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
-    const bankOk = !!(this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account && this.bankForm.account_digit);
-    const needBack = this.docForm.doc_type !== 'PASSPORT';
-    const docOk  = !!(this.docForm.frontFile && (needBack ? this.docForm.backFile : true));
     return !!(
       this.form.account_holder &&
       this.form.email          &&
@@ -470,13 +496,15 @@ export class FinanceiroComponent implements OnInit {
     this.error   = null;
     this.warning = null;
     try {
-      // 1 — dados pessoais + criação da subconta
-      const { asaas_warning } = await this.financialService.save(this.form);
-      if (asaas_warning) {
-        this.warning = `Dados salvos, mas houve um problema ao criar a conta de recebimento: ${asaas_warning} Entre em contato com o suporte para regularizar.`;
-        this.editing = false;
-        this.resetForm();
-        return;
+      // 1 — dados pessoais + criação da subconta (pulado no modo completar)
+      if (!this.completionMode) {
+        const { asaas_warning } = await this.financialService.save(this.form);
+        if (asaas_warning) {
+          this.warning = `Dados salvos, mas houve um problema ao criar a conta de recebimento: ${asaas_warning} Entre em contato com o suporte para regularizar.`;
+          this.editing = false;
+          this.resetForm();
+          return;
+        }
       }
 
       // 2 — dados bancários
@@ -500,7 +528,8 @@ export class FinanceiroComponent implements OnInit {
         await this.financialService.saveDocument(fdBack);
       }
 
-      this.editing = false;
+      this.editing        = false;
+      this.completionMode = false;
       this.resetForm();
       this.toast.show('Dados financeiros salvos com sucesso!');
     } catch (e: any) {
