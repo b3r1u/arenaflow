@@ -149,13 +149,26 @@ import { Subscription, filter } from 'rxjs';
       box-shadow: 0 4px 14px rgba(34,197,94,0.25);
     }
     .nav-accent {
-      border: 1px solid rgba(251,191,36,0.28);
-      background-color: rgba(251,191,36,0.08);
-      color: rgba(251,191,36,0.85) !important;
+      position: relative;
+      overflow: hidden;
+      color: rgba(144,161,154,0.8) !important;
+    }
+    .nav-accent::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -75%;
+      width: 50%; height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.18), transparent);
+      animation: nav-shine 2.8s ease-in-out infinite;
+    }
+    @keyframes nav-shine {
+      0%   { left: -75%; }
+      40%  { left: 125%; }
+      100% { left: 125%; }
     }
     .nav-accent:hover {
-      background-color: rgba(251,191,36,0.16) !important;
-      color: rgba(251,191,36,1) !important;
+      background-color: var(--sidebar-accent) !important;
+      color: var(--sidebar-foreground) !important;
     }
   `]
 })
@@ -179,7 +192,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     { label: 'Mensalistas',   path: '/mensalistas',  icon: 'card_membership',   accent: false },
     { label: 'Promoções',     path: '/promocoes',    icon: 'local_offer',       accent: false },
     { label: 'Relatórios',    path: '/relatorios',   icon: 'bar_chart',         accent: false },
-    { label: 'Reservas',      path: '/reservas',     icon: 'shopping_cart',     accent: true  },
+    { label: 'Reservas',      path: '/reservas',     icon: 'shopping_cart',     accent: false },
     { label: 'Financeiro',    path: '/financeiro',   icon: 'account_balance',   accent: false },
     { label: 'Perfil',        path: '/perfil',       icon: 'settings',          accent: false },
     { label: 'Planos',        path: '/planos',       icon: 'workspace_premium', accent: true  },
