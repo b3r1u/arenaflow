@@ -170,6 +170,12 @@ import { Subscription, filter } from 'rxjs';
       background-color: var(--sidebar-accent) !important;
       color: var(--sidebar-foreground) !important;
     }
+    .nav-active.nav-accent {
+      color: white !important;
+    }
+    .nav-active.nav-accent::after {
+      display: none;
+    }
   `]
 })
 export class LayoutComponent implements OnInit, OnDestroy {
