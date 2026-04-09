@@ -259,47 +259,12 @@ import { ToastService } from '../../services/toast.service';
               </div>
             </div>
 
-            <!-- ── Documentos de Identidade ── -->
-            <p class="text-xs font-semibold uppercase tracking-wide mt-2" style="color:var(--muted-foreground)">Documento de identidade</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Tipo de documento *</label>
-                <select class="select" [(ngModel)]="docForm.doc_type" (ngModelChange)="onDocFormTypeChange()">
-                  <option value="IDENTIFICATION">RG (frente + verso)</option>
-                  <option value="DRIVER_LICENSE">CNH (frente + verso)</option>
-                  <option value="PASSPORT">Passaporte (somente frente)</option>
-                </select>
-              </div>
+            <!-- Aviso documentos -->
+            <div class="flex items-start gap-2 px-3 py-2.5 rounded-lg text-xs mt-2"
+                 style="background:hsl(217,91%,60%,0.08);border:1px solid hsl(217,91%,60%,0.25);color:hsl(217,91%,60%)">
+              <span class="material-icons flex-shrink-0" style="font-size:1rem;margin-top:0.05rem">info</span>
+              <span>O envio de documentos de identidade será realizado na próxima etapa, após salvar os dados bancários.</span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">
-                  Frente do {{ docTypeLabel() }} *
-                </label>
-                <label class="flex items-center gap-2 input cursor-pointer" style="padding:0.5rem 0.75rem">
-                  <span class="material-icons" style="font-size:1.1rem;color:var(--muted-foreground)">upload_file</span>
-                  <span class="text-sm flex-1 truncate" style="color:var(--muted-foreground)">
-                    {{ docForm.frontFile?.name || 'Selecionar arquivo...' }}
-                  </span>
-                  <input type="file" class="hidden" accept="image/*,application/pdf"
-                         (change)="onFileChange($event, 'front')">
-                </label>
-              </div>
-              <div *ngIf="docForm.doc_type !== 'PASSPORT'">
-                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">
-                  Verso do {{ docTypeLabel() }} *
-                </label>
-                <label class="flex items-center gap-2 input cursor-pointer" style="padding:0.5rem 0.75rem">
-                  <span class="material-icons" style="font-size:1.1rem;color:var(--muted-foreground)">upload_file</span>
-                  <span class="text-sm flex-1 truncate" style="color:var(--muted-foreground)">
-                    {{ docForm.backFile?.name || 'Selecionar arquivo...' }}
-                  </span>
-                  <input type="file" class="hidden" accept="image/*,application/pdf"
-                         (change)="onFileChange($event, 'back')">
-                </label>
-              </div>
-            </div>
-            <p class="text-xs" style="color:var(--muted-foreground)">Formatos aceitos: JPG, PNG, PDF. Tamanho máximo: 10MB por arquivo.</p>
 
             <!-- Consentimento LGPD -->
             <div class="flex items-start gap-3 mt-2 p-4 rounded-xl" style="background:var(--muted)">
@@ -372,8 +337,8 @@ export class FinanceiroComponent implements OnInit {
 
   startEdit() {
     const f = this.financialService.financial();
-    // Se já tem subconta criada mas faltam banco ou docs → modo completar
-    this.completionMode = !!(f?.asaas_account_id && (!f.bank_registered || f.docs_uploaded === 0));
+    // Se já tem subconta criada mas falta banco → modo completar
+    this.completionMode = !!(f?.asaas_account_id && !f.bank_registered);
     this.editing = true;
     if (f && !this.completionMode) {
       this.form.account_holder = f.account_holder;
@@ -415,30 +380,6 @@ export class FinanceiroComponent implements OnInit {
     agency: '', agency_digit: '', account: '', account_digit: '',
   };
 
-  docForm = {
-    doc_type:  'IDENTIFICATION',
-    frontFile: null as File | null,
-    backFile:  null as File | null,
-  };
-
-  docTypeLabel(): string {
-    const map: Record<string, string> = {
-      IDENTIFICATION: 'RG', DRIVER_LICENSE: 'CNH', PASSPORT: 'Passaporte',
-    };
-    return map[this.docForm.doc_type] ?? '';
-  }
-
-  onDocFormTypeChange() {
-    this.docForm.frontFile = null;
-    this.docForm.backFile  = null;
-  }
-
-  onFileChange(event: Event, side: 'front' | 'back') {
-    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
-    if (side === 'front') this.docForm.frontFile = file;
-    else                  this.docForm.backFile  = file;
-  }
-
   maskPhone(v: string): string {
     const d = v.replace(/\D/g, '').slice(0, 11);
     if (d.length <= 2)  return `(${d}`;
@@ -477,13 +418,9 @@ export class FinanceiroComponent implements OnInit {
   }
 
   canSave(): boolean {
-    const bankOk   = !!(this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account && this.bankForm.account_digit);
-    const needBack = this.docForm.doc_type !== 'PASSPORT';
-    const docOk    = !!(this.docForm.frontFile && (needBack ? this.docForm.backFile : true));
+    const bankOk = !!(this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account && this.bankForm.account_digit);
 
-    if (this.completionMode) {
-      return bankOk && docOk;
-    }
+    if (this.completionMode) return bankOk;
 
     const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date;
     const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
@@ -494,7 +431,7 @@ export class FinanceiroComponent implements OnInit {
       this.form.pix_key_value  &&
       this.form.lgpd_consent   &&
       (cpfOk || cnpjOk)       &&
-      bankOk && docOk
+      bankOk
     );
   }
 
@@ -519,26 +456,10 @@ export class FinanceiroComponent implements OnInit {
         await this.financialService.saveBank(this.bankForm);
       }
 
-      // 3 — documentos (frente e verso se necessário)
-      if (this.docForm.frontFile) {
-        const fdFront = new FormData();
-        fdFront.append('doc_type', this.docForm.doc_type);
-        fdFront.append('doc_side', 'FRONT');
-        fdFront.append('documentFile', this.docForm.frontFile);
-        await this.financialService.saveDocument(fdFront);
-      }
-      if (this.docForm.backFile && this.docForm.doc_type !== 'PASSPORT') {
-        const fdBack = new FormData();
-        fdBack.append('doc_type', this.docForm.doc_type);
-        fdBack.append('doc_side', 'BACK');
-        fdBack.append('documentFile', this.docForm.backFile);
-        await this.financialService.saveDocument(fdBack);
-      }
-
       this.editing        = false;
       this.completionMode = false;
       this.resetForm();
-      this.toast.show('Dados financeiros salvos com sucesso!');
+      this.toast.show('Dados bancários salvos com sucesso!');
     } catch (e: any) {
       this.error = e?.error?.error || 'Erro ao salvar dados financeiros';
     } finally {
@@ -556,7 +477,6 @@ export class FinanceiroComponent implements OnInit {
       lgpd_consent: false,
     };
     this.bankForm = { bank_code: '', account_type: 'CONTA_CORRENTE', agency: '', agency_digit: '', account: '', account_digit: '' };
-    this.docForm  = { doc_type: 'IDENTIFICATION', frontFile: null, backFile: null };
   }
 
   pixPlaceholder(): string {
