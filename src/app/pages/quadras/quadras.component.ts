@@ -111,7 +111,7 @@ import { Court } from '../../models/models';
               quadra{{ courts.courts().length !== 1 ? 's' : '' }}
             </p>
           </div>
-          <button class="btn-primary" (click)="openModal()" [disabled]="atLimit() || !financialService.hasFinancial()">
+          <button class="btn-primary" (click)="openModal()" [disabled]="atLimit() || !financialActive()">
             <span>+</span> Nova Quadra
           </button>
         </div>
@@ -122,7 +122,19 @@ import { Court } from '../../models/models';
           <span class="material-icons" style="font-size:1.1rem;flex-shrink:0;margin-top:0.05rem">account_balance</span>
           <div>
             <span class="font-semibold">Dados financeiros não configurados.</span>
-            <span style="color:hsl(38,92%,50%,0.75)"> Para habilitar reservas pagas, configure seus dados de recebimento na aba </span>
+            <span style="color:hsl(38,92%,50%,0.75)"> Configure seus dados de recebimento na aba </span>
+            <a routerLink="/financeiro" style="color:hsl(38,92%,50%);text-decoration:underline;font-weight:600">Financeiro</a>
+            <span style="color:hsl(38,92%,50%,0.75)"> para liberar o cadastro de quadras.</span>
+          </div>
+        </div>
+
+        <!-- Banner: financeiro em análise -->
+        <div *ngIf="!financialService.loading() && financialService.hasFinancial() && !financialActive()" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+             style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.25);color:hsl(38,92%,50%)">
+          <span class="material-icons" style="font-size:1.1rem;flex-shrink:0;margin-top:0.05rem">hourglass_top</span>
+          <div>
+            <span class="font-semibold">Cadastro financeiro em verificação.</span>
+            <span style="color:hsl(38,92%,50%,0.75)"> O cadastro de quadras será liberado assim que sua conta for ativada. Acompanhe o status na aba </span>
             <a routerLink="/financeiro" style="color:hsl(38,92%,50%);text-decoration:underline;font-weight:600">Financeiro</a>.
           </div>
         </div>
@@ -287,6 +299,11 @@ export class QuadrasComponent implements OnInit {
     return sub?.plan.name ?? 'Free';
   });
 
+  /** true somente quando o financeiro está com status ACTIVE */
+  readonly financialActive = computed(() =>
+    this.financialService.financial()?.status === 'ACTIVE'
+  );
+
   /** true quando o usuário já atingiu o limite de quadras do plano */
   readonly atLimit = computed(() => {
     const limit = this.courtLimit();
@@ -379,6 +396,13 @@ export class QuadrasComponent implements OnInit {
   }
 
   openModal() {
+    if (!this.financialActive()) {
+      const msg = this.financialService.hasFinancial()
+        ? 'Seu cadastro financeiro ainda está em verificação. Aguarde a ativação para cadastrar quadras.'
+        : 'Configure seus dados financeiros antes de cadastrar quadras.';
+      this.toast.show(msg);
+      return;
+    }
     if (this.atLimit()) return;
     this.form              = this.emptyForm();
     this.hourlyRateDisplay = this.formatBRL(this.form.hourly_rate);
