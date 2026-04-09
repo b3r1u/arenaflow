@@ -10,10 +10,21 @@ export interface FinancialInfo {
   pix_key_type: 'CPF' | 'CNPJ' | 'EMAIL' | 'PHONE' | 'RANDOM';
   pix_key_masked: string;
   asaas_account_id?: string;
+  bank_registered: boolean;
+  docs_uploaded: number;
   status: 'PENDING_REVIEW' | 'ACTIVE' | 'SUSPENDED';
   lgpd_consent_at: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface SaveBankDto {
+  bank_code: string;
+  account_type: string;
+  agency: string;
+  agency_digit?: string;
+  account: string;
+  account_digit: string;
 }
 
 export interface SaveFinancialDto {
@@ -69,6 +80,24 @@ export class FinancialService {
     );
     this._financial.set(res.financial);
     return res;
+  }
+
+  async saveBank(data: SaveBankDto): Promise<FinancialInfo> {
+    const res = await firstValueFrom(
+      this.api.post<{ financial: FinancialInfo }>('/financial/bank-account', data)
+    );
+    this._financial.set(res.financial);
+    return res.financial;
+  }
+
+  async saveDocument(formData: FormData): Promise<FinancialInfo> {
+    const res = await firstValueFrom(
+      this.api.http.post<{ financial: FinancialInfo }>(
+        `${this.api.baseUrl}/financial/document`, formData
+      )
+    );
+    this._financial.set(res.financial);
+    return res.financial;
   }
 
   reset(): void {

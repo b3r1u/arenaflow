@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FinancialService, FinancialInfo } from '../../services/financial.service';
+import { FinancialService, FinancialInfo, SaveBankDto } from '../../services/financial.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -200,6 +200,86 @@ import { ToastService } from '../../services/toast.service';
               </div>
             </div>
 
+            <!-- ── Dados Bancários ── -->
+            <p class="text-xs font-semibold uppercase tracking-wide mt-2" style="color:var(--muted-foreground)">Dados Bancários</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Banco *</label>
+                <select class="select" [(ngModel)]="bankForm.bank_code">
+                  <option value="">Selecione o banco</option>
+                  <option *ngFor="let b of banks" [value]="b.code">{{ b.code }} - {{ b.name }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Tipo de conta *</label>
+                <select class="select" [(ngModel)]="bankForm.account_type">
+                  <option value="CONTA_CORRENTE">Conta Corrente</option>
+                  <option value="CONTA_POUPANCA">Conta Poupança</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="col-span-1">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Agência *</label>
+                <input class="input" [(ngModel)]="bankForm.agency" placeholder="0001" maxlength="6">
+              </div>
+              <div class="col-span-1">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Dígito</label>
+                <input class="input" [(ngModel)]="bankForm.agency_digit" placeholder="0" maxlength="1">
+              </div>
+              <div class="col-span-1">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Conta *</label>
+                <input class="input" [(ngModel)]="bankForm.account" placeholder="000000" maxlength="12">
+              </div>
+              <div class="col-span-1">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Dígito *</label>
+                <input class="input" [(ngModel)]="bankForm.account_digit" placeholder="0" maxlength="2">
+              </div>
+            </div>
+
+            <!-- ── Documentos de Identidade ── -->
+            <p class="text-xs font-semibold uppercase tracking-wide mt-2" style="color:var(--muted-foreground)">Documento de identidade</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Tipo de documento *</label>
+                <select class="select" [(ngModel)]="docForm.doc_type" (ngModelChange)="onDocFormTypeChange()">
+                  <option value="IDENTIFICATION">RG (frente + verso)</option>
+                  <option value="DRIVER_LICENSE">CNH (frente + verso)</option>
+                  <option value="PASSPORT">Passaporte (somente frente)</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">
+                  Frente do {{ docTypeLabel() }} *
+                </label>
+                <label class="flex items-center gap-2 input cursor-pointer" style="padding:0.5rem 0.75rem">
+                  <span class="material-icons" style="font-size:1.1rem;color:var(--muted-foreground)">upload_file</span>
+                  <span class="text-sm flex-1 truncate" style="color:var(--muted-foreground)">
+                    {{ docForm.frontFile?.name || 'Selecionar arquivo...' }}
+                  </span>
+                  <input type="file" class="hidden" accept="image/*,application/pdf"
+                         (change)="onFileChange($event, 'front')">
+                </label>
+              </div>
+              <div *ngIf="docForm.doc_type !== 'PASSPORT'">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">
+                  Verso do {{ docTypeLabel() }} *
+                </label>
+                <label class="flex items-center gap-2 input cursor-pointer" style="padding:0.5rem 0.75rem">
+                  <span class="material-icons" style="font-size:1.1rem;color:var(--muted-foreground)">upload_file</span>
+                  <span class="text-sm flex-1 truncate" style="color:var(--muted-foreground)">
+                    {{ docForm.backFile?.name || 'Selecionar arquivo...' }}
+                  </span>
+                  <input type="file" class="hidden" accept="image/*,application/pdf"
+                         (change)="onFileChange($event, 'back')">
+                </label>
+              </div>
+            </div>
+            <p class="text-xs" style="color:var(--muted-foreground)">Formatos aceitos: JPG, PNG, PDF. Tamanho máximo: 10MB por arquivo.</p>
+
             <!-- Consentimento LGPD -->
             <div class="flex items-start gap-3 mt-2 p-4 rounded-xl" style="background:var(--muted)">
               <input type="checkbox" id="lgpd" [(ngModel)]="form.lgpd_consent"
@@ -285,6 +365,52 @@ export class FinanceiroComponent implements OnInit {
     this.resetForm();
   }
 
+  banks = [
+    { code: '001', name: 'Banco do Brasil'       },
+    { code: '033', name: 'Santander'             },
+    { code: '077', name: 'Banco Inter'           },
+    { code: '104', name: 'Caixa Econômica Federal'},
+    { code: '237', name: 'Bradesco'              },
+    { code: '260', name: 'Nubank'                },
+    { code: '290', name: 'PagBank'               },
+    { code: '323', name: 'Mercado Pago'          },
+    { code: '336', name: 'C6 Bank'              },
+    { code: '341', name: 'Itaú'                  },
+    { code: '380', name: 'PicPay'                },
+    { code: '403', name: 'Cora'                  },
+    { code: '748', name: 'Sicredi'               },
+    { code: '756', name: 'Sicoob'                },
+  ];
+
+  bankForm: SaveBankDto = {
+    bank_code: '', account_type: 'CONTA_CORRENTE',
+    agency: '', agency_digit: '', account: '', account_digit: '',
+  };
+
+  docForm = {
+    doc_type:  'IDENTIFICATION',
+    frontFile: null as File | null,
+    backFile:  null as File | null,
+  };
+
+  docTypeLabel(): string {
+    const map: Record<string, string> = {
+      IDENTIFICATION: 'RG', DRIVER_LICENSE: 'CNH', PASSPORT: 'Passaporte',
+    };
+    return map[this.docForm.doc_type] ?? '';
+  }
+
+  onDocFormTypeChange() {
+    this.docForm.frontFile = null;
+    this.docForm.backFile  = null;
+  }
+
+  onFileChange(event: Event, side: 'front' | 'back') {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    if (side === 'front') this.docForm.frontFile = file;
+    else                  this.docForm.backFile  = file;
+  }
+
   maskPhone(v: string): string {
     const d = v.replace(/\D/g, '').slice(0, 11);
     if (d.length <= 2)  return `(${d}`;
@@ -325,13 +451,17 @@ export class FinanceiroComponent implements OnInit {
   canSave(): boolean {
     const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date;
     const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
+    const bankOk = !!(this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account && this.bankForm.account_digit);
+    const needBack = this.docForm.doc_type !== 'PASSPORT';
+    const docOk  = !!(this.docForm.frontFile && (needBack ? this.docForm.backFile : true));
     return !!(
       this.form.account_holder &&
       this.form.email          &&
       this.form.document_value &&
       this.form.pix_key_value  &&
       this.form.lgpd_consent   &&
-      (cpfOk || cnpjOk)
+      (cpfOk || cnpjOk)       &&
+      bankOk && docOk
     );
   }
 
@@ -340,14 +470,39 @@ export class FinanceiroComponent implements OnInit {
     this.error   = null;
     this.warning = null;
     try {
+      // 1 — dados pessoais + criação da subconta
       const { asaas_warning } = await this.financialService.save(this.form);
-      this.editing = false;
-      this.resetForm();
       if (asaas_warning) {
         this.warning = `Dados salvos, mas houve um problema ao criar a conta de recebimento: ${asaas_warning} Entre em contato com o suporte para regularizar.`;
-      } else {
-        this.toast.show('Dados financeiros salvos com sucesso!');
+        this.editing = false;
+        this.resetForm();
+        return;
       }
+
+      // 2 — dados bancários
+      if (this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account) {
+        await this.financialService.saveBank(this.bankForm);
+      }
+
+      // 3 — documentos (frente e verso se necessário)
+      if (this.docForm.frontFile) {
+        const fdFront = new FormData();
+        fdFront.append('doc_type', this.docForm.doc_type);
+        fdFront.append('doc_side', 'FRONT');
+        fdFront.append('documentFile', this.docForm.frontFile);
+        await this.financialService.saveDocument(fdFront);
+      }
+      if (this.docForm.backFile && this.docForm.doc_type !== 'PASSPORT') {
+        const fdBack = new FormData();
+        fdBack.append('doc_type', this.docForm.doc_type);
+        fdBack.append('doc_side', 'BACK');
+        fdBack.append('documentFile', this.docForm.backFile);
+        await this.financialService.saveDocument(fdBack);
+      }
+
+      this.editing = false;
+      this.resetForm();
+      this.toast.show('Dados financeiros salvos com sucesso!');
     } catch (e: any) {
       this.error = e?.error?.error || 'Erro ao salvar dados financeiros';
     } finally {
@@ -364,6 +519,8 @@ export class FinanceiroComponent implements OnInit {
       pix_key_type: 'CPF', pix_key_value: '',
       lgpd_consent: false,
     };
+    this.bankForm = { bank_code: '', account_type: 'CONTA_CORRENTE', agency: '', agency_digit: '', account: '', account_digit: '' };
+    this.docForm  = { doc_type: 'IDENTIFICATION', frontFile: null, backFile: null };
   }
 
   pixPlaceholder(): string {

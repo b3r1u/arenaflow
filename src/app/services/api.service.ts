@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 export class ApiService {
   readonly baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(public http: HttpClient) {}
 
   get<T>(path: string, params?: Record<string, string>): Observable<T> {
     let httpParams = new HttpParams();
