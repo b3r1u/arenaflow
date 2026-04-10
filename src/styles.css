@@ -414,8 +414,3 @@ body {
 
 [data-theme="dark"] .badge-accent { color: hsl(36, 90%, 65%); }
 [data-theme="dark"] .badge-primary { background-color: hsl(152,60%,45%,0.15); }
-
-/* ─── Selo ASAAS BaaS ────────────────────────────────────── */
-.asaas-selo-negativo { display: none; }
-[data-theme="dark"] .asaas-selo-positivo { display: none; }
-[data-theme="dark"] .asaas-selo-negativo { display: block; }
