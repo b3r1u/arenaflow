@@ -67,7 +67,11 @@ import { Court } from '../../models/models';
             <!-- Horário -->
             <div>
               <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Horário de funcionamento</label>
-              <input class="input" [(ngModel)]="setupForm.open_hours" placeholder="Ex: 07:00 - 23:00">
+              <div class="flex items-center gap-2">
+                <input class="input flex-1" type="time" [(ngModel)]="setupForm.open_hours_start">
+                <span class="text-sm font-medium flex-shrink-0" style="color:var(--muted-foreground)">até</span>
+                <input class="input flex-1" type="time" [(ngModel)]="setupForm.open_hours_end">
+              </div>
             </div>
             <!-- Esportes -->
             <div>
@@ -312,12 +316,20 @@ export class QuadrasComponent implements OnInit {
   });
 
   setupForm = {
-    name:         '',
-    city:         '',
-    neighborhood: '',
-    open_hours:   '',
-    sports:       [] as string[],
+    name:            '',
+    city:            '',
+    neighborhood:    '',
+    open_hours_start: '07:00',
+    open_hours_end:   '23:00',
+    sports:          [] as string[],
   };
+
+  get openHoursValue(): string {
+    const s = this.setupForm.open_hours_start;
+    const e = this.setupForm.open_hours_end;
+    if (!s || !e) return '';
+    return `${s} - ${e}`;
+  }
 
   sportOptions = [
     { value: 'futevôlei',    label: 'Futevôlei'    },
@@ -357,7 +369,7 @@ export class QuadrasComponent implements OnInit {
         name:         this.setupForm.name,
         city:         this.setupForm.city  || undefined,
         neighborhood: this.setupForm.neighborhood || undefined,
-        open_hours:   this.setupForm.open_hours   || undefined,
+        open_hours:   this.openHoursValue || undefined,
         sports:       this.setupForm.sports.length ? this.setupForm.sports : undefined,
         logo_url:     logoUrl || undefined,
       });

@@ -36,6 +36,29 @@ export interface SaveBankDto {
   account_digit: string;
 }
 
+export interface FinancialFormData {
+  account_holder: string;
+  document_type: string;
+  document_value: string;
+  pix_key_type: string;
+  pix_key_value: string;
+  email: string;
+  phone: string;
+  birth_date: string;
+  company_type: string;
+  address: string;
+  address_number: string;
+  complement: string;
+  province: string;
+  postal_code: string;
+  bank_code: string;
+  bank_account_type: string;
+  bank_agency: string;
+  bank_agency_digit: string;
+  bank_account: string;
+  bank_account_digit: string;
+}
+
 export interface SaveFinancialDto {
   account_holder: string;
   document_type: string;
@@ -103,6 +126,13 @@ export class FinancialService {
     );
     this._financial.set(res.financial);
     return res.financial;
+  }
+
+  async getForm(): Promise<FinancialFormData | null> {
+    const res = await firstValueFrom(
+      this.api.get<{ form: FinancialFormData | null }>('/financial/me/form')
+    );
+    return res.form;
   }
 
   async getDocumentLinks(): Promise<DocumentLink[]> {

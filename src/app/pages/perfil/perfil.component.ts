@@ -333,15 +333,16 @@ export class PerfilComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.profile = this.profileService.getProfile();
-    this.form = {
-      name: this.profile.name,
-      phone: this.profile.phone || '',
-      email: this.profile.email || '',
-      address: this.profile.address || '',
-      city: this.profile.city || '',
-    };
-    this.profileService.profile$.subscribe(p => this.profile = p);
+    this.profileService.profile$.subscribe(p => {
+      this.profile = p;
+      this.form = {
+        name: p.name,
+        phone: p.phone || '',
+        email: p.email || '',
+        address: p.address || '',
+        city: p.city || '',
+      };
+    });
     const stored = localStorage.getItem('arenaflow_cancel_policy');
     if (stored) this.cancelPolicy = { ...this.cancelPolicy, ...JSON.parse(stored) };
   }

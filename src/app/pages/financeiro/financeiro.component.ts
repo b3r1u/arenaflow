@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FinancialService, FinancialInfo, SaveBankDto, DocumentLink } from '../../services/financial.service';
+import { FinancialService, FinancialInfo, SaveBankDto, DocumentLink, FinancialFormData } from '../../services/financial.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -292,7 +292,10 @@ import { ToastService } from '../../services/toast.service';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div *ngIf="form.document_type === 'CPF'">
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Data de nascimento *</label>
-                <input class="input" type="date" [(ngModel)]="form.birth_date">
+                <input class="input" type="date" [(ngModel)]="form.birth_date" [max]="today">
+                <p *ngIf="form.birth_date && form.birth_date > today" class="text-xs mt-1" style="color:hsl(0,72%,51%)">
+                  A data de nascimento não pode ser futura.
+                </p>
               </div>
               <div *ngIf="form.document_type === 'CNPJ'">
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Tipo de empresa *</label>
@@ -434,6 +437,7 @@ import { ToastService } from '../../services/toast.service';
   `
 })
 export class FinanceiroComponent implements OnInit {
+  today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   editing        = false;
   completionMode = false;
   saving         = false;
@@ -554,19 +558,37 @@ export class FinanceiroComponent implements OnInit {
     return 'hsl(38,92%,50%)';
   }
 
-  startEdit() {
+  async startEdit() {
     const f = this.financialService.financial();
-    // Se já tem subconta criada mas falta banco → modo completar
     this.completionMode = !!(f?.asaas_account_id && !f.bank_registered);
     this.editing = true;
-    if (f && !this.completionMode) {
-      this.form.account_holder = f.account_holder;
-      this.form.document_type  = f.document_type;
-      this.form.pix_key_type   = f.pix_key_type;
-      this.form.lgpd_consent   = true;
-    }
-    if (this.completionMode) {
-      this.form.lgpd_consent = true;
+    try {
+      const formData = await this.financialService.getForm();
+      if (formData) {
+        this.form.account_holder = formData.account_holder;
+        this.form.document_type  = formData.document_type;
+        this.form.document_value = formData.document_value;
+        this.form.pix_key_type   = formData.pix_key_type;
+        this.form.pix_key_value  = formData.pix_key_value;
+        this.form.email          = formData.email;
+        this.form.phone          = formData.phone;
+        this.form.birth_date     = formData.birth_date;
+        this.form.company_type   = formData.company_type || 'MEI';
+        this.form.address        = formData.address;
+        this.form.address_number = formData.address_number;
+        this.form.complement     = formData.complement;
+        this.form.province       = formData.province;
+        this.form.postal_code    = formData.postal_code;
+        this.form.lgpd_consent   = true;
+        this.bankForm.bank_code      = formData.bank_code;
+        this.bankForm.account_type   = formData.bank_account_type || 'CONTA_CORRENTE';
+        this.bankForm.agency         = formData.bank_agency;
+        this.bankForm.agency_digit   = formData.bank_agency_digit;
+        this.bankForm.account        = formData.bank_account;
+        this.bankForm.account_digit  = formData.bank_account_digit;
+      }
+    } catch {
+      // Se falhar ao buscar, mantém o form em branco (não bloqueia a edição)
     }
   }
 
@@ -641,7 +663,7 @@ export class FinanceiroComponent implements OnInit {
 
     if (this.completionMode) return bankOk;
 
-    const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date;
+    const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date && this.form.birth_date <= this.today;
     const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
     return !!(
       this.form.account_holder &&
@@ -663,10 +685,8 @@ export class FinanceiroComponent implements OnInit {
       if (!this.completionMode) {
         const { asaas_warning } = await this.financialService.save(this.form);
         if (asaas_warning) {
-          this.warning = `Dados salvos, mas houve um problema ao criar a conta de recebimento: ${asaas_warning} Entre em contato com o suporte para regularizar.`;
-          this.editing = false;
-          this.resetForm();
-          return;
+          this.toast.show(asaas_warning, 'error');
+          return; // permanece no formulário
         }
       }
 
@@ -678,7 +698,7 @@ export class FinanceiroComponent implements OnInit {
       this.editing        = false;
       this.completionMode = false;
       this.resetForm();
-      this.toast.show('Dados bancários salvos com sucesso!');
+      this.toast.show('Dados financeiros salvos com sucesso!');
     } catch (e: any) {
       this.error = e?.error?.error || 'Erro ao salvar dados financeiros';
     } finally {

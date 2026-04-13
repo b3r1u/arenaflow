@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
-import { ToastService } from '../services/toast.service';
+import { ToastService, ToastMessage } from '../services/toast.service';
 import { ProfileService } from '../services/profile.service';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
@@ -132,7 +132,8 @@ import { Subscription, filter } from 'rxjs';
       </nav>
 
       <!-- Toast -->
-      <div *ngIf="toastMessage" class="toast">{{ toastMessage }}</div>
+      <div *ngIf="toast?.type === 'error'" class="toast toast-error">{{ toast!.text }}</div>
+      <div *ngIf="toast?.type === 'success'" class="toast">{{ toast!.text }}</div>
     </div>
   `,
   styles: [`
@@ -176,12 +177,15 @@ import { Subscription, filter } from 'rxjs';
     .nav-active.nav-accent::after {
       display: none;
     }
+    .toast-error {
+      background-color: #ef4444 !important;
+    }
   `]
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   sidebarOpen = false;
   isDesktop = false;
-  toastMessage: string | null = null;
+  toast: ToastMessage | null = null;
   currentPageLabel = '';
   profile: EstablishmentProfile = { name: 'Minha Arena' };
   private subs: Subscription[] = [];
@@ -215,7 +219,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   googleUser = this.authService.user;
 
   constructor(
-    private toast: ToastService,
+    private toastService: ToastService,
     private router: Router,
     private profileService: ProfileService,
     private authService: AuthService,
@@ -235,7 +239,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     // Registra usuário no banco e verifica estabelecimento
     this.establishmentService.init();
     this.subs.push(this.profileService.profile$.subscribe(p => this.profile = p));
-    this.subs.push(this.toast.message$.subscribe(msg => this.toastMessage = msg));
+    this.subs.push(this.toastService.message$.subscribe(msg => this.toast = msg));
     this.subs.push(
       this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
         const url = e.urlAfterRedirects || e.url;

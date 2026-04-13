@@ -1,8 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, effect } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { EstablishmentProfile, ThemeId } from '../models/models';
+import { ThemeService } from './theme.service';
 
 const STORAGE_KEY = (uid: string) => `arenaflow_profile_${uid}`;
+
+// Vars de superfície controladas pelo CSS [data-theme="dark"] —
+// não devem ser aplicadas como inline style quando dark mode está ativo.
+const SURFACE_VARS_SET = new Set([
+  '--background', '--foreground', '--card', '--muted', '--muted-foreground',
+  '--border', '--secondary', '--header-bg', '--input-bg', '--surface-raised', '--svg-empty',
+]);
 
 // Only accent/primary vars — surface vars (background, card, muted, border)
 // are controlled exclusively by CSS [data-theme] to keep dark mode working.
@@ -76,7 +84,13 @@ export class ProfileService {
   private profileSubject = new BehaviorSubject<EstablishmentProfile>({ ...this.defaultProfile });
   profile$ = this.profileSubject.asObservable();
 
-  constructor() {}
+  constructor(private themeService: ThemeService) {
+    // Reaplicar tema sempre que o modo escuro for alternado
+    effect(() => {
+      const _ = this.themeService.dark(); // rastreia o signal
+      this.applyTheme(this.profileSubject.getValue().theme ?? 'base');
+    });
+  }
 
   /** Chamado pelo AuthService ao confirmar o usuário logado */
   init(uid: string): void {
@@ -95,6 +109,15 @@ export class ProfileService {
   clear(): void {
     this.uid = null;
     this.profileSubject.next({ ...this.defaultProfile });
+  }
+
+  /** Remove o cache do localStorage e reseta para os valores padrão (conta nova) */
+  resetStorage(): void {
+    if (this.uid) {
+      localStorage.removeItem(STORAGE_KEY(this.uid));
+    }
+    this.profileSubject.next({ ...this.defaultProfile });
+    this.applyTheme('base');
   }
 
   getProfile(): EstablishmentProfile {
@@ -121,10 +144,17 @@ export class ProfileService {
 
   applyTheme(id: ThemeId): void {
     const root = document.documentElement;
+    const isDark = this.themeService.dark();
     const overrides = THEME_VARS[id] ?? {};
     const vars = { ...DEFAULT_VARS, ...overrides };
     Object.entries(vars).forEach(([key, value]) => {
+      // Em dark mode, não sobrescrever as vars de superfície controladas pelo CSS
+      if (isDark && SURFACE_VARS_SET.has(key)) return;
       root.style.setProperty(key, value);
     });
+    // Garantir que surface vars inline não fiquem "presas" ao entrar no dark mode
+    if (isDark) {
+      SURFACE_VARS_SET.forEach(v => root.style.removeProperty(v));
+    }
   }
 }

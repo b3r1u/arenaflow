@@ -129,6 +129,8 @@ export class EstablishmentService {
       } catch (e: any) {
         if (e?.status === 404) {
           this._establishment.set(null);
+          // Conta sem estabelecimento no banco — limpa cache local do perfil
+          this.profileService.resetStorage();
         } else {
           throw e;
         }
