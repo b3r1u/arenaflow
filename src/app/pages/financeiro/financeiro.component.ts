@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FinancialService, FinancialInfo, SaveBankDto, DocumentLink, FinancialFormData } from '../../services/financial.service';
+import { FinancialService, FinancialInfo, SaveBankDto, FinancialFormData } from '../../services/financial.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -21,7 +21,7 @@ import { ToastService } from '../../services/toast.service';
         <span class="material-icons" style="font-size:2.5rem;color:var(--border);animation:spin 1s linear infinite">refresh</span>
       </div>
 
-      <!-- Aviso ASAAS (CPF já em uso, etc.) -->
+      <!-- Aviso genérico -->
       <div *ngIf="warning" class="mb-5 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
            style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.3);color:hsl(38,92%,50%)">
         <span class="material-icons flex-shrink-0" style="font-size:1.1rem;margin-top:0.05rem">warning</span>
@@ -89,136 +89,19 @@ import { ToastService } from '../../services/toast.service';
           </div>
         </div>
 
-        <!-- Documentos de identidade -->
+        <!-- Status Pagar.me (recebedor cadastrado, aguardando ativação) -->
         <div *ngIf="financialService.hasFinancial() && !editing && financialService.financial()?.bank_registered && financialService.financial()?.status !== 'ACTIVE'"
-             class="card p-6 mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h2 class="font-heading font-semibold text-base" style="color:var(--foreground)">Documentos de identidade</h2>
-              <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">
-                Envie seus documentos para concluir a verificação da conta
-              </p>
-            </div>
-            <button class="btn-outline text-sm px-3 py-1.5 flex items-center gap-1.5"
-                    (click)="loadDocumentLinks()"
-                    [disabled]="loadingDocs">
-              <span *ngIf="loadingDocs" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
-              <span *ngIf="!loadingDocs" class="material-icons" style="font-size:0.9rem">refresh</span>
-              {{ documentLinks.length ? 'Atualizar' : 'Verificar pendências' }}
-            </button>
-          </div>
-
-          <!-- Grupos de documentos -->
-          <div *ngIf="documentLinks.length > 0" class="space-y-4">
-            <div *ngFor="let doc of documentLinks" class="rounded-xl p-4" style="border:1px solid var(--border)">
-
-              <!-- Cabeçalho do grupo -->
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     [style.background]="docStatusBg(doc.status)">
-                  <span class="material-icons" style="font-size:1rem;color:white">
-                    {{ doc.type === 'IDENTIFICATION_SELFIE' ? 'face' : 'badge' }}
-                  </span>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium" style="color:var(--foreground)">{{ doc.title }}</p>
-                  <p class="text-xs" style="color:var(--muted-foreground)">{{ docStatusLabel(doc.status) }}</p>
-                </div>
-                <span class="text-xs px-2.5 py-1 rounded-full font-medium"
-                      [style.background]="docStatusBg(doc.status) + '22'"
-                      [style.color]="docStatusBg(doc.status)">
-                  {{ docStatusLabel(doc.status) }}
-                </span>
-              </div>
-
-              <!-- Via link externo (onboardingUrl presente) -->
-              <a *ngIf="doc.onboardingUrl && isDocPending(doc.status)"
-                 [href]="doc.onboardingUrl" target="_blank"
-                 class="btn-primary text-sm w-full flex items-center justify-center gap-1.5">
-                <span class="material-icons" style="font-size:0.9rem">open_in_new</span>
-                Abrir página de envio
-              </a>
-
-              <!-- Via upload direto (sem onboardingUrl) -->
-              <div *ngIf="!doc.onboardingUrl && isDocPending(doc.status)" class="space-y-2">
-                <p *ngIf="doc.description" class="text-xs px-3 py-2 rounded-lg"
-                   style="background:hsl(38,92%,50%,0.08);border:1px solid hsl(38,92%,50%,0.25);color:hsl(38,92%,50%)">
-                  {{ doc.description }}
-                </p>
-                <p *ngIf="!doc.description" class="text-xs" style="color:var(--muted-foreground)">
-                  {{ doc.type === 'IDENTIFICATION_SELFIE' ? 'Envie uma foto sua (selfie). Em smartphones, você poderá usar a câmera.' : 'Envie a frente e o verso do documento (foto ou PDF).' }}
-                </p>
-
-                <!-- Selfie: 1 arquivo -->
-                <ng-container *ngIf="doc.type === 'IDENTIFICATION_SELFIE'">
-                  <label class="flex items-center gap-2 input cursor-pointer" style="padding:0.5rem 0.75rem">
-                    <span class="material-icons" style="font-size:1.1rem;color:var(--muted-foreground)">photo_camera</span>
-                    <span class="text-sm flex-1 truncate" style="color:var(--muted-foreground)">
-                      {{ getFile(doc.id, 'front')?.name || 'Selecionar selfie...' }}
-                    </span>
-                    <input type="file" class="hidden" accept="image/*"
-                           (change)="onDocFile($event, doc.id, 'front')">
-                  </label>
-                  <button class="btn-primary text-sm w-full"
-                          [disabled]="!getFile(doc.id, 'front') || uploadingDoc === doc.id"
-                          (click)="uploadDocument(doc, 'selfie')">
-                    <span *ngIf="uploadingDoc === doc.id" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
-                    <span *ngIf="uploadingDoc !== doc.id">Enviar selfie</span>
-                  </button>
-                </ng-container>
-
-                <!-- Documento: frente + verso -->
-                <ng-container *ngIf="doc.type !== 'IDENTIFICATION_SELFIE'">
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <p class="text-xs mb-1" style="color:var(--muted-foreground)">Frente</p>
-                      <label class="flex items-center gap-1.5 input cursor-pointer" style="padding:0.4rem 0.6rem">
-                        <span class="material-icons" style="font-size:1rem;color:var(--muted-foreground)">upload_file</span>
-                        <span class="text-xs flex-1 truncate" style="color:var(--muted-foreground)">
-                          {{ getFile(doc.id, 'front')?.name || 'Frente...' }}
-                        </span>
-                        <input type="file" class="hidden" accept="image/*,application/pdf"
-                               (change)="onDocFile($event, doc.id, 'front')">
-                      </label>
-                    </div>
-                    <div>
-                      <p class="text-xs mb-1" style="color:var(--muted-foreground)">Verso</p>
-                      <label class="flex items-center gap-1.5 input cursor-pointer" style="padding:0.4rem 0.6rem">
-                        <span class="material-icons" style="font-size:1rem;color:var(--muted-foreground)">upload_file</span>
-                        <span class="text-xs flex-1 truncate" style="color:var(--muted-foreground)">
-                          {{ getFile(doc.id, 'back')?.name || 'Verso...' }}
-                        </span>
-                        <input type="file" class="hidden" accept="image/*,application/pdf"
-                               (change)="onDocFile($event, doc.id, 'back')">
-                      </label>
-                    </div>
-                  </div>
-                  <button class="btn-primary text-sm w-full"
-                          [disabled]="!getFile(doc.id, 'front') || !getFile(doc.id, 'back') || uploadingDoc === doc.id"
-                          (click)="uploadDocument(doc, 'id')">
-                    <span *ngIf="uploadingDoc === doc.id" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
-                    <span *ngIf="uploadingDoc !== doc.id">Enviar documento</span>
-                  </button>
-                </ng-container>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Estado vazio -->
-          <div *ngIf="documentLinks.length === 0 && !loadingDocs" class="text-center py-6">
-            <span class="material-icons" style="font-size:2rem;color:var(--border)">task_alt</span>
-            <p class="text-sm mt-2" style="color:var(--muted-foreground)">
-              Clique em "Verificar pendências" para ver os documentos necessários.
+             class="card p-5 mb-6 flex items-start gap-3">
+          <span class="material-icons mt-0.5 flex-shrink-0" style="font-size:1.2rem;color:hsl(217,91%,60%)">info</span>
+          <div>
+            <p class="text-sm font-semibold" style="color:var(--foreground)">Recebedor cadastrado no Pagar.me</p>
+            <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">
+              Seus dados foram enviados para análise. A ativação ocorre automaticamente pelo Pagar.me em até 1 dia útil.
+              Nenhuma ação adicional é necessária.
             </p>
           </div>
-
-          <!-- Erro -->
-          <div *ngIf="docError" class="mt-3 px-3 py-2 rounded-lg text-sm"
-               style="background:hsl(0,72%,51%,0.1);color:hsl(0,72%,51%)">
-            {{ docError }}
-          </div>
         </div>
+
 
         <!-- Formulário (cadastro ou edição) -->
         <div *ngIf="!financialService.hasFinancial() || editing" class="card p-6">
@@ -308,6 +191,24 @@ import { ToastService } from '../../services/toast.service';
               </div>
             </div>
 
+            <!-- Dados KYC obrigatórios (Pessoa Física) -->
+            <ng-container *ngIf="form.document_type === 'CPF'">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Nome da mãe *</label>
+                  <input class="input" [(ngModel)]="form.mother_name" placeholder="Maria Silva">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Profissão *</label>
+                  <input class="input" [(ngModel)]="form.professional_occupation" placeholder="Empresário">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Renda mensal (R$) *</label>
+                <input class="input" type="number" [(ngModel)]="form.monthly_income" placeholder="5000">
+              </div>
+            </ng-container>
+
             <!-- Endereço -->
             <p class="text-xs font-semibold uppercase tracking-wide mt-2" style="color:var(--muted-foreground)">Endereço</p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -327,11 +228,24 @@ import { ToastService } from '../../services/toast.service';
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">CEP</label>
-                <input class="input" [value]="form.postal_code" (input)="form.postal_code = maskCep($any($event.target).value)" placeholder="89223-005">
+                <input class="input" [value]="form.postal_code"
+                       (input)="onCepInput($any($event.target).value)"
+                       placeholder="89223-005">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Complemento</label>
                 <input class="input" [(ngModel)]="form.complement" placeholder="Sala 502">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Cidade *</label>
+                <input class="input" [(ngModel)]="form.city" placeholder="Recife">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Estado (UF) *</label>
+                <input class="input" [(ngModel)]="form.state" placeholder="PE" maxlength="2"
+                       style="text-transform:uppercase">
               </div>
             </div>
 
@@ -393,11 +307,11 @@ import { ToastService } from '../../services/toast.service';
               </div>
             </div>
 
-            <!-- Aviso documentos -->
+            <!-- Aviso Pagar.me -->
             <div class="flex items-start gap-2 px-3 py-2.5 rounded-lg text-xs mt-2"
                  style="background:hsl(217,91%,60%,0.08);border:1px solid hsl(217,91%,60%,0.25);color:hsl(217,91%,60%)">
               <span class="material-icons flex-shrink-0" style="font-size:1rem;margin-top:0.05rem">info</span>
-              <span>O envio de documentos de identidade será realizado na próxima etapa, após salvar os dados bancários.</span>
+              <span>Ao salvar, seus dados serão enviados ao Pagar.me para criação do recebedor. A verificação é feita automaticamente pelo Pagar.me em até 1 dia útil.</span>
             </div>
 
             <!-- Consentimento LGPD -->
@@ -441,14 +355,8 @@ export class FinanceiroComponent implements OnInit {
   editing        = false;
   completionMode = false;
   saving         = false;
-  loadingDocs    = false;
-  uploadingDoc:  string | null = null;
-  error:         string | null = null;
-  warning:       string | null = null;
-  docError:      string | null = null;
-  documentLinks: DocumentLink[] = [];
-  // mapa groupId → { front?: File, back?: File }
-  docFiles: Record<string, { front?: File; back?: File }> = {};
+  error:   string | null = null;
+  warning: string | null = null;
 
   form = {
     account_holder: '',
@@ -458,11 +366,16 @@ export class FinanceiroComponent implements OnInit {
     document_value: '',
     birth_date:     '',
     company_type:   'MEI',
+    mother_name:             '',
+    monthly_income:          '',
+    professional_occupation: '',
     address:        '',
     address_number: '',
     complement:     '',
     province:       '',
     postal_code:    '',
+    city:           '',
+    state:          '',
     pix_key_type:   'CPF',
     pix_key_value:  '',
     lgpd_consent:   false,
@@ -477,90 +390,27 @@ export class FinanceiroComponent implements OnInit {
     this.financialService.load();
   }
 
-  async loadDocumentLinks() {
-    this.loadingDocs = true;
-    this.docError    = null;
-    try {
-      this.documentLinks = await this.financialService.getDocumentLinks();
-    } catch (e: any) {
-      this.docError = e?.error?.error || 'Erro ao buscar documentos pendentes';
-    } finally {
-      this.loadingDocs = false;
+  async onCepInput(raw: string) {
+    const masked = this.maskCep(raw);
+    this.form.postal_code = masked;
+    const digits = raw.replace(/\D/g, '');
+    if (digits.length === 8) {
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+        const data = await res.json();
+        if (!data.erro) {
+          if (data.logradouro && !this.form.address)  this.form.address  = data.logradouro;
+          if (data.bairro    && !this.form.province)  this.form.province = data.bairro;
+          if (data.localidade) this.form.city  = data.localidade;
+          if (data.uf)         this.form.state = data.uf.toUpperCase();
+        }
+      } catch { /* ignora erros silenciosamente */ }
     }
-  }
-
-  onDocFile(event: Event, groupId: string, side: 'front' | 'back') {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    if (!this.docFiles[groupId]) this.docFiles[groupId] = {};
-    this.docFiles[groupId][side] = file;
-  }
-
-  getFile(groupId: string, side: 'front' | 'back'): File | undefined {
-    return this.docFiles[groupId]?.[side];
-  }
-
-  async uploadDocument(doc: DocumentLink, mode: 'selfie' | 'id') {
-    this.uploadingDoc = doc.id;
-    this.docError     = null;
-    try {
-      if (mode === 'selfie') {
-        const fd = new FormData();
-        fd.append('doc_type', 'IDENTIFICATION_SELFIE');
-        fd.append('documentFile', this.docFiles[doc.id].front!);
-        await this.financialService.uploadDocumentById(doc.id, fd);
-      } else {
-        // frente
-        const fdFront = new FormData();
-        fdFront.append('doc_type', 'IDENTIFICATION');
-        fdFront.append('documentFile', this.docFiles[doc.id].front!);
-        await this.financialService.uploadDocumentById(doc.id, fdFront);
-        // verso (mesmo type — ASAAS não possui IDENTIFICATION_BACK no enum)
-        const fdBack = new FormData();
-        fdBack.append('doc_type', 'IDENTIFICATION');
-        fdBack.append('documentFile', this.docFiles[doc.id].back!);
-        await this.financialService.uploadDocumentById(doc.id, fdBack);
-      }
-      this.docFiles[doc.id] = {};
-      this.toast.show('Documento enviado com sucesso!');
-      await this.loadDocumentLinks(); // atualiza status
-    } catch (e: any) {
-      const raw = e?.error?.error || e?.message || 'Erro ao enviar documento';
-      if (raw.toLowerCase().includes('não pode ser enviado via api')) {
-        this.docError = 'Este documento deve ser enviado pelo app ASAAS ou pelo link de onboarding. Entre em contato com o suporte ArenaFlow para receber o link de verificação.';
-      } else {
-        this.docError = raw;
-      }
-    } finally {
-      this.uploadingDoc = null;
-    }
-  }
-
-  isDocPending(status: string): boolean {
-    return ['NOT_SENT', 'PENDING', 'REJECTED'].includes(status);
-  }
-
-  docStatusLabel(status: string): string {
-    const map: Record<string, string> = {
-      NOT_SENT:          'Aguardando envio',
-      PENDING:           'Aguardando envio',
-      AWAITING_APPROVAL: 'Em análise',
-      APPROVED:          'Aprovado',
-      REJECTED:          'Reprovado',
-    };
-    return map[status] ?? status;
-  }
-
-  docStatusBg(status: string): string {
-    if (status === 'APPROVED')          return 'hsl(142,71%,45%)';
-    if (status === 'AWAITING_APPROVAL') return 'hsl(217,91%,60%)';
-    if (status === 'REJECTED')          return 'hsl(0,72%,51%)';
-    return 'hsl(38,92%,50%)';
   }
 
   async startEdit() {
     const f = this.financialService.financial();
-    this.completionMode = !!(f?.asaas_account_id && !f.bank_registered);
+    this.completionMode = !!f && !f.bank_registered;
     this.editing = true;
     try {
       const formData = await this.financialService.getForm();
@@ -574,11 +424,16 @@ export class FinanceiroComponent implements OnInit {
         this.form.phone          = formData.phone;
         this.form.birth_date     = formData.birth_date;
         this.form.company_type   = formData.company_type || 'MEI';
+        this.form.mother_name             = formData.mother_name             || '';
+        this.form.monthly_income          = formData.monthly_income          || '';
+        this.form.professional_occupation = formData.professional_occupation || '';
         this.form.address        = formData.address;
         this.form.address_number = formData.address_number;
         this.form.complement     = formData.complement;
         this.form.province       = formData.province;
         this.form.postal_code    = formData.postal_code;
+        this.form.city           = formData.city;
+        this.form.state          = formData.state;
         this.form.lgpd_consent   = true;
         this.bankForm.bank_code      = formData.bank_code;
         this.bankForm.account_type   = formData.bank_account_type || 'CONTA_CORRENTE';
@@ -663,7 +518,11 @@ export class FinanceiroComponent implements OnInit {
 
     if (this.completionMode) return bankOk;
 
-    const cpfOk  = this.form.document_type === 'CPF'  && !!this.form.birth_date && this.form.birth_date <= this.today;
+    const cpfOk  = this.form.document_type === 'CPF'
+      && !!this.form.birth_date && this.form.birth_date <= this.today
+      && !!this.form.mother_name
+      && !!this.form.monthly_income
+      && !!this.form.professional_occupation;
     const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
     return !!(
       this.form.account_holder &&
@@ -671,8 +530,11 @@ export class FinanceiroComponent implements OnInit {
       this.form.document_value &&
       this.form.pix_key_value  &&
       this.form.lgpd_consent   &&
-      (cpfOk || cnpjOk)       &&
-      bankOk
+      this.form.city           &&
+      this.form.state          &&
+      this.form.phone          &&
+      this.form.address        &&
+      (cpfOk || cnpjOk)
     );
   }
 
@@ -681,17 +543,20 @@ export class FinanceiroComponent implements OnInit {
     this.error   = null;
     this.warning = null;
     try {
-      // 1 — dados pessoais + criação da subconta (pulado no modo completar)
+      // 1 — salva dados pessoais no DB
       if (!this.completionMode) {
-        const { asaas_warning } = await this.financialService.save(this.form);
-        if (asaas_warning) {
-          this.toast.show(asaas_warning, 'error');
-          return; // permanece no formulário
-        }
+        await this.financialService.save(this.form);
       }
 
-      // 2 — dados bancários
-      if (this.bankForm.bank_code && this.bankForm.agency && this.bankForm.account) {
+      // 2 — dados bancários → cria recebedor no Pagar.me (só se todos os campos estiverem preenchidos)
+      const bankComplete = !!(
+        this.bankForm.bank_code   &&
+        this.bankForm.account_type &&
+        this.bankForm.agency      &&
+        this.bankForm.account     &&
+        this.bankForm.account_digit
+      );
+      if (bankComplete) {
         await this.financialService.saveBank(this.bankForm);
       }
 
@@ -711,7 +576,9 @@ export class FinanceiroComponent implements OnInit {
       account_holder: '', email: '', phone: '',
       document_type: 'CPF', document_value: '',
       birth_date: '', company_type: 'MEI',
+      mother_name: '', monthly_income: '', professional_occupation: '',
       address: '', address_number: '', complement: '', province: '', postal_code: '',
+      city: '', state: '',
       pix_key_type: 'CPF', pix_key_value: '',
       lgpd_consent: false,
     };

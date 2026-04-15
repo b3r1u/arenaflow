@@ -9,22 +9,12 @@ export interface FinancialInfo {
   document_masked: string;
   pix_key_type: 'CPF' | 'CNPJ' | 'EMAIL' | 'PHONE' | 'RANDOM';
   pix_key_masked: string;
-  asaas_account_id?: string;
+  pagarme_recipient_id?: string;
   bank_registered: boolean;
-  docs_uploaded: number;
   status: 'PENDING_REVIEW' | 'ACTIVE' | 'SUSPENDED';
   lgpd_consent_at: string;
   created_at: string;
   updated_at: string;
-}
-
-export interface DocumentLink {
-  id: string;
-  type: string;
-  title: string;
-  description: string | null;
-  status: string;
-  onboardingUrl: string | null;
 }
 
 export interface SaveBankDto {
@@ -46,11 +36,16 @@ export interface FinancialFormData {
   phone: string;
   birth_date: string;
   company_type: string;
+  mother_name: string;
+  monthly_income: string;
+  professional_occupation: string;
   address: string;
   address_number: string;
   complement: string;
   province: string;
   postal_code: string;
+  city: string;
+  state: string;
   bank_code: string;
   bank_account_type: string;
   bank_agency: string;
@@ -70,11 +65,16 @@ export interface SaveFinancialDto {
   phone?: string;
   birth_date?: string;
   company_type?: string;
+  mother_name?: string;
+  monthly_income?: string;
+  professional_occupation?: string;
   address?: string;
   address_number?: string;
   complement?: string;
   province?: string;
   postal_code?: string;
+  city?: string;
+  state?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -112,9 +112,9 @@ export class FinancialService {
     }
   }
 
-  async save(data: SaveFinancialDto): Promise<{ financial: FinancialInfo; asaas_warning: string | null }> {
+  async save(data: SaveFinancialDto): Promise<{ financial: FinancialInfo }> {
     const res = await firstValueFrom(
-      this.api.post<{ financial: FinancialInfo; asaas_warning: string | null }>('/financial/me', data)
+      this.api.post<{ financial: FinancialInfo }>('/financial/me', data)
     );
     this._financial.set(res.financial);
     return res;
@@ -133,21 +133,6 @@ export class FinancialService {
       this.api.get<{ form: FinancialFormData | null }>('/financial/me/form')
     );
     return res.form;
-  }
-
-  async getDocumentLinks(): Promise<DocumentLink[]> {
-    const res = await firstValueFrom(
-      this.api.get<{ links: DocumentLink[] }>('/financial/document-links')
-    );
-    return res.links;
-  }
-
-  async uploadDocumentById(groupId: string, formData: FormData): Promise<void> {
-    await firstValueFrom(
-      this.api.http.post<{ financial: FinancialInfo }>(
-        `${this.api.baseUrl}/financial/document/${groupId}`, formData
-      )
-    );
   }
 
   reset(): void {
