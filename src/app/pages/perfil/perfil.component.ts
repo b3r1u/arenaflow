@@ -162,21 +162,57 @@ interface ThemeOption {
             </div>
           </div>
 
-          <!-- Endereço -->
+          <!-- CEP -->
           <div>
-            <label class="info-label">Endereço</label>
-            <div class="info-input-wrap">
-              <span class="material-icons info-icon">location_on</span>
-              <input class="input info-input" [(ngModel)]="form.address" placeholder="Rua, número, bairro" />
+            <label class="info-label">CEP</label>
+            <div class="info-input-wrap" style="position:relative">
+              <span class="material-icons info-icon">pin_drop</span>
+              <input class="input info-input" [value]="cep" placeholder="00000-000" maxlength="9"
+                     style="padding-right:2rem"
+                     (input)="onCepInput($event)" />
+              <span *ngIf="cepLoading" class="material-icons"
+                    style="position:absolute;right:0.7rem;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--muted-foreground);animation:spin 1s linear infinite">
+                refresh
+              </span>
+            </div>
+            <p *ngIf="cepError" class="text-xs mt-1" style="color:var(--destructive)">{{ cepError }}</p>
+          </div>
+
+          <!-- Rua + Número -->
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]" style="grid-template-columns:1fr 90px">
+            <div>
+              <label class="info-label">Logradouro</label>
+              <div class="info-input-wrap">
+                <span class="material-icons info-icon">location_on</span>
+                <input class="input info-input" [(ngModel)]="street"
+                       placeholder="Rua, Avenida..." (ngModelChange)="updateAddress()" />
+              </div>
+            </div>
+            <div>
+              <label class="info-label">Número</label>
+              <div class="info-input-wrap">
+                <input class="input info-input" [(ngModel)]="houseNumber"
+                       placeholder="Nº" style="padding-left:0.75rem"
+                       (ngModelChange)="updateAddress()" />
+              </div>
             </div>
           </div>
 
-          <!-- Cidade -->
-          <div>
-            <label class="info-label">Cidade</label>
-            <div class="info-input-wrap">
-              <span class="material-icons info-icon">map</span>
-              <input class="input info-input" [(ngModel)]="form.city" placeholder="São Paulo - SP" />
+          <!-- Bairro + Cidade -->
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="info-label">Bairro</label>
+              <div class="info-input-wrap">
+                <span class="material-icons info-icon">holiday_village</span>
+                <input class="input info-input" [(ngModel)]="form.neighborhood" placeholder="Bairro" />
+              </div>
+            </div>
+            <div>
+              <label class="info-label">Cidade</label>
+              <div class="info-input-wrap">
+                <span class="material-icons info-icon">map</span>
+                <input class="input info-input" [(ngModel)]="form.city" placeholder="Cidade - UF" />
+              </div>
             </div>
           </div>
 
@@ -290,7 +326,14 @@ export class PerfilComponent implements OnInit {
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
   profile!: EstablishmentProfile;
-  form: Omit<EstablishmentProfile, 'logoUrl' | 'theme'> = { name: '', phone: '', email: '', address: '', city: '' };
+  form: Omit<EstablishmentProfile, 'logoUrl' | 'theme'> = { name: '', phone: '', email: '', address: '', neighborhood: '', city: '' };
+
+  // CEP lookup state (não persistido diretamente no banco)
+  cep = '';
+  street = '';
+  houseNumber = '';
+  cepLoading = false;
+  cepError = '';
   isDragging = false;
   errorMsg = '';
 
@@ -340,8 +383,11 @@ export class PerfilComponent implements OnInit {
         phone: p.phone || '',
         email: p.email || '',
         address: p.address || '',
+        neighborhood: p.neighborhood || '',
         city: p.city || '',
       };
+      // Preload street from stored address (best effort)
+      this.street = p.address || '';
     });
     const stored = localStorage.getItem('arenaflow_cancel_policy');
     if (stored) this.cancelPolicy = { ...this.cancelPolicy, ...JSON.parse(stored) };
@@ -364,6 +410,44 @@ export class PerfilComponent implements OnInit {
     this.form.phone = masked;
   }
 
+  onCepInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const d = el.value.replace(/\D/g, '').slice(0, 8);
+    const masked = d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+    el.value = masked;
+    this.cep = masked;
+    this.cepError = '';
+    if (d.length === 8) {
+      this.lookupCep(d);
+    }
+  }
+
+  async lookupCep(raw: string): Promise<void> {
+    this.cepLoading = true;
+    this.cepError = '';
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`);
+      const data = await res.json();
+      if (data.erro) {
+        this.cepError = 'CEP não encontrado';
+        return;
+      }
+      this.street = data.logradouro || '';
+      this.form.neighborhood = data.bairro || '';
+      this.form.city = data.localidade && data.uf ? `${data.localidade} - ${data.uf}` : (data.localidade || '');
+      this.updateAddress();
+    } catch {
+      this.cepError = 'Erro ao buscar CEP';
+    } finally {
+      this.cepLoading = false;
+    }
+  }
+
+  updateAddress(): void {
+    const parts = [this.street, this.houseNumber].filter(s => s.trim());
+    this.form.address = parts.join(', ');
+  }
+
   savingInfo = false;
 
   async saveInfo() {
@@ -375,8 +459,15 @@ export class PerfilComponent implements OnInit {
     try {
       // Salva localmente (sidebar, tema, etc.)
       this.profileService.updateProfile({ ...this.form });
-      // Sincroniza com a API: logo atual
-      await this.establishmentService.syncLogo(this.profile.logoUrl ?? null);
+      // Sincroniza com a API: perfil completo + logo atual
+      await this.establishmentService.syncProfile({
+        name:         this.form.name         || undefined,
+        phone:        this.form.phone        || undefined,
+        address:      this.form.address      || undefined,
+        neighborhood: this.form.neighborhood || undefined,
+        city:         this.form.city         || undefined,
+        logo_url:     this.profile.logoUrl   ?? null,
+      });
       this.toast.show('Informações salvas com sucesso!');
     } catch {
       this.toast.show('Erro ao salvar. Tente novamente.');

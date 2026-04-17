@@ -1,7 +1,7 @@
 export interface Court {
   id: string;
   name: string;
-  sport_type: 'ambos' | 'futevôlei' | 'vôlei';
+  sport_type: 'ambos' | 'futevôlei' | 'vôlei' | 'beach tennis' | 'futebol';
   status: 'disponível' | 'ocupada' | 'bloqueada';
   hourly_rate: number;
   description?: string;
@@ -61,6 +61,7 @@ export interface EstablishmentProfile {
   phone?: string;
   email?: string;
   address?: string;
+  neighborhood?: string;
   city?: string;
   theme?: ThemeId;
 }

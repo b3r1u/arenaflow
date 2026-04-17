@@ -90,7 +90,7 @@ import { ToastService } from '../../services/toast.service';
         </div>
 
         <!-- Status Pagar.me (recebedor cadastrado, aguardando ativação) -->
-        <div *ngIf="financialService.hasFinancial() && !editing && financialService.financial()?.bank_registered && financialService.financial()?.status !== 'ACTIVE'"
+        <div *ngIf="financialService.hasFinancial() && !editing && financialService.financial()?.bank_registered && resolvedStatus !== 'active'"
              class="card p-5 mb-6 flex items-start gap-3">
           <span class="material-icons mt-0.5 flex-shrink-0" style="font-size:1.2rem;color:hsl(217,91%,60%)">info</span>
           <div>
@@ -358,6 +358,7 @@ export class FinanceiroComponent implements OnInit {
   error:   string | null = null;
   warning: string | null = null;
 
+
   form = {
     account_holder: '',
     email:          '',
@@ -600,38 +601,66 @@ export class FinanceiroComponent implements OnInit {
     return type ? (map[type] ?? type) : '';
   }
 
-  statusBg(): string {
+  // Usa o status real do Pagar.me quando disponível
+  get resolvedStatus(): string {
+    const ps = this.financialService.financial()?.pagarme_status;
+    if (ps) return ps;
     const s = this.financialService.financial()?.status;
-    if (s === 'ACTIVE')         return 'hsl(152,69%,40%)';
-    if (s === 'SUSPENDED')      return 'hsl(0,72%,51%)';
-    return 'hsl(38,92%,50%)'; // PENDING_REVIEW
+    if (s === 'ACTIVE')    return 'active';
+    if (s === 'SUSPENDED') return 'suspended';
+    return 'registration';
+  }
+
+  statusBg(): string {
+    const s = this.resolvedStatus;
+    if (s === 'active')                        return 'hsl(152,69%,40%)';
+    if (s === 'refused'  || s === 'blocked')   return 'hsl(0,72%,51%)';
+    if (s === 'suspended'|| s === 'inactive')  return 'hsl(0,72%,51%)';
+    if (s === 'affiliation')                   return 'hsl(217,91%,60%)';
+    return 'hsl(38,92%,50%)'; // registration / default
   }
 
   statusIcon(): string {
-    const s = this.financialService.financial()?.status;
-    if (s === 'ACTIVE')    return 'check_circle';
-    if (s === 'SUSPENDED') return 'block';
+    const s = this.resolvedStatus;
+    if (s === 'active')                       return 'check_circle';
+    if (s === 'refused' || s === 'blocked')   return 'block';
+    if (s === 'suspended'|| s === 'inactive') return 'pause_circle';
+    if (s === 'affiliation')                  return 'pending';
     return 'hourglass_top';
   }
 
   statusBadge(): string {
-    const s = this.financialService.financial()?.status;
-    if (s === 'ACTIVE')    return 'Ativo';
-    if (s === 'SUSPENDED') return 'Suspenso';
-    return 'Em análise';
+    const map: Record<string, string> = {
+      active:      'Ativo',
+      registration:'Registro',
+      affiliation: 'Afiliação',
+      refused:     'Recusado',
+      suspended:   'Suspenso',
+      blocked:     'Bloqueado',
+      inactive:    'Inativo',
+    };
+    return map[this.resolvedStatus] ?? 'Em análise';
   }
 
   statusLabel(): string {
-    const s = this.financialService.financial()?.status;
-    if (s === 'ACTIVE')    return 'Conta ativa — recebendo pagamentos';
-    if (s === 'SUSPENDED') return 'Conta suspensa';
-    return 'Verificação em andamento';
+    const s = this.resolvedStatus;
+    if (s === 'active')      return 'Conta ativa — recebendo pagamentos';
+    if (s === 'affiliation') return 'Aguardando afiliação pelo Pagar.me';
+    if (s === 'refused')     return 'Cadastro recusado';
+    if (s === 'suspended')   return 'Conta suspensa';
+    if (s === 'blocked')     return 'Conta bloqueada';
+    if (s === 'inactive')    return 'Conta inativa';
+    return 'Registro criado — credenciamento pendente';
   }
 
   statusDesc(): string {
-    const s = this.financialService.financial()?.status;
-    if (s === 'ACTIVE')    return 'Seus clientes já podem pagar via app.';
-    if (s === 'SUSPENDED') return 'Entre em contato com o suporte ArenaFlow.';
-    return 'Seus dados foram enviados para verificação. A ativação ocorre automaticamente em até 1 dia útil.';
+    const s = this.resolvedStatus;
+    if (s === 'active')      return 'Seus clientes já podem pagar via app.';
+    if (s === 'affiliation') return 'O Pagar.me está analisando seu cadastro. Em breve será ativado.';
+    if (s === 'refused')     return 'Entre em contato com o suporte ArenaFlow.';
+    if (s === 'suspended')   return 'Entre em contato com o suporte ArenaFlow.';
+    if (s === 'blocked')     return 'Entre em contato com o suporte ArenaFlow.';
+    if (s === 'inactive')    return 'Entre em contato com o suporte ArenaFlow.';
+    return 'Recebedor criado. Pode transacionar, mas saques ficam disponíveis após afiliação.';
   }
 }

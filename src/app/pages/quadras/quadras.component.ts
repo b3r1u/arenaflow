@@ -226,21 +226,38 @@ import { Court } from '../../models/models';
             <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Nome *</label>
             <input class="input" [(ngModel)]="form.name" placeholder="Ex: Quadra 1">
           </div>
+          <!-- Esporte — cards clicáveis -->
           <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Esporte</label>
-            <select class="select" [(ngModel)]="form.sport_type">
-              <option value="ambos">Ambos</option>
-              <option value="futevôlei">Futevôlei</option>
-              <option value="vôlei">Vôlei</option>
-              <option value="beach tennis">Beach Tennis</option>
-            </select>
+            <label class="block text-sm font-medium mb-2" style="color:var(--foreground)">Esporte</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button *ngFor="let opt of sportOptions"
+                      type="button"
+                      (click)="form.sport_type = opt.value"
+                      class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl border text-xs font-medium transition-all"
+                      [style]="form.sport_type === opt.value
+                        ? 'background:var(--primary);border-color:var(--primary);color:#fff'
+                        : 'background:var(--card);border-color:var(--border);color:var(--muted-foreground)'">
+                <span class="material-icons" style="font-size:1.4rem">{{ opt.icon }}</span>
+                {{ opt.label }}
+              </button>
+            </div>
           </div>
+
+          <!-- Status — cards clicáveis -->
           <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Status</label>
-            <select class="select" [(ngModel)]="form.status">
-              <option value="disponível">Disponível</option>
-              <option value="bloqueada">Bloqueada</option>
-            </select>
+            <label class="block text-sm font-medium mb-2" style="color:var(--foreground)">Status</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button *ngFor="let opt of statusOptions"
+                      type="button"
+                      (click)="form.status = opt.value"
+                      class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl border text-sm font-medium transition-all"
+                      [style]="form.status === opt.value
+                        ? 'background:' + opt.color + ';border-color:' + opt.color + ';color:#fff'
+                        : 'background:var(--card);border-color:var(--border);color:var(--muted-foreground)'">
+                <span class="material-icons" style="font-size:1.1rem">{{ opt.icon }}</span>
+                {{ opt.label }}
+              </button>
+            </div>
           </div>
           <div>
             <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Valor/hora (R$)</label>
@@ -303,9 +320,9 @@ export class QuadrasComponent implements OnInit {
     return sub?.plan.name ?? 'Free';
   });
 
-  /** true somente quando o financeiro está com status ACTIVE */
+  /** true somente quando o financeiro está com status active no Pagar.me */
   readonly financialActive = computed(() =>
-    this.financialService.financial()?.status === 'ACTIVE'
+    this.financialService.financial()?.pagarme_status === 'active'
   );
 
   /** true quando o usuário já atingiu o limite de quadras do plano */
@@ -332,9 +349,15 @@ export class QuadrasComponent implements OnInit {
   }
 
   sportOptions = [
-    { value: 'futevôlei',    label: 'Futevôlei'    },
-    { value: 'vôlei',        label: 'Vôlei'        },
-    { value: 'beach tennis', label: 'Beach Tennis' },
+    { value: 'futevôlei',    label: 'Futevôlei',    icon: 'sports_volleyball' },
+    { value: 'vôlei',        label: 'Vôlei',        icon: 'sports_volleyball' },
+    { value: 'beach tennis', label: 'Beach Tennis', icon: 'sports_tennis'     },
+    { value: 'futebol',      label: 'Futebol',      icon: 'sports_soccer'     },
+  ];
+
+  statusOptions = [
+    { value: 'disponível', label: 'Disponível', icon: 'check_circle', color: 'hsl(152,69%,40%)' },
+    { value: 'bloqueada',  label: 'Bloqueada',  icon: 'block',        color: 'hsl(0,72%,51%)'   },
   ];
 
   constructor(
@@ -386,7 +409,7 @@ export class QuadrasComponent implements OnInit {
   // ─── Quadras ───────────────────────────────────────────────────────────────
 
   emptyForm(): CourtFormData {
-    return { name: '', sport_type: 'ambos', status: 'disponível', hourly_rate: 80, description: '' };
+    return { name: '', sport_type: 'futevôlei', status: 'disponível', hourly_rate: 80, description: '' };
   }
 
   getStatusClass(s: string) {

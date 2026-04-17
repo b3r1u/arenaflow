@@ -119,10 +119,14 @@ export class EstablishmentService {
           this.courtService.seed(est.courts);
         }
 
-        // Sincroniza nome e logo da API com o perfil local (sidebar)
-        const profileUpdates: { name?: string; logoUrl?: string } = {};
-        if (est.name)    profileUpdates.name    = est.name;
-        if (est.logo_url) profileUpdates.logoUrl = est.logo_url;
+        // Sincroniza dados da API com o perfil local (sidebar + formulário de perfil)
+        const profileUpdates: { name?: string; logoUrl?: string; phone?: string; address?: string; neighborhood?: string; city?: string } = {};
+        if (est.name)         profileUpdates.name         = est.name;
+        if (est.logo_url)     profileUpdates.logoUrl      = est.logo_url;
+        if (est.phone)        profileUpdates.phone        = est.phone;
+        if (est.address)      profileUpdates.address      = est.address;
+        if (est.neighborhood) profileUpdates.neighborhood = est.neighborhood;
+        if (est.city)         profileUpdates.city         = est.city;
         if (Object.keys(profileUpdates).length) {
           this.profileService.updateProfile(profileUpdates);
         }
@@ -173,6 +177,37 @@ export class EstablishmentService {
     } catch (err) {
       console.error('[EstablishmentService] syncLogo error', err);
       throw err; // propaga para o componente poder exibir feedback
+    }
+  }
+
+  /**
+   * Sincroniza os dados do perfil (nome, telefone, endereço, cidade, etc.) com o banco.
+   * Chamado pelo PerfilComponent ao clicar em "Salvar informações".
+   */
+  async syncProfile(data: {
+    name?: string;
+    phone?: string;
+    address?: string;
+    neighborhood?: string;
+    city?: string;
+    description?: string;
+    logo_url?: string | null;
+  }): Promise<void> {
+    if (!this._initialized()) {
+      await this.init();
+    }
+    if (!this.hasEstablishment()) return;
+    try {
+      const res = await firstValueFrom(
+        this.api.patch<{ establishment: ApiEstablishment }>(
+          '/establishments/me',
+          data
+        )
+      );
+      this._establishment.set(res.establishment);
+    } catch (err) {
+      console.error('[EstablishmentService] syncProfile error', err);
+      throw err;
     }
   }
 

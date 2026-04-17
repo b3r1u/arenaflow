@@ -4,6 +4,7 @@ import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexFill, ApexStrok
          ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers,
          ApexPlotOptions } from 'ng-apexcharts';
 import { DataService } from '../../services/data.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { Court, Booking } from '../../models/models';
 
 @Component({
@@ -276,24 +277,28 @@ export class DashboardComponent implements OnInit {
     hover: { size: 6, sizeOffset: 2 }
   };
 
-  constructor(private data: DataService) {}
+  constructor(private data: DataService, private dashboard: DashboardService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.courts = this.data.getCourts();
-    this.todayBookings = this.data.getTodayBookings();
-    this.paidToday = this.todayBookings.filter(b => b.payment_status === 'pago').length;
-    this.pendingToday = this.todayBookings.filter(b => b.payment_status === 'pendente').length;
-    this.todayRevenue = this.data.getTodayRevenue();
-    this.monthlyRevenue = this.data.getMonthlyRevenue();
-    this.monthlyBookings = this.data.getBookings().filter(b => {
-      const d = new Date(b.date), now = new Date();
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    }).length;
-    this.clientsCount = this.data.getClients().length;
     this.last7Days = this.data.getLast7DaysRevenue();
     this.popularHours = this.data.getPopularHours();
     this.totalLast7 = this.last7Days.reduce((s, d) => s + d.revenue, 0);
+    this.clientsCount = this.data.getClients().length;
     this.buildChart();
+
+    // Cards com dados reais da API
+    try {
+      const stats = await this.dashboard.getStats();
+      this.todayBookings   = Array(stats.reservasHoje);   // usado só para .length
+      this.paidToday       = stats.pagasHoje;
+      this.pendingToday    = stats.pendentesHoje;
+      this.todayRevenue    = stats.receitaHoje;
+      this.monthlyRevenue  = stats.receitaMensal;
+      this.monthlyBookings = stats.reservasMes;
+    } catch (err) {
+      console.error('[DASHBOARD] Erro ao carregar stats:', err);
+    }
   }
 
   buildChart() {

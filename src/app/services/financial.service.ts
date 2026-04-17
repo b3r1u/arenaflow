@@ -10,6 +10,7 @@ export interface FinancialInfo {
   pix_key_type: 'CPF' | 'CNPJ' | 'EMAIL' | 'PHONE' | 'RANDOM';
   pix_key_masked: string;
   pagarme_recipient_id?: string;
+  pagarme_status?: string;
   bank_registered: boolean;
   status: 'PENDING_REVIEW' | 'ACTIVE' | 'SUSPENDED';
   lgpd_consent_at: string;
@@ -126,6 +127,16 @@ export class FinancialService {
     );
     this._financial.set(res.financial);
     return res.financial;
+  }
+
+  async getRecipientStatus(): Promise<{ id: string; status: string; name: string } | null> {
+    try {
+      return await firstValueFrom(
+        this.api.get<{ id: string; status: string; name: string }>('/financial/recipient-status')
+      );
+    } catch {
+      return null;
+    }
   }
 
   async getForm(): Promise<FinancialFormData | null> {
