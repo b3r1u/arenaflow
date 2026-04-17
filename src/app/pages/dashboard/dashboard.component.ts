@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexFill, ApexStroke,
          ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers,
          ApexPlotOptions } from 'ng-apexcharts';
 import { DataService } from '../../services/data.service';
-import { DashboardService, RevenueDay } from '../../services/dashboard.service';
+import { DashboardService, RevenueDay, TodayBooking } from '../../services/dashboard.service';
 import { CourtService } from '../../services/court.service';
+import { ApiService } from '../../services/api.service';
 import { Court, Booking } from '../../models/models';
 
 @Component({
@@ -129,7 +131,7 @@ import { Court, Booking } from '../../models/models';
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-semibold text-sm truncate" style="color:var(--foreground)">{{ booking.client_name }}</div>
-                <div class="text-xs" style="color:var(--muted-foreground)">{{ booking.start_hour }}–{{ booking.end_hour }} · {{ getCourtName(booking.court_id) }}</div>
+                <div class="text-xs" style="color:var(--muted-foreground)">{{ booking.start_hour }}–{{ booking.end_hour }} · {{ booking.court_name }}</div>
               </div>
               <span class="badge flex-shrink-0" [ngClass]="getPaymentStatusClass(booking.payment_status)">{{ booking.payment_status }}</span>
             </div>
@@ -164,7 +166,7 @@ import { Court, Booking } from '../../models/models';
 })
 export class DashboardComponent implements OnInit {
   courts: Court[] = [];
-  todayBookings: Booking[] = [];
+  todayBookings: TodayBooking[] = [];
   paidToday = 0;
   pendingToday = 0;
   todayRevenue = 0;
@@ -285,21 +287,21 @@ export class DashboardComponent implements OnInit {
     hover: { size: 6, sizeOffset: 2 }
   };
 
-  constructor(private data: DataService, private dashboard: DashboardService, public courtService: CourtService) {}
+  constructor(private data: DataService, private dashboard: DashboardService, public courtService: CourtService, private api: ApiService) {}
 
   async ngOnInit() {
-    this.popularHours = this.data.getPopularHours();
-    this.clientsCount = this.data.getClients().length;
-
     try {
-      const [stats, revenue7] = await Promise.all([
+      const [stats, revenue7, bookingsToday, popularHours, clientsRes] = await Promise.all([
         this.dashboard.getStats(),
         this.dashboard.getRevenue7Days(),
+        this.dashboard.getBookingsToday(),
+        this.dashboard.getPopularHours(),
+        firstValueFrom(this.api.get<{ clients: unknown[] }>('/clients')),
         this.courtService.load(),
       ]);
 
       // Cards
-      this.todayBookings   = Array(stats.reservasHoje);
+      this.todayBookings   = bookingsToday;
       this.paidToday       = stats.pagasHoje;
       this.pendingToday    = stats.pendentesHoje;
       this.todayRevenue    = stats.receitaHoje;
@@ -307,8 +309,10 @@ export class DashboardComponent implements OnInit {
       this.monthlyBookings = stats.reservasMes;
 
       // Gráfico 7 dias
-      this.last7Days  = revenue7;
-      this.totalLast7 = revenue7.reduce((s, d) => s + d.revenue, 0);
+      this.last7Days    = revenue7;
+      this.totalLast7   = revenue7.reduce((s, d) => s + d.revenue, 0);
+      this.popularHours = popularHours;
+      this.clientsCount = clientsRes.clients.length;
       this.buildChart();
     } catch (err) {
       console.error('[DASHBOARD] Erro ao carregar dados:', err);

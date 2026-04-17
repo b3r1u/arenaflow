@@ -1,9 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { ApiService } from '../../services/api.service';
+import { CourtService } from '../../services/court.service';
 import { DataService } from '../../services/data.service';
 import { ToastService } from '../../services/toast.service';
-import { Booking, Court, Mensalista } from '../../models/models';
+import { Court, Mensalista } from '../../models/models';
+
+interface AdminBooking {
+  id:             string;
+  client_name:    string;
+  client_phone:   string | null;
+  court_id:       string;
+  court_name:     string | null;
+  sport_type:     string | null;
+  date:           string;
+  start_hour:     string;
+  end_hour:       string;
+  total_amount:   number;
+  paid_amount:    number;
+  payment_status: string;
+}
 
 @Component({
   selector: 'app-agendamentos',
@@ -15,7 +33,9 @@ import { Booking, Court, Mensalista } from '../../models/models';
       <div class="flex items-center justify-between mb-6">
         <div>
           <h1 class="font-heading font-bold text-2xl lg:text-3xl" style="color: var(--foreground)">Agendamentos</h1>
-          <p class="text-sm mt-1" style="color: var(--muted-foreground)">Gerencie as reservas das quadras</p>
+          <p class="text-sm mt-1" style="color: var(--muted-foreground)">
+            {{ loadingBookings ? 'Carregando...' : 'Gerencie as reservas das quadras' }}
+          </p>
         </div>
         <button class="btn-primary" (click)="openModal()">
           <span>+</span> Nova Reserva
@@ -48,15 +68,20 @@ import { Booking, Court, Mensalista } from '../../models/models';
         </div>
       </div>
 
+      <!-- Loading spinner -->
+      <div *ngIf="loadingBookings" class="flex items-center justify-center py-16">
+        <span class="material-icons" style="font-size:2rem;color:var(--muted-foreground);animation:spin 1s linear infinite">refresh</span>
+      </div>
+
       <!-- Mobile: booking cards list -->
-      <div class="lg:hidden space-y-3">
+      <div *ngIf="!loadingBookings" class="lg:hidden space-y-3">
         <ng-container *ngFor="let court of courts">
           <div class="card overflow-hidden">
             <!-- Court header -->
             <div class="flex items-center justify-between px-4 py-3"
                  style="background-color:var(--muted);border-bottom:1px solid var(--border)">
               <div class="flex items-center gap-2">
-                <span class="material-icons" style="font-size:1rem;color:var(--primary)">sports_volleyball</span>
+                <span class="material-icons" style="font-size:1rem;color:var(--primary)">{{ getSportIcon(court.sport_type) }}</span>
                 <span class="font-heading font-semibold text-sm" style="color:var(--foreground)">{{ court.name }}</span>
               </div>
               <span class="badge" [ngClass]="getCourtStatusClass(court.status)">{{ court.status }}</span>
@@ -75,7 +100,7 @@ import { Booking, Court, Mensalista } from '../../models/models';
                     </div>
                     <div class="flex-1 min-w-0">
                       <div class="font-semibold text-sm truncate" style="color:var(--foreground)">{{ booking.client_name }}</div>
-                      <div class="text-xs" style="color:var(--muted-foreground)">{{ booking.start_hour }}–{{ booking.end_hour }} · R\${{ booking.total_amount }}</div>
+                      <div class="text-xs" style="color:var(--muted-foreground)">{{ booking.start_hour }}–{{ booking.end_hour }} · R\${{ booking.total_amount | number:'1.2-2' }}</div>
                     </div>
                     <span class="badge flex-shrink-0" [ngClass]="getPaymentStatusClass(booking.payment_status)">{{ booking.payment_status }}</span>
                   </div>
@@ -114,7 +139,7 @@ import { Booking, Court, Mensalista } from '../../models/models';
       </div>
 
       <!-- Desktop: grid table -->
-      <div class="hidden lg:block card overflow-auto mobile-scroll">
+      <div *ngIf="!loadingBookings" class="hidden lg:block card overflow-auto mobile-scroll">
         <table class="w-full text-sm">
           <thead>
             <tr style="border-bottom:1px solid var(--border)">
@@ -191,7 +216,7 @@ import { Booking, Court, Mensalista } from '../../models/models';
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-1.5" style="color: var(--foreground)">Nome do Cliente *</label>
-            <input class="input" [(ngModel)]="form.client_name" placeholder="Nome completo" (blur)="autoFillPhone()">
+            <input class="input" [(ngModel)]="form.client_name" placeholder="Nome completo">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1.5" style="color: var(--foreground)">Telefone</label>
@@ -240,37 +265,28 @@ import { Booking, Court, Mensalista } from '../../models/models';
           <!-- Price preview -->
           <div *ngIf="pricePreview > 0" class="p-4 rounded-xl text-sm font-medium" style="background-color: hsl(152,69%,40%,0.05); border: 1px solid hsl(152,69%,40%,0.2)">
             <div style="color: var(--muted-foreground)">{{ durationHours }}h × R\${{ hourlyRate }}/h</div>
-            <div class="font-heading font-bold text-lg mt-1" style="color: var(--primary)">R\${{ pricePreview }}</div>
+            <div class="font-heading font-bold text-lg mt-1" style="color: var(--primary)">R\${{ pricePreview | number:'1.2-2' }}</div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1.5" style="color: var(--foreground)">Pagamento</label>
-            <select class="select" [(ngModel)]="form.payment_method">
-              <option value="">Não informado</option>
-              <option value="pix">Pix</option>
-              <option value="cartão">Cartão</option>
-              <option value="dinheiro">Dinheiro</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color: var(--foreground)">Status</label>
+            <label class="block text-sm font-medium mb-1.5" style="color: var(--foreground)">Status do Pagamento</label>
             <select class="select" [(ngModel)]="form.payment_status">
-              <option value="não informado">Não informado</option>
               <option value="pendente">Pendente</option>
               <option value="pago">Pago</option>
+              <option value="parcial">Parcial</option>
             </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color: var(--foreground)">Observações</label>
-            <textarea class="textarea" [(ngModel)]="form.notes" placeholder="Alguma observação?" rows="2"></textarea>
           </div>
         </div>
 
         <div class="flex gap-3 mt-6">
           <button class="btn-outline flex-1" (click)="closeModal()">Cancelar</button>
-          <button *ngIf="editingId" class="btn-outline flex-1" style="border-color: var(--destructive); color: var(--destructive)" (click)="deleteBooking()">Excluir</button>
-          <button class="btn-primary flex-1" (click)="saveBooking()" [disabled]="hasConflict || !form.client_name || !form.court_id">
-            {{ editingId ? 'Salvar' : 'Criar Reserva' }}
+          <button *ngIf="editingId" class="btn-outline flex-1" style="border-color: var(--destructive); color: var(--destructive)"
+                  [disabled]="saving" (click)="deleteBooking()">
+            {{ saving ? '...' : 'Excluir' }}
+          </button>
+          <button class="btn-primary flex-1" (click)="saveBooking()"
+                  [disabled]="hasConflict || !form.client_name || !form.court_id || saving">
+            {{ saving ? 'Salvando...' : (editingId ? 'Salvar' : 'Criar Reserva') }}
           </button>
         </div>
       </div>
@@ -278,42 +294,80 @@ import { Booking, Court, Mensalista } from '../../models/models';
   `
 })
 export class AgendamentosComponent implements OnInit {
-  courts:      Court[]      = [];
-  bookings:    Booking[]    = [];
-  mensalistas: Mensalista[] = [];
+  courts:      Court[]        = [];
+  bookings:    AdminBooking[] = [];
+  mensalistas: Mensalista[]   = [];
 
-  currentDate = new Date();
-  showModal   = false;
-  editingId:  string | null = null;
-  hasConflict = false;
+  currentDate     = new Date();
+  loadingBookings = false;
+  saving          = false;
+  showModal       = false;
+  editingId:      string | null = null;
+  hasConflict     = false;
   conflictType: 'reserva' | 'mensalista' = 'reserva';
-  pricePreview  = 0;
-  durationHours = 0;
-  hourlyRate    = 0;
-  hoveredRow    = '';
+  pricePreview    = 0;
+  durationHours   = 0;
+  hourlyRate      = 0;
+  hoveredRow      = '';
 
   hours    = Array.from({ length: 17 }, (_, i) => `${(i + 7).toString().padStart(2, '0')}:00`);
   get endHours()     { return this.hours.slice(1); }
   get activeCourts() { return this.courts.filter(c => c.status !== 'bloqueada'); }
-  get dateStr()      { return this.currentDate.toISOString().split('T')[0]; }
+
+  /** Retorna YYYY-MM-DD baseado na data local (sem conversão UTC) */
+  get dateStr(): string {
+    const y = this.currentDate.getFullYear();
+    const m = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+    const d = String(this.currentDate.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
 
   form = this.emptyForm();
 
-  constructor(private data: DataService, private toast: ToastService) {}
+  constructor(
+    private api:          ApiService,
+    private courtService: CourtService,
+    private data:         DataService,
+    private toast:        ToastService,
+  ) {}
 
-  ngOnInit() {
-    this.data.courts$.subscribe(c      => this.courts      = c);
-    this.data.bookings$.subscribe(b    => this.bookings    = b);
+  async ngOnInit() {
+    // Mensalistas ainda vêm do mock (sem tabela no banco)
     this.data.mensalistas$.subscribe(m => this.mensalistas = m);
+
+    // Carrega quadras reais
+    await this.courtService.load();
+    this.courts = this.courtService.courts();
+
+    // Carrega reservas do dia atual
+    await this.loadBookings();
+  }
+
+  async loadBookings(): Promise<void> {
+    this.loadingBookings = true;
+    try {
+      const res = await firstValueFrom(
+        this.api.get<{ bookings: AdminBooking[] }>(`/admin/bookings?date=${this.dateStr}`)
+      );
+      this.bookings = res.bookings;
+    } catch (err) {
+      console.error('[AGENDAMENTOS]', err);
+      this.bookings = [];
+    } finally {
+      this.loadingBookings = false;
+    }
   }
 
   emptyForm() {
     return {
-      client_name: '', client_phone: '', court_id: '',
-      date: new Date().toISOString().split('T')[0],
-      start_hour: '09:00', end_hour: '10:00',
-      payment_method: '' as any, payment_status: 'pendente' as any,
-      notes: '', total_amount: 0
+      client_name:    '',
+      client_phone:   '',
+      court_id:       '',
+      date:           this.dateStr,
+      start_hour:     '09:00',
+      end_hour:       '10:00',
+      payment_status: 'pendente',
+      total_amount:   0,
     };
   }
 
@@ -321,18 +375,18 @@ export class AgendamentosComponent implements OnInit {
     return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
   }
 
-  changeDate(delta: number) {
+  changeDate(delta: number): void {
     const d = new Date(this.currentDate);
     d.setDate(d.getDate() + delta);
     this.currentDate = d;
+    this.loadBookings();
   }
 
   // ─── Slot lookup ────────────────────────────────────────────────────────────
 
-  getBookingForSlot(courtId: string, hour: string): Booking | undefined {
+  getBookingForSlot(courtId: string, hour: string): AdminBooking | undefined {
     return this.bookings.find(b =>
-      b.court_id === courtId &&
-      b.date     === this.dateStr &&
+      b.court_id   === courtId &&
       b.start_hour <= hour &&
       b.end_hour   >  hour
     );
@@ -346,42 +400,45 @@ export class AgendamentosComponent implements OnInit {
     return this.data.getMensalistasAtivos(courtId, this.data.getDayOfWeek(this.dateStr));
   }
 
-  getDayBookingsForCourt(courtId: string): Booking[] {
-    return this.bookings.filter(b => b.court_id === courtId && b.date === this.dateStr);
+  getDayBookingsForCourt(courtId: string): AdminBooking[] {
+    return this.bookings.filter(b => b.court_id === courtId);
   }
 
   // ─── Modal ──────────────────────────────────────────────────────────────────
 
-  openModal(courtId?: string, hour?: string) {
-    this.form       = this.emptyForm();
-    this.form.date  = this.dateStr;
+  openModal(courtId?: string, hour?: string): void {
+    this.form           = this.emptyForm();
+    this.form.date      = this.dateStr;
     if (courtId) this.form.court_id   = courtId;
-    if (hour)   { this.form.start_hour = hour; this.form.end_hour = this.getNextHour(hour); }
-    this.editingId  = null;
+    if (hour)  { this.form.start_hour = hour; this.form.end_hour = this.getNextHour(hour); }
+    this.editingId      = null;
     this.calcPrice();
-    this.showModal  = true;
+    this.showModal      = true;
   }
 
-  editBooking(b: Booking) {
+  editBooking(b: AdminBooking): void {
     this.form = {
-      client_name: b.client_name, client_phone: b.client_phone || '',
-      court_id: b.court_id, date: b.date, start_hour: b.start_hour,
-      end_hour: b.end_hour, payment_method: b.payment_method || '' as any,
-      payment_status: b.payment_status as any, notes: b.notes || '', total_amount: b.total_amount
+      client_name:    b.client_name,
+      client_phone:   b.client_phone || '',
+      court_id:       b.court_id,
+      date:           b.date,
+      start_hour:     b.start_hour,
+      end_hour:       b.end_hour,
+      payment_status: b.payment_status,
+      total_amount:   b.total_amount,
     };
     this.editingId = b.id;
     this.calcPrice();
     this.showModal = true;
   }
 
-  // ─── Conflict check (regra de negócio) ──────────────────────────────────────
+  // ─── Conflict check ──────────────────────────────────────────────────────────
 
-  checkConflict() {
+  checkConflict(): void {
     if (!this.form.court_id) { this.hasConflict = false; return; }
 
     const hasBookingConflict = this.bookings.some(b =>
       b.court_id   === this.form.court_id &&
-      b.date       === this.form.date &&
       b.id         !== this.editingId &&
       b.start_hour <  this.form.end_hour &&
       b.end_hour   >  this.form.start_hour
@@ -391,61 +448,93 @@ export class AgendamentosComponent implements OnInit {
       this.form.court_id,
       this.form.date,
       this.form.start_hour,
-      this.form.end_hour
+      this.form.end_hour,
     );
 
     this.hasConflict  = hasBookingConflict || hasMensalistaConflict;
     this.conflictType = hasMensalistaConflict ? 'mensalista' : 'reserva';
   }
 
-  calcPrice() {
+  calcPrice(): void {
     const start = parseInt(this.form.start_hour);
     const end   = parseInt(this.form.end_hour);
     this.durationHours = end - start;
     const court = this.courts.find(c => c.id === this.form.court_id);
-    this.hourlyRate   = court?.hourly_rate || 0;
-    this.pricePreview = this.durationHours > 0 ? this.durationHours * this.hourlyRate : 0;
+    this.hourlyRate    = court?.hourly_rate || 0;
+    this.pricePreview  = this.durationHours > 0 ? this.durationHours * this.hourlyRate : 0;
     this.checkConflict();
   }
 
-  autoFillPhone() {
-    const client = this.data.getClients().find(c => c.name === this.form.client_name);
-    if (client?.phone) this.form.client_phone = client.phone;
-  }
+  async saveBooking(): Promise<void> {
+    if (!this.form.client_name || !this.form.court_id || this.saving) return;
+    this.saving = true;
 
-  saveBooking() {
-    if (!this.form.client_name || !this.form.court_id) return;
-    const booking = { ...this.form, total_amount: this.pricePreview || this.form.total_amount, duration_hours: this.durationHours };
-    if (this.editingId) {
-      this.data.updateBooking(this.editingId, booking);
-      this.toast.show('Reserva atualizada!');
-    } else {
-      this.data.addBooking(booking);
-      const exists = this.data.getClients().some(c => c.name === this.form.client_name);
-      if (!exists && this.form.client_name) {
-        this.data.addClient({ name: this.form.client_name, phone: this.form.client_phone || '' });
+    const payload = {
+      client_name:    this.form.client_name,
+      client_phone:   this.form.client_phone || null,
+      court_id:       this.form.court_id,
+      date:           this.form.date,
+      start_hour:     this.form.start_hour,
+      end_hour:       this.form.end_hour,
+      payment_status: this.form.payment_status,
+      total_amount:   this.pricePreview || this.form.total_amount,
+    };
+
+    try {
+      if (this.editingId) {
+        await firstValueFrom(this.api.patch(`/admin/bookings/${this.editingId}`, payload));
+        this.toast.show('Reserva atualizada!');
+      } else {
+        await firstValueFrom(this.api.post('/admin/bookings', payload));
+        this.toast.show('Reserva criada!');
       }
-      this.toast.show('Reserva criada!');
+      this.closeModal();
+      await this.loadBookings();
+    } catch (err: any) {
+      const msg = err?.error?.error || 'Erro ao salvar reserva';
+      this.toast.show(msg);
+    } finally {
+      this.saving = false;
     }
-    this.closeModal();
   }
 
-  deleteBooking() {
-    if (this.editingId) {
-      this.data.deleteBooking(this.editingId);
+  async deleteBooking(): Promise<void> {
+    if (!this.editingId || this.saving) return;
+    this.saving = true;
+    try {
+      await firstValueFrom(this.api.delete(`/admin/bookings/${this.editingId}`));
       this.toast.show('Reserva excluída!');
       this.closeModal();
+      await this.loadBookings();
+    } catch (err: any) {
+      const msg = err?.error?.error || 'Erro ao excluir reserva';
+      this.toast.show(msg);
+    } finally {
+      this.saving = false;
     }
   }
 
-  closeModal(event?: MouseEvent) {
+  closeModal(event?: MouseEvent): void {
     if (event && event.target !== event.currentTarget) return;
     this.showModal = false;
     this.editingId = null;
   }
 
-  getPaymentStatusClass(s: string) { return s === 'pago' ? 'badge-primary' : s === 'pendente' ? 'badge-accent' : 'badge-muted'; }
-  getCourtStatusClass(s: string)   { return s === 'disponível' ? 'badge-primary' : s === 'bloqueada' ? 'badge-destructive' : 'badge-accent'; }
+  getPaymentStatusClass(s: string): string {
+    return s === 'pago' ? 'badge-primary' : s === 'pendente' ? 'badge-accent' : 'badge-muted';
+  }
+
+  getCourtStatusClass(s: string): string {
+    return s === 'disponível' ? 'badge-primary' : s === 'bloqueada' ? 'badge-destructive' : 'badge-accent';
+  }
+
+  getSportIcon(sport: string): string {
+    if (sport?.includes('tennis'))  return 'sports_tennis';
+    if (sport?.includes('futev'))   return 'sports_volleyball';
+    if (sport?.includes('vôlei'))   return 'sports_volleyball';
+    if (sport?.includes('futebol')) return 'sports_soccer';
+    return 'sports';
+  }
 
   getNextHour(h: string): string {
     const idx = this.hours.indexOf(h);

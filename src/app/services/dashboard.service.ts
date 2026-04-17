@@ -16,6 +16,19 @@ export interface RevenueDay {
   revenue: number;
 }
 
+export interface TodayBooking {
+  id:             string;
+  client_name:    string;
+  start_hour:     string;
+  end_hour:       string;
+  payment_status: string;
+  total_amount:   number;
+  paid_amount:    number;
+  court_id:       string;
+  court_name:     string;
+  sport_type:     string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
   constructor(private api: ApiService) {}
@@ -26,5 +39,17 @@ export class DashboardService {
 
   async getRevenue7Days(): Promise<RevenueDay[]> {
     return firstValueFrom(this.api.get<RevenueDay[]>('/dashboard/revenue7days'));
+  }
+
+  async getBookingsToday(): Promise<TodayBooking[]> {
+    return firstValueFrom(
+      this.api.get<{ bookings: TodayBooking[] }>('/dashboard/bookings-today')
+    ).then(r => r.bookings);
+  }
+
+  async getPopularHours(): Promise<{ hour: string; count: number }[]> {
+    return firstValueFrom(
+      this.api.get<{ hour: string; count: number }[]>('/dashboard/popular-hours')
+    );
   }
 }
