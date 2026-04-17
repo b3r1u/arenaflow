@@ -4,7 +4,8 @@ import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexFill, ApexStrok
          ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers,
          ApexPlotOptions } from 'ng-apexcharts';
 import { DataService } from '../../services/data.service';
-import { DashboardService } from '../../services/dashboard.service';
+import { DashboardService, RevenueDay } from '../../services/dashboard.service';
+import { CourtService } from '../../services/court.service';
 import { Court, Booking } from '../../models/models';
 
 @Component({
@@ -38,7 +39,7 @@ import { Court, Booking } from '../../models/models';
             <span class="text-xs font-medium leading-tight" style="color:var(--muted-foreground)">Receita Hoje</span>
             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color:hsl(36,95%,55%,0.1);color:hsl(36,95%,55%)"><span class="material-icons" style="font-size:1.1rem">payments</span></div>
           </div>
-          <div class="font-heading font-bold text-2xl lg:text-3xl mt-1" style="color:var(--foreground)">R\${{ todayRevenue | number:'1.0-0' }}</div>
+          <div class="font-heading font-bold text-2xl lg:text-3xl mt-1" style="color:var(--foreground)">R\${{ todayRevenue | number:'1.2-2' }}</div>
           <div class="text-xs mt-1 flex items-center gap-1" style="color:var(--muted-foreground)">
             <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:hsl(36,95%,55%)"></span>
             {{ pendingToday }} pendentes
@@ -50,7 +51,7 @@ import { Court, Booking } from '../../models/models';
             <span class="text-xs font-medium leading-tight" style="color:var(--muted-foreground)">Receita Mensal</span>
             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color:hsl(221,83%,53%,0.1);color:hsl(221,83%,53%)"><span class="material-icons" style="font-size:1.1rem">trending_up</span></div>
           </div>
-          <div class="font-heading font-bold text-2xl lg:text-3xl mt-1" style="color:var(--foreground)">R\${{ monthlyRevenue | number:'1.0-0' }}</div>
+          <div class="font-heading font-bold text-2xl lg:text-3xl mt-1" style="color:var(--foreground)">R\${{ monthlyRevenue | number:'1.2-2' }}</div>
           <div class="text-xs mt-1 flex items-center gap-1" style="color:var(--muted-foreground)">
             <span class="inline-block w-1.5 h-1.5 rounded-full" style="background:hsl(221,83%,53%)"></span>
             {{ monthlyBookings }} reservas
@@ -72,7 +73,7 @@ import { Court, Booking } from '../../models/models';
         <div class="flex items-center justify-between mb-0">
           <div>
             <h2 class="font-heading font-semibold text-base" style="color:var(--foreground)">Faturamento (7 dias)</h2>
-            <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">Total: <span class="font-heading font-bold" style="color:var(--primary)">R\${{ totalLast7 | number:'1.0-0' }}</span></p>
+            <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">Total: <span class="font-heading font-bold" style="color:var(--primary)">R\${{ totalLast7 | number:'1.2-2' }}</span></p>
           </div>
         </div>
         <apx-chart
@@ -94,18 +95,25 @@ import { Court, Booking } from '../../models/models';
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <div class="card p-5">
           <h2 class="font-heading font-semibold text-base mb-3" style="color:var(--foreground)">Status das Quadras</h2>
-          <div class="space-y-2">
-            <div *ngFor="let court of courts" class="flex items-center justify-between p-3 rounded-xl" style="background-color:var(--muted)">
+          <div *ngIf="courtService.loading()" class="text-center py-6 text-sm" style="color:var(--muted-foreground)">
+            <span class="material-icons" style="font-size:1.5rem;animation:spin 1s linear infinite">refresh</span>
+          </div>
+          <div *ngIf="!courtService.loading()" class="space-y-2">
+            <div *ngFor="let court of courtService.courts()" class="flex items-center justify-between p-3 rounded-xl" style="background-color:var(--muted)">
               <div class="flex items-center gap-3 min-w-0">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background-color:hsl(152,69%,40%,0.1);color:hsl(152,69%,40%)"><span class="material-icons" style="font-size:1.15rem">sports_volleyball</span></div>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                     [style.background-color]="getSportBgColor(court.sport_type)"
+                     [style.color]="getSportColor(court.sport_type)">
+                  <span class="material-icons" style="font-size:1.15rem">{{ getSportIcon(court.sport_type) }}</span>
+                </div>
                 <div class="min-w-0">
                   <div class="font-semibold text-sm font-heading truncate" style="color:var(--foreground)">{{ court.name }}</div>
-                  <div class="text-xs" style="color:var(--muted-foreground)">R\${{ court.hourly_rate }}/h · {{ court.sport_type }}</div>
+                  <div class="text-xs" style="color:var(--muted-foreground)">R\${{ court.hourly_rate | number:'1.2-2' }}/h · {{ court.sport_type }}</div>
                 </div>
               </div>
               <span class="badge ml-2 flex-shrink-0" [ngClass]="getCourtStatusClass(court.status)">{{ court.status }}</span>
             </div>
-            <div *ngIf="courts.length === 0" class="text-center py-4 text-sm" style="color:var(--muted-foreground)">
+            <div *ngIf="courtService.courts().length === 0" class="text-center py-4 text-sm" style="color:var(--muted-foreground)">
               Nenhuma quadra cadastrada
             </div>
           </div>
@@ -164,7 +172,7 @@ export class DashboardComponent implements OnInit {
   monthlyBookings = 0;
   clientsCount = 0;
   totalLast7 = 0;
-  last7Days: { day: string; revenue: number }[] = [];
+  last7Days: RevenueDay[] = [];
   popularHours: { hour: string; count: number }[] = [];
 
   // Popular hours ApexCharts
@@ -277,27 +285,36 @@ export class DashboardComponent implements OnInit {
     hover: { size: 6, sizeOffset: 2 }
   };
 
-  constructor(private data: DataService, private dashboard: DashboardService) {}
+  constructor(private data: DataService, private dashboard: DashboardService, public courtService: CourtService) {}
 
   async ngOnInit() {
-    this.courts = this.data.getCourts();
-    this.last7Days = this.data.getLast7DaysRevenue();
     this.popularHours = this.data.getPopularHours();
-    this.totalLast7 = this.last7Days.reduce((s, d) => s + d.revenue, 0);
     this.clientsCount = this.data.getClients().length;
-    this.buildChart();
 
-    // Cards com dados reais da API
     try {
-      const stats = await this.dashboard.getStats();
-      this.todayBookings   = Array(stats.reservasHoje);   // usado só para .length
+      const [stats, revenue7] = await Promise.all([
+        this.dashboard.getStats(),
+        this.dashboard.getRevenue7Days(),
+        this.courtService.load(),
+      ]);
+
+      // Cards
+      this.todayBookings   = Array(stats.reservasHoje);
       this.paidToday       = stats.pagasHoje;
       this.pendingToday    = stats.pendentesHoje;
       this.todayRevenue    = stats.receitaHoje;
       this.monthlyRevenue  = stats.receitaMensal;
       this.monthlyBookings = stats.reservasMes;
+
+      // Gráfico 7 dias
+      this.last7Days  = revenue7;
+      this.totalLast7 = revenue7.reduce((s, d) => s + d.revenue, 0);
+      this.buildChart();
     } catch (err) {
-      console.error('[DASHBOARD] Erro ao carregar stats:', err);
+      console.error('[DASHBOARD] Erro ao carregar dados:', err);
+      // fallback: constrói gráfico vazio
+      this.last7Days = [];
+      this.buildChart();
     }
   }
 
@@ -311,7 +328,31 @@ export class DashboardComponent implements OnInit {
       categories: this.popularHours.map(h => h.hour.replace(':00', 'h'))
     };
   }
-  getCourtName(id: string): string { return this.courts.find(c => c.id === id)?.name || 'Quadra'; }
+  getCourtName(id: string): string { return this.courtService.courts().find(c => c.id === id)?.name || 'Quadra'; }
   getCourtStatusClass(s: string) { return s === 'disponível' ? 'badge-primary' : s === 'bloqueada' ? 'badge-destructive' : 'badge-accent'; }
   getPaymentStatusClass(s: string) { return s === 'pago' ? 'badge-primary' : s === 'pendente' ? 'badge-accent' : 'badge-muted'; }
+
+  getSportIcon(sport: string): string {
+    if (sport.includes('tennis'))  return 'sports_tennis';
+    if (sport.includes('futev'))   return 'sports_volleyball';
+    if (sport.includes('vôlei'))   return 'sports_volleyball';
+    if (sport.includes('futebol')) return 'sports_soccer';
+    return 'sports';
+  }
+
+  getSportColor(sport: string): string {
+    if (sport.includes('tennis'))  return 'hsl(38,92%,50%)';
+    if (sport.includes('futev'))   return 'hsl(199,89%,48%)';
+    if (sport.includes('vôlei'))   return 'hsl(262,80%,60%)';
+    if (sport.includes('futebol')) return 'hsl(142,70%,40%)';
+    return 'hsl(152,69%,40%)';
+  }
+
+  getSportBgColor(sport: string): string {
+    if (sport.includes('tennis'))  return 'hsl(38,92%,50%,0.1)';
+    if (sport.includes('futev'))   return 'hsl(199,89%,48%,0.1)';
+    if (sport.includes('vôlei'))   return 'hsl(262,80%,60%,0.1)';
+    if (sport.includes('futebol')) return 'hsl(142,70%,40%,0.1)';
+    return 'hsl(152,69%,40%,0.1)';
+  }
 }
