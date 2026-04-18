@@ -47,9 +47,10 @@ export class DashboardService {
     ).then(r => r.bookings);
   }
 
-  async getPopularHours(): Promise<{ hour: string; count: number }[]> {
+  async getPopularHours(period?: number): Promise<{ hour: string; count: number }[]> {
+    const params: Record<string, string> = period ? { period: String(period) } : {};
     return firstValueFrom(
-      this.api.get<{ hour: string; count: number }[]>('/dashboard/popular-hours')
+      this.api.get<{ hour: string; count: number }[]>('/dashboard/popular-hours', params)
     );
   }
 

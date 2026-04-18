@@ -237,21 +237,25 @@ export class RelatoriosComponent implements OnInit {
 
   async calcStats() {
     try {
-      const report = await this.dashboard.getReport(this.period);
+      const [report, hours] = await Promise.all([
+        this.dashboard.getReport(this.period),
+        this.dashboard.getPopularHours(this.period),
+      ]);
+
       this.totalRevenue   = report.totalRevenue;
       this.avgDaily       = report.avgDaily;
       this.totalBookings  = report.totalBookings;
       this.pendingRevenue = report.pendingRevenue;
       this.dailyData      = report.dailyData;
       this.buildChart();
+
+      this.popularHours = hours;
+      this.maxCount = Math.max(...hours.map(h => h.count), 1);
     } catch {
       // fallback: mantém zeros em caso de erro
     }
 
-    // Horários populares e estatísticas de quadra ainda via mock/DataService
-    // (serão migrados em etapa posterior)
-    this.popularHours = this.data.getPopularHours();
-    this.maxCount = Math.max(...this.popularHours.map(h => h.count), 1);
+    // Estatísticas de quadra ainda via mock (migração futura)
     const bookings = this.data.getBookings();
     this.buildCourtStats(bookings);
     this.buildPaymentStats(bookings);
