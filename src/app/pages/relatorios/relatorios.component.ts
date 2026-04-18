@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexFill, ApexStroke,
          ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers } from 'ng-apexcharts';
 import { DataService } from '../../services/data.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { Booking } from '../../models/models';
 
 @Component({
@@ -231,39 +232,33 @@ export class RelatoriosComponent implements OnInit {
   chartDataLabels: ApexDataLabels = { enabled: false };
   chartMarkers: ApexMarkers = { size: 0, hover: { size: 6, sizeOffset: 2 } };
 
-  constructor(private data: DataService) {}
+  constructor(private data: DataService, private dashboard: DashboardService) {}
   ngOnInit() { this.calcStats(); }
 
-  calcStats() {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - this.period);
-    const bookings = this.data.getBookings().filter(b => new Date(b.date) >= cutoff);
-    const paid = bookings.filter(b => b.payment_status === 'pago');
-    this.totalRevenue = paid.reduce((s, b) => s + b.total_amount, 0);
-    this.avgDaily = this.totalRevenue / this.period;
-    this.totalBookings = bookings.length;
-    this.pendingRevenue = bookings.filter(b => b.payment_status === 'pendente').reduce((s, b) => s + b.total_amount, 0);
-    this.buildDailyData(bookings);
-    this.buildCourtStats(bookings);
-    this.buildPaymentStats(bookings);
+  async calcStats() {
+    try {
+      const report = await this.dashboard.getReport(this.period);
+      this.totalRevenue   = report.totalRevenue;
+      this.avgDaily       = report.avgDaily;
+      this.totalBookings  = report.totalBookings;
+      this.pendingRevenue = report.pendingRevenue;
+      this.dailyData      = report.dailyData;
+      this.buildChart();
+    } catch {
+      // fallback: mantém zeros em caso de erro
+    }
+
+    // Horários populares e estatísticas de quadra ainda via mock/DataService
+    // (serão migrados em etapa posterior)
     this.popularHours = this.data.getPopularHours();
     this.maxCount = Math.max(...this.popularHours.map(h => h.count), 1);
+    const bookings = this.data.getBookings();
+    this.buildCourtStats(bookings);
+    this.buildPaymentStats(bookings);
   }
 
-  buildDailyData(bookings: Booking[]) {
-    const days = Math.min(this.period, 14);
-    this.dailyData = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      const revenue = bookings
-        .filter(b => b.date === dateStr && b.payment_status === 'pago')
-        .reduce((s, b) => s + b.total_amount, 0);
-      this.dailyData.push({ label, revenue });
-    }
-    this.buildChart();
+  buildDailyData(_bookings: Booking[]) {
+    // Não utilizado — dados vêm da API via calcStats()
   }
 
   buildChart() {

@@ -52,4 +52,18 @@ export class DashboardService {
       this.api.get<{ hour: string; count: number }[]>('/dashboard/popular-hours')
     );
   }
+
+  async getReport(period: number): Promise<ReportData> {
+    return firstValueFrom(
+      this.api.get<ReportData>('/dashboard/report', { period: String(period) })
+    );
+  }
+}
+
+export interface ReportData {
+  totalRevenue:   number;
+  avgDaily:       number;
+  totalBookings:  number;
+  pendingRevenue: number;
+  dailyData:      { label: string; revenue: number }[];
 }

@@ -1,0 +1,158 @@
+- Building...
+
+Initial chunk files | Names                  |  Raw size
+polyfills.js        | polyfills              |  88.09 kB | 
+styles.css          | styles                 |  44.03 kB | 
+main.js             | main                   |  32.80 kB | 
+chunk-H524CDHX.js   | -                      |  11.56 kB | 
+chunk-M5DATJPP.js   | -                      |   3.47 kB | 
+chunk-5J5LCGSU.js   | -                      |   2.26 kB | 
+chunk-4WXVOEFY.js   | -                      |   1.46 kB | 
+chunk-KSZINFI4.js   | -                      |   1.39 kB | 
+chunk-BXOW425V.js   | -                      | 856 bytes | 
+
+                    | Initial total          | 185.90 kB
+
+Lazy chunk files    | Names                  |  Raw size
+chunk-I3QNO4DW.js   | login-component        |  82.79 kB | 
+chunk-MA44DG4R.js   | financeiro-component   |  58.56 kB | 
+chunk-U5RFEERH.js   | agendamentos-component |  53.21 kB | 
+chunk-A4YI7X3B.js   | quadras-component      |  44.74 kB | 
+chunk-ARQLANTX.js   | perfil-component       |  38.57 kB | 
+chunk-Z2BRZ4FX.js   | mensalistas-component  |  34.21 kB | 
+chunk-TBBGMNGC.js   | reservas-component     |  33.07 kB | 
+chunk-NKNU4T2H.js   | planos-component       |  27.31 kB | 
+chunk-7KYMHJNR.js   | promocoes-component    |  25.62 kB | 
+chunk-4TSNR3RM.js   | clientes-component     |  24.42 kB | 
+chunk-PDZ56IDK.js   | dashboard-component    |  24.19 kB | 
+chunk-XONJPMMQ.js   | relatorios-component   |  20.71 kB | 
+chunk-NM6A4CWW.js   | -                      |  15.15 kB | 
+chunk-K4NIST4S.js   | -                      |   2.63 kB | 
+
+Application bundle generation complete. [12.099 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:66:152:
+      66 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:101:105:
+      101 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Watch mode enabled. Watching for file changes...
+  ➜  Local:   http://localhost:4200/
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names               | Raw size
+main.js             | main                | 32.80 kB | 
+
+Lazy chunk files    | Names               | Raw size
+chunk-3U4WZ4VG.js   | dashboard-component | 24.36 kB | 
+
+Application bundle generation complete. [1.114 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:66:152:
+      66 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:101:105:
+      101 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                | Raw size
+main.js             | main                 | 32.80 kB | 
+
+Lazy chunk files    | Names                | Raw size
+chunk-DX2EFKIB.js   | relatorios-component | 20.71 kB | 
+
+Application bundle generation complete. [0.223 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:66:152:
+      66 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:101:105:
+      101 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                  | Raw size
+main.js             | main                   | 32.80 kB | 
+
+Lazy chunk files    | Names                  | Raw size
+chunk-KHMUWNIX.js   | financeiro-component   | 58.56 kB | 
+chunk-KTMWKRYC.js   | agendamentos-component | 53.21 kB | 
+chunk-5BVGLIUN.js   | quadras-component      | 44.74 kB | 
+chunk-7NKZE3X6.js   | perfil-component       | 38.57 kB | 
+chunk-RGPIRWIJ.js   | dashboard-component    | 22.81 kB | 
+chunk-4UC5LWGO.js   | relatorios-component   | 20.27 kB | 
+chunk-K7UW3PON.js   | -                      |  1.52 kB | 
+
+Application bundle generation complete. [0.409 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:66:152:
+      66 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:101:105:
+      101 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
