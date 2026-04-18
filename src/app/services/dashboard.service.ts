@@ -65,6 +65,20 @@ export class DashboardService {
       this.api.get<CourtStat[]>('/dashboard/court-stats', { period: String(period) })
     );
   }
+
+  async getPaymentStats(period: number): Promise<PaymentStat[]> {
+    return firstValueFrom(
+      this.api.get<PaymentStat[]>('/dashboard/payment-stats', { period: String(period) })
+    );
+  }
+}
+
+export interface PaymentStat {
+  label:   string;
+  color:   string;
+  count:   number;
+  total:   number;
+  percent: number;
 }
 
 export interface CourtStat {

@@ -345,3 +345,69 @@ Application bundle generation complete. [0.225 seconds]
 
 
 Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                | Raw size
+main.js             | main                 | 32.80 kB | 
+
+Lazy chunk files    | Names                | Raw size
+chunk-G72YJV4H.js   | dashboard-component  | 22.81 kB | 
+chunk-XHOOR56I.js   | relatorios-component | 20.39 kB | 
+chunk-LP2AXVZD.js   | -                    |  1.95 kB | 
+
+Application bundle generation complete. [0.452 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:66:152:
+      66 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:101:105:
+      101 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                | Raw size
+main.js             | main                 | 32.80 kB | 
+
+Lazy chunk files    | Names                | Raw size
+chunk-W6NTY56D.js   | relatorios-component | 20.41 kB | 
+
+Application bundle generation complete. [0.324 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:66:152:
+      66 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:101:105:
+      101 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
