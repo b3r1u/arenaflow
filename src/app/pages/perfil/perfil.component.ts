@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
@@ -216,6 +216,96 @@ interface ThemeOption {
             </div>
           </div>
 
+          <!-- Horário de funcionamento -->
+          <div class="hours-block">
+            <div class="flex items-center justify-between mb-3">
+              <label class="info-label" style="margin-bottom:0">
+                <span class="material-icons" style="font-size:0.9rem;vertical-align:middle;margin-right:4px;color:var(--primary)">schedule</span>
+                Horário de funcionamento
+              </label>
+              <span class="hours-badge">
+                <span class="material-icons" style="font-size:0.8rem">timelapse</span>
+                {{ hoursOperatingLabel }}
+              </span>
+            </div>
+
+            <!-- Inputs abertura/fechamento -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <label class="hours-sub-label">Abertura</label>
+                <div class="info-input-wrap">
+                  <span class="material-icons info-icon">wb_sunny</span>
+                  <input class="input info-input" type="time"
+                         [(ngModel)]="openHoursStart"
+                         (ngModelChange)="onHoursChange()" />
+                </div>
+              </div>
+              <div>
+                <label class="hours-sub-label">Fechamento</label>
+                <div class="info-input-wrap">
+                  <span class="material-icons info-icon">nightlight_round</span>
+                  <input class="input info-input" type="time"
+                         [(ngModel)]="openHoursEnd"
+                         (ngModelChange)="onHoursChange()" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline 24h interativa -->
+            <div class="timeline-track" #timelineTrack>
+
+              <!-- Fundo inativo esquerdo -->
+              <div class="timeline-bg"
+                   [style.width.%]="startPct"></div>
+
+              <!-- Faixa ativa -->
+              <div class="timeline-fill"
+                   [class.dragging]="!!dragging"
+                   [style.left.%]="startPct"
+                   [style.width.%]="widthPct"></div>
+
+              <!-- Marcas de referência -->
+              <div class="timeline-tick" style="left:25%"></div>
+              <div class="timeline-tick" style="left:50%"></div>
+              <div class="timeline-tick" style="left:75%"></div>
+
+              <!-- Handle abertura -->
+              <div class="timeline-handle"
+                   [class.active]="dragging === 'start'"
+                   [style.left.%]="startPct"
+                   (mousedown)="startDrag('start', $event)"
+                   (touchstart)="startDrag('start', $event)">
+                <div class="handle-tooltip">{{ openHoursStart }}</div>
+              </div>
+
+              <!-- Handle fechamento -->
+              <div class="timeline-handle"
+                   [class.active]="dragging === 'end'"
+                   [style.left.%]="startPct + widthPct"
+                   (mousedown)="startDrag('end', $event)"
+                   (touchstart)="startDrag('end', $event)">
+                <div class="handle-tooltip">{{ openHoursEnd }}</div>
+              </div>
+
+            </div>
+
+            <!-- Labels 24h -->
+            <div class="timeline-labels">
+              <span>00h</span>
+              <span>06h</span>
+              <span>12h</span>
+              <span>18h</span>
+              <span>24h</span>
+            </div>
+
+            <!-- Resumo -->
+            <div class="hours-summary">
+              <span class="material-icons" style="font-size:0.9rem;color:var(--primary)">info</span>
+              Abre às <strong>{{ openHoursStart }}</strong> e fecha às <strong>{{ openHoursEnd }}</strong>
+              — <strong>{{ hoursOperatingLabel }}</strong> por dia.
+            </div>
+          </div>
+
         </div>
 
         <div class="flex justify-end pt-4 mt-2" style="border-top:1px solid var(--border)">
@@ -320,10 +410,162 @@ interface ThemeOption {
       background-color: var(--input-bg) !important;
       height: 2.6rem;
     }
+    .hours-block {
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border);
+    }
+    .hours-sub-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted-foreground);
+    }
+    .hours-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: hsl(152, 69%, 40%, 0.12);
+      color: var(--primary);
+      border: 1px solid hsl(152, 69%, 40%, 0.25);
+    }
+    .timeline-track {
+      position: relative;
+      height: 14px;
+      border-radius: 9999px;
+      background: var(--muted);
+      margin: 1.4rem 0 0.5rem;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .timeline-bg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      border-radius: 9999px 0 0 9999px;
+      background: var(--muted);
+      pointer-events: none;
+    }
+    .timeline-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-radius: 0;
+      background: linear-gradient(
+        90deg,
+        hsl(152, 69%, 50%) 0%,
+        hsl(152, 69%, 42%) 100%
+      );
+      box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4);
+      transition: left 0.06s ease, width 0.06s ease;
+      pointer-events: none;
+    }
+    .timeline-fill.dragging {
+      transition: none;
+    }
+    .timeline-tick {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      width: 1.5px;
+      background: rgba(255,255,255,0.35);
+      transform: translateX(-50%);
+      pointer-events: none;
+      border-radius: 9999px;
+    }
+    .timeline-handle {
+      position: absolute;
+      top: 50%;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #fff;
+      border: 3px solid var(--primary);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      cursor: grab;
+      transition: left 0.06s ease, box-shadow 0.15s ease, transform 0.15s ease;
+      touch-action: none;
+      z-index: 2;
+    }
+    .timeline-handle:hover,
+    .timeline-handle.active {
+      box-shadow: 0 0 0 5px hsl(152, 69%, 40%, 0.18), 0 3px 10px rgba(0,0,0,0.2);
+      transform: translate(-50%, -50%) scale(1.15);
+    }
+    .timeline-handle.active {
+      cursor: grabbing;
+      transition: none;
+    }
+    .handle-tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--foreground);
+      color: var(--background, #fff);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.2rem 0.45rem;
+      border-radius: 0.35rem;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .handle-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: var(--foreground);
+    }
+    .timeline-handle:hover .handle-tooltip,
+    .timeline-handle.active .handle-tooltip {
+      opacity: 1;
+    }
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      letter-spacing: 0.03em;
+      padding: 0 4px;
+      margin-top: 0.3rem;
+    }
+    .hours-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.85rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.65rem;
+      background: var(--muted);
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+    }
+    .hours-summary strong {
+      color: var(--foreground);
+      font-weight: 700;
+    }
   `]
 })
-export class PerfilComponent implements OnInit {
-  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+export class PerfilComponent implements OnInit, OnDestroy {
+  @ViewChild('fileInput')     fileInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('timelineTrack') trackRef!: ElementRef<HTMLDivElement>;
 
   profile!: EstablishmentProfile;
   form: Omit<EstablishmentProfile, 'logoUrl' | 'theme'> = { name: '', phone: '', email: '', address: '', neighborhood: '', city: '' };
@@ -339,6 +581,92 @@ export class PerfilComponent implements OnInit {
 
   cancelPolicy: CancellationPolicy = { limit_hours: 1, fee_percent: 0 };
   feePcts = [0, 25, 50, 100];
+
+  // ─── Horário de funcionamento ──────────────────────────────────────────────
+  openHoursStart = '07:00';
+  openHoursEnd   = '23:00';
+  dragging: 'start' | 'end' | null = null;
+
+  private toMinutes(hhmm: string): number {
+    const [h, m] = (hhmm || '00:00').split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+  }
+
+  private minutesToHhmm(min: number): string {
+    const clamped = Math.max(0, Math.min(1440, min));
+    const h = Math.floor(clamped / 60);
+    const m = clamped % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  /** Converte clientX para minutos (snap a 30 min) */
+  private clientXToMinutes(clientX: number): number {
+    if (!this.trackRef) return 0;
+    const rect = this.trackRef.nativeElement.getBoundingClientRect();
+    const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return Math.round((pct * 1440) / 30) * 30; // snap 30 min
+  }
+
+  get startPct(): number {
+    return Math.max(0, Math.min(100, (this.toMinutes(this.openHoursStart) / 1440) * 100));
+  }
+
+  get widthPct(): number {
+    const s    = this.toMinutes(this.openHoursStart);
+    const e    = this.toMinutes(this.openHoursEnd);
+    const diff = Math.max(0, e - s);
+    return Math.max(0, Math.min(100 - this.startPct, (diff / 1440) * 100));
+  }
+
+  get hoursOperatingLabel(): string {
+    const diff = this.toMinutes(this.openHoursEnd) - this.toMinutes(this.openHoursStart);
+    if (diff <= 0) return 'Horário inválido';
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+    return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, '0')}`;
+  }
+
+  onHoursChange(): void { /* inputs digitados — getters recomputed automatically */ }
+
+  /** Inicia drag (mouse ou touch) */
+  startDrag(which: 'start' | 'end', event: MouseEvent | TouchEvent): void {
+    event.preventDefault();
+    this.dragging = which;
+  }
+
+  /** Move durante o drag */
+  @HostListener('document:mousemove', ['$event'])
+  @HostListener('document:touchmove', ['$event'])
+  onDragMove(event: MouseEvent | TouchEvent): void {
+    if (!this.dragging) return;
+    event.preventDefault();
+    const clientX = event instanceof MouseEvent
+      ? event.clientX
+      : event.touches[0].clientX;
+    const mins = this.clientXToMinutes(clientX);
+    this.zone.run(() => {
+      if (this.dragging === 'start') {
+        const endMins = this.toMinutes(this.openHoursEnd);
+        // Garante mínimo de 30 min de abertura, máximo 30 min antes do fechamento
+        this.openHoursStart = this.minutesToHhmm(Math.min(mins, endMins - 30));
+      } else {
+        const startMins = this.toMinutes(this.openHoursStart);
+        // Garante mínimo de 30 min após abertura, máximo 24:00
+        this.openHoursEnd = this.minutesToHhmm(Math.max(mins, startMins + 30));
+      }
+    });
+  }
+
+  /** Finaliza drag */
+  @HostListener('document:mouseup')
+  @HostListener('document:touchend')
+  stopDrag(): void {
+    this.dragging = null;
+  }
+
+  ngOnDestroy(): void {
+    this.dragging = null;
+  }
 
   get cancelPolicySummary(): string {
     const h = this.cancelPolicy.limit_hours;
@@ -373,6 +701,7 @@ export class PerfilComponent implements OnInit {
     private profileService: ProfileService,
     private toast: ToastService,
     private establishmentService: EstablishmentService,
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -389,8 +718,25 @@ export class PerfilComponent implements OnInit {
       // Preload street from stored address (best effort)
       this.street = p.address || '';
     });
+
+    // Carrega o horário de funcionamento do estabelecimento (se existir)
+    const est = this.establishmentService.establishment();
+    if (est?.open_hours) {
+      const parsed = this.parseOpenHours(est.open_hours);
+      if (parsed) {
+        this.openHoursStart = parsed.start;
+        this.openHoursEnd   = parsed.end;
+      }
+    }
+
     const stored = localStorage.getItem('arenaflow_cancel_policy');
     if (stored) this.cancelPolicy = { ...this.cancelPolicy, ...JSON.parse(stored) };
+  }
+
+  private parseOpenHours(value: string): { start: string; end: string } | null {
+    const match = value.match(/(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})/);
+    if (!match) return null;
+    return { start: match[1], end: match[2] };
   }
 
   get initials(): string {
@@ -455,6 +801,12 @@ export class PerfilComponent implements OnInit {
       this.toast.show('O nome do estabelecimento é obrigatório.');
       return;
     }
+    // Validação do horário
+    if (this.toMinutes(this.openHoursEnd) <= this.toMinutes(this.openHoursStart)) {
+      this.toast.show('O horário de fechamento deve ser posterior ao de abertura.');
+      return;
+    }
+
     this.savingInfo = true;
     try {
       // Salva localmente (sidebar, tema, etc.)
@@ -466,6 +818,7 @@ export class PerfilComponent implements OnInit {
         address:      this.form.address      || undefined,
         neighborhood: this.form.neighborhood || undefined,
         city:         this.form.city         || undefined,
+        open_hours:   `${this.openHoursStart} - ${this.openHoursEnd}`,
         logo_url:     this.profile.logoUrl   ?? null,
       });
       this.toast.show('Informações salvas com sucesso!');

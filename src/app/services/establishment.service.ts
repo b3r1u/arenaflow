@@ -191,12 +191,31 @@ export class EstablishmentService {
     neighborhood?: string;
     city?: string;
     description?: string;
+    open_hours?: string;
     logo_url?: string | null;
   }): Promise<void> {
     if (!this._initialized()) {
       await this.init();
     }
-    if (!this.hasEstablishment()) return;
+
+    // Se ainda não existe estabelecimento, cria um a partir dos dados do perfil.
+    if (!this.hasEstablishment()) {
+      if (!data.name) {
+        throw new Error('Nome do estabelecimento é obrigatório para criar o cadastro.');
+      }
+      await this.create({
+        name:         data.name,
+        phone:        data.phone        || undefined,
+        address:      data.address      || undefined,
+        neighborhood: data.neighborhood || undefined,
+        city:         data.city         || undefined,
+        description:  data.description  || undefined,
+        open_hours:   data.open_hours   || undefined,
+        logo_url:     data.logo_url     ?? undefined,
+      });
+      return;
+    }
+
     try {
       const res = await firstValueFrom(
         this.api.patch<{ establishment: ApiEstablishment }>(

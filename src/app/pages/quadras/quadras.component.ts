@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { EstablishmentService } from '../../services/establishment.service';
 import { CourtService, CourtFormData } from '../../services/court.service';
-import { ProfileService } from '../../services/profile.service';
 import { FinancialService } from '../../services/financial.service';
 import { Court } from '../../models/models';
 
@@ -13,6 +12,33 @@ import { Court } from '../../models/models';
   selector: 'app-quadras',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
+  styles: [`
+    .setup-step {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      border-radius: 0.85rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .setup-step:hover {
+      border-color: var(--primary);
+      background: hsl(152, 69%, 40%, 0.04);
+      transform: translateY(-1px);
+    }
+    .setup-step-icon {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  `],
   template: `
     <div>
 
@@ -25,77 +51,55 @@ import { Court } from '../../models/models';
       </div>
 
       <!-- ═══════════════════════════════════════════════════════════
-           Estado: sem estabelecimento → onboarding
+           Estado: sem estabelecimento → aviso direcionando para Perfil/Financeiro
       ════════════════════════════════════════════════════════════ -->
       <div *ngIf="establishment.initialized() && !establishment.hasEstablishment()">
 
-        <!-- Header onboarding -->
+        <!-- Header -->
         <div class="mb-6">
           <h1 class="font-heading font-bold text-2xl lg:text-3xl" style="color:var(--foreground)">Quadras</h1>
           <p class="text-sm mt-1" style="color:var(--muted-foreground)">Gerencie suas quadras esportivas</p>
         </div>
 
-        <!-- Card de setup -->
+        <!-- Card de aviso -->
         <div class="card p-8 max-w-xl mx-auto text-center">
           <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-               style="background:hsl(152,69%,40%,0.12)">
-            <span class="material-icons" style="font-size:2rem;color:hsl(152,69%,40%)">sports_volleyball</span>
+               style="background:hsl(38,92%,50%,0.12)">
+            <span class="material-icons" style="font-size:2rem;color:hsl(38,92%,50%)">info</span>
           </div>
-          <h2 class="font-heading font-bold text-xl mb-2" style="color:var(--foreground)">Configure seu estabelecimento</h2>
+          <h2 class="font-heading font-bold text-xl mb-2" style="color:var(--foreground)">Complete seu cadastro primeiro</h2>
           <p class="text-sm mb-6" style="color:var(--muted-foreground)">
-            Antes de cadastrar quadras, precisamos das informações do seu espaço esportivo.<br>
-            Depois disso, sua arena já aparece no app de reservas!
+            Para cadastrar quadras é necessário concluir os dados do seu estabelecimento em
+            <strong>Perfil</strong> e os dados financeiros em <strong>Financeiro</strong>.
           </p>
 
-          <div class="text-left space-y-4">
-            <!-- Nome -->
-            <div>
-              <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Nome do estabelecimento *</label>
-              <input class="input" [(ngModel)]="setupForm.name" placeholder="Ex: Arena Beach Park">
-            </div>
-            <!-- Cidade -->
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Cidade</label>
-                <input class="input" [(ngModel)]="setupForm.city" placeholder="Ex: São Paulo">
+          <div class="space-y-3 text-left">
+            <a routerLink="/perfil" class="setup-step">
+              <div class="setup-step-icon" style="background:hsl(152,69%,40%,0.12);color:hsl(152,69%,40%)">
+                <span class="material-icons" style="font-size:1.1rem">business</span>
               </div>
-              <div>
-                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Bairro</label>
-                <input class="input" [(ngModel)]="setupForm.neighborhood" placeholder="Ex: Pinheiros">
+              <div class="flex-1">
+                <p class="font-semibold text-sm" style="color:var(--foreground)">1. Dados do estabelecimento</p>
+                <p class="text-xs" style="color:var(--muted-foreground)">Nome, endereço, telefone e horário de funcionamento</p>
               </div>
-            </div>
-            <!-- Horário -->
-            <div>
-              <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Horário de funcionamento</label>
-              <div class="flex items-center gap-2">
-                <input class="input flex-1" type="time" [(ngModel)]="setupForm.open_hours_start">
-                <span class="text-sm font-medium flex-shrink-0" style="color:var(--muted-foreground)">até</span>
-                <input class="input flex-1" type="time" [(ngModel)]="setupForm.open_hours_end">
+              <span class="material-icons" style="color:var(--muted-foreground)">chevron_right</span>
+            </a>
+
+            <a routerLink="/financeiro" class="setup-step">
+              <div class="setup-step-icon" style="background:hsl(38,92%,50%,0.12);color:hsl(38,92%,50%)">
+                <span class="material-icons" style="font-size:1.1rem">account_balance</span>
               </div>
-            </div>
-            <!-- Esportes -->
-            <div>
-              <label class="block text-sm font-medium mb-2" style="color:var(--foreground)">Esportes oferecidos</label>
-              <div class="flex flex-wrap gap-2">
-                <button *ngFor="let s of sportOptions"
-                        type="button"
-                        class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all"
-                        [style.background]="setupForm.sports.includes(s.value) ? 'hsl(152,69%,40%,0.1)' : 'var(--card)'"
-                        [style.color]="setupForm.sports.includes(s.value) ? 'hsl(152,69%,40%)' : 'var(--muted-foreground)'"
-                        [style.border-color]="setupForm.sports.includes(s.value) ? 'hsl(152,69%,40%)' : 'var(--border)'"
-                        (click)="toggleSport(s.value)">
-                  {{ s.label }}
-                </button>
+              <div class="flex-1">
+                <p class="font-semibold text-sm" style="color:var(--foreground)">2. Dados financeiros</p>
+                <p class="text-xs" style="color:var(--muted-foreground)">CPF/CNPJ, chave PIX e conta bancária para recebimentos</p>
               </div>
-            </div>
+              <span class="material-icons" style="color:var(--muted-foreground)">chevron_right</span>
+            </a>
           </div>
 
-          <button class="btn-primary w-full mt-6"
-                  [disabled]="!setupForm.name || savingSetup"
-                  (click)="createEstablishment()">
-            <span *ngIf="savingSetup" class="material-icons" style="font-size:1rem;animation:spin 1s linear infinite">refresh</span>
-            <span *ngIf="!savingSetup">Criar estabelecimento e continuar</span>
-          </button>
+          <p class="text-xs mt-6" style="color:var(--muted-foreground)">
+            Depois dessas duas etapas, o cadastro de quadras será liberado.
+          </p>
         </div>
       </div>
 
@@ -302,7 +306,6 @@ export class QuadrasComponent implements OnInit {
   showModal   = false;
   editingId: string | null = null;
   modalError: string | null = null;
-  savingSetup = false;
   hourlyRateDisplay = 'R$ 80,00';
 
   form = this.emptyForm();
@@ -332,22 +335,6 @@ export class QuadrasComponent implements OnInit {
     return this.courts.courts().length >= limit;
   });
 
-  setupForm = {
-    name:            '',
-    city:            '',
-    neighborhood:    '',
-    open_hours_start: '07:00',
-    open_hours_end:   '23:00',
-    sports:          [] as string[],
-  };
-
-  get openHoursValue(): string {
-    const s = this.setupForm.open_hours_start;
-    const e = this.setupForm.open_hours_end;
-    if (!s || !e) return '';
-    return `${s} - ${e}`;
-  }
-
   sportOptions = [
     { value: 'futevôlei',    label: 'Futevôlei',    icon: 'sports_volleyball' },
     { value: 'vôlei',        label: 'Vôlei',        icon: 'sports_volleyball' },
@@ -364,46 +351,11 @@ export class QuadrasComponent implements OnInit {
     public establishment: EstablishmentService,
     public courts: CourtService,
     private toast: ToastService,
-    private profile: ProfileService,
     public financialService: FinancialService,
   ) {}
 
   ngOnInit() {
     this.financialService.load();
-  }
-
-  // ─── Onboarding ────────────────────────────────────────────────────────────
-
-  toggleSport(value: string) {
-    const idx = this.setupForm.sports.indexOf(value);
-    if (idx >= 0) {
-      this.setupForm.sports.splice(idx, 1);
-    } else {
-      this.setupForm.sports.push(value);
-    }
-  }
-
-  async createEstablishment() {
-    if (!this.setupForm.name) return;
-    this.savingSetup = true;
-    try {
-      const logoUrl = this.profile.getProfile().logoUrl;
-      await this.establishment.create({
-        name:         this.setupForm.name,
-        city:         this.setupForm.city  || undefined,
-        neighborhood: this.setupForm.neighborhood || undefined,
-        open_hours:   this.openHoursValue || undefined,
-        sports:       this.setupForm.sports.length ? this.setupForm.sports : undefined,
-        logo_url:     logoUrl || undefined,
-      });
-      this.toast.show('Estabelecimento criado com sucesso!');
-      // O effect vai detectar hasEstablishment() = true e chamar courts.load()
-    } catch (e: any) {
-      const msg = e?.error?.error || 'Erro ao criar estabelecimento';
-      this.toast.show(msg);
-    } finally {
-      this.savingSetup = false;
-    }
   }
 
   // ─── Quadras ───────────────────────────────────────────────────────────────

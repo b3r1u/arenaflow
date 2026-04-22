@@ -139,7 +139,20 @@ import { ToastService } from '../../services/toast.service';
             <!-- Titular -->
             <div>
               <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Nome do titular *</label>
-              <input class="input" [(ngModel)]="form.account_holder" placeholder="Nome completo ou razão social">
+              <input class="input" [(ngModel)]="form.account_holder"
+                     maxlength="30"
+                     placeholder="Nome completo ou razão social"
+                     [style.border-color]="form.account_holder.length > 30 ? 'hsl(0,72%,51%)' : ''">
+              <div class="flex items-center justify-between mt-1">
+                <p *ngIf="form.account_holder.length > 30" class="text-xs" style="color:hsl(0,72%,51%)">
+                  <span class="material-icons" style="font-size:0.75rem;vertical-align:middle">error_outline</span>
+                  Máximo 30 caracteres (exigência do Pagar.me)
+                </p>
+                <p *ngIf="form.account_holder.length > 0" class="text-xs ml-auto"
+                   [style.color]="form.account_holder.length > 30 ? 'hsl(0,72%,51%)' : 'var(--muted-foreground)'">
+                  {{ form.account_holder.length }}/30
+                </p>
+              </div>
             </div>
 
             <!-- E-mail e Celular -->
@@ -526,15 +539,16 @@ export class FinanceiroComponent implements OnInit {
       && !!this.form.professional_occupation;
     const cnpjOk = this.form.document_type === 'CNPJ' && !!this.form.company_type;
     return !!(
-      this.form.account_holder &&
-      this.form.email          &&
-      this.form.document_value &&
-      this.form.pix_key_value  &&
-      this.form.lgpd_consent   &&
-      this.form.city           &&
-      this.form.state          &&
-      this.form.phone          &&
-      this.form.address        &&
+      this.form.account_holder                &&
+      this.form.account_holder.length <= 30   &&
+      this.form.email                         &&
+      this.form.document_value                &&
+      this.form.pix_key_value                 &&
+      this.form.lgpd_consent                  &&
+      this.form.city                          &&
+      this.form.state                         &&
+      this.form.phone                         &&
+      this.form.address                       &&
       (cpfOk || cnpjOk)
     );
   }
