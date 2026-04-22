@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FinancialService, FinancialInfo, SaveBankDto, FinancialFormData } from '../../services/financial.service';
@@ -363,7 +363,7 @@ import { ToastService } from '../../services/toast.service';
     </div>
   `
 })
-export class FinanceiroComponent implements OnInit {
+export class FinanceiroComponent implements OnInit, OnDestroy {
   today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   editing        = false;
   completionMode = false;
@@ -395,13 +395,47 @@ export class FinanceiroComponent implements OnInit {
     lgpd_consent:   false,
   };
 
+  private _pollTimer: any = null;
+
   constructor(
     public financialService: FinancialService,
     private toast: ToastService,
   ) {}
 
   ngOnInit() {
-    this.financialService.load();
+    this.financialService.load().then(() => {
+      this.startPollingIfNeeded();
+    });
+  }
+
+  ngOnDestroy() {
+    this.stopPolling();
+  }
+
+  /** Inicia polling silencioso de 5s se o recebedor existir e não estiver ativo */
+  startPollingIfNeeded() {
+    const f = this.financialService.financial();
+    if (!f?.bank_registered) return;       // recebedor ainda não criado
+    if (this.resolvedStatus === 'active') return; // já está ativo
+    this.startPolling();
+  }
+
+  private startPolling() {
+    if (this._pollTimer) return; // já rodando
+    this._pollTimer = setInterval(async () => {
+      const isActive = await this.financialService.pollRecipientStatus();
+      if (isActive) {
+        this.stopPolling();
+        this.toast.show('✅ Conta ativada! Você já pode cadastrar quadras.');
+      }
+    }, 5000);
+  }
+
+  private stopPolling() {
+    if (this._pollTimer) {
+      clearInterval(this._pollTimer);
+      this._pollTimer = null;
+    }
   }
 
   async onCepInput(raw: string) {
@@ -579,6 +613,8 @@ export class FinanceiroComponent implements OnInit {
       this.completionMode = false;
       this.resetForm();
       this.toast.show('Dados financeiros salvos com sucesso!');
+      // Inicia polling para detectar ativação do recebedor
+      this.startPollingIfNeeded();
     } catch (e: any) {
       this.error = e?.error?.error || 'Erro ao salvar dados financeiros';
     } finally {

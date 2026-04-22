@@ -139,6 +139,25 @@ export class FinancialService {
     }
   }
 
+  /**
+   * Consulta o status do recebedor silenciosamente (sem loading global).
+   * Atualiza o pagarme_status no signal. Retorna true se ficou ativo.
+   */
+  async pollRecipientStatus(): Promise<boolean> {
+    try {
+      const result = await firstValueFrom(
+        this.api.getSilent<{ id: string; status: string; name: string }>('/financial/recipient-status')
+      );
+      const current = this._financial();
+      if (current && result?.status) {
+        this._financial.set({ ...current, pagarme_status: result.status });
+      }
+      return result?.status === 'active';
+    } catch {
+      return false;
+    }
+  }
+
   async getForm(): Promise<FinancialFormData | null> {
     const res = await firstValueFrom(
       this.api.get<{ form: FinancialFormData | null }>('/financial/me/form')
