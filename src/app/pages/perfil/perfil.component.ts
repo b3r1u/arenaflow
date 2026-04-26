@@ -320,18 +320,31 @@ interface ThemeOption {
 
       <!-- Política de Cancelamento -->
       <div class="card p-6">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-               style="background:hsl(0,84%,60%,0.1);color:var(--destructive)">
-            <span class="material-icons" style="font-size:1.1rem">policy</span>
+        <div class="flex items-center justify-between gap-3 mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                 style="background:hsl(0,84%,60%,0.1);color:var(--destructive)">
+              <span class="material-icons" style="font-size:1.1rem">policy</span>
+            </div>
+            <div>
+              <h2 class="font-heading font-semibold text-base leading-tight" style="color:var(--foreground)">Política de Cancelamento</h2>
+              <p class="text-xs" style="color:var(--muted-foreground)">Define as regras para cancelamento de reservas pelos clientes</p>
+            </div>
           </div>
-          <div>
-            <h2 class="font-heading font-semibold text-base leading-tight" style="color:var(--foreground)">Política de Cancelamento</h2>
-            <p class="text-xs" style="color:var(--muted-foreground)">Define as regras para cancelamento de reservas pelos clientes</p>
-          </div>
+          <!-- Toggle ativo/inativo -->
+          <button class="toggle-btn flex-shrink-0"
+                  [class.toggle-on]="cancelPolicy.enabled"
+                  (click)="cancelPolicy.enabled = !cancelPolicy.enabled"
+                  [attr.aria-label]="cancelPolicy.enabled ? 'Desativar política' : 'Ativar política'">
+            <span class="toggle-knob"></span>
+          </button>
         </div>
 
-        <div class="space-y-4">
+        <!-- Campos desabilitados quando política está inativa -->
+        <div [style.opacity]="cancelPolicy.enabled ? '1' : '0.4'"
+             [style.pointer-events]="cancelPolicy.enabled ? 'auto' : 'none'"
+             style="transition:opacity 0.2s"
+             class="space-y-4">
 
           <!-- Tempo limite -->
           <div>
@@ -379,11 +392,14 @@ interface ThemeOption {
             <p class="text-xs leading-relaxed" style="color:var(--muted-foreground)">{{ cancelPolicySummary }}</p>
           </div>
 
-        </div>
+        </div><!-- /campos -->
 
         <div class="flex justify-end pt-4 mt-2" style="border-top:1px solid var(--border)">
-          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl" (click)="saveCancelPolicy()">
-            Salvar política
+          <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl"
+                  [disabled]="savingPolicy"
+                  (click)="saveCancelPolicy()">
+            <span *ngIf="savingPolicy" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite;vertical-align:middle;margin-right:4px">refresh</span>
+            {{ savingPolicy ? 'Salvando...' : 'Salvar política' }}
           </button>
         </div>
       </div>
@@ -572,6 +588,36 @@ interface ThemeOption {
       color: var(--foreground);
       font-weight: 700;
     }
+    /* Toggle switch */
+    .toggle-btn {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 9999px;
+      background: var(--muted);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .toggle-btn.toggle-on {
+      background: var(--primary);
+    }
+    .toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .toggle-on .toggle-knob {
+      transform: translateX(20px);
+    }
   `]
 })
 export class PerfilComponent implements OnInit, OnDestroy {
@@ -590,7 +636,8 @@ export class PerfilComponent implements OnInit, OnDestroy {
   isDragging = false;
   errorMsg = '';
 
-  cancelPolicy: CancellationPolicy = { limit_hours: 0, fee_percent: 0 };
+  cancelPolicy: CancellationPolicy & { enabled: boolean } = { enabled: false, limit_hours: 0, fee_percent: 0 };
+  savingPolicy = false;
 
   // Displays formatados para os inputs de máscara
   limitHoursDisplay = '00:00:00';
@@ -760,6 +807,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   get cancelPolicySummary(): string {
+    if (!this.cancelPolicy.enabled) return 'Política desativada — clientes podem cancelar livremente a qualquer momento.';
     const h = this.cancelPolicy.limit_hours;
     const f = this.cancelPolicy.fee_percent;
     const hLabel = this.formatLimitHours(h);
@@ -769,14 +817,36 @@ export class PerfilComponent implements OnInit, OnDestroy {
       : totalMins % 60 === 0
         ? `${Math.floor(totalMins / 60)}h`
         : `${Math.floor(totalMins / 60)}h${String(totalMins % 60).padStart(2, '0')}`;
-    if (h === 0) return 'Clientes podem cancelar a qualquer momento sem custo.';
+    if (h === 0) return 'Janela definida como 00:00:00 — configure o prazo mínimo acima.';
     if (f === 0) return `Cancelamento gratuito até ${hLabel} (${humanLabel}) antes do horário. Fora do prazo, ainda é gratuito.`;
-    return `Cancelamento gratuito até ${hLabel} (${humanLabel}) antes do horário. Fora do prazo, taxa de ${f}% sobre o valor já pago.`;
+    return `Cancelamento gratuito até ${hLabel} (${humanLabel}) antes do início. Após o prazo, taxa de ${f}% sobre o valor pago.`;
   }
 
-  saveCancelPolicy(): void {
-    localStorage.setItem('arenaflow_cancel_policy', JSON.stringify(this.cancelPolicy));
-    this.toast.show('Política de cancelamento salva!');
+  /** Sincroniza o buffer interno de horas com o valor atual de cancelPolicy */
+  private _syncLimitBuffer(): void {
+    const totalMins = Math.round(this.cancelPolicy.limit_hours * 60);
+    const hh = Math.floor(totalMins / 60);
+    const mm  = totalMins % 60;
+    this.limitBuffer = [
+      Math.floor(hh / 10), hh % 10,
+      Math.floor(mm / 10), mm % 10,
+    ];
+  }
+
+  async saveCancelPolicy(): Promise<void> {
+    this.savingPolicy = true;
+    try {
+      await this.establishmentService.syncCancelPolicy({
+        cancel_policy_enabled: this.cancelPolicy.enabled,
+        cancel_limit_hours:    this.cancelPolicy.limit_hours,
+        cancel_fee_percent:    this.cancelPolicy.fee_percent,
+      });
+      this.toast.show('Política de cancelamento salva!');
+    } catch {
+      this.toast.show('Erro ao salvar política. Tente novamente.');
+    } finally {
+      this.savingPolicy = false;
+    }
   }
 
   themes: ThemeOption[] = [
@@ -829,10 +899,19 @@ export class PerfilComponent implements OnInit, OnDestroy {
       }
     }
 
-    const stored = localStorage.getItem('arenaflow_cancel_policy');
-    if (stored) this.cancelPolicy = { ...this.cancelPolicy, ...JSON.parse(stored) };
+    // Carrega política de cancelamento do estabelecimento (API)
+    const estData = this.establishmentService.establishment();
+    if (estData) {
+      this.cancelPolicy = {
+        enabled:     estData.cancel_policy_enabled ?? false,
+        limit_hours: estData.cancel_limit_hours    ?? 0,
+        fee_percent: estData.cancel_fee_percent    ?? 0,
+      };
+    }
     this.limitHoursDisplay = this.formatLimitHours(this.cancelPolicy.limit_hours);
     this.feePctDisplay = `${this.cancelPolicy.fee_percent}%`;
+    // Reconstrói buffer do teclado
+    this._syncLimitBuffer();
   }
 
   private parseOpenHours(value: string): { start: string; end: string } | null {

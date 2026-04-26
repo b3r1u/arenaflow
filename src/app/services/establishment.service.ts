@@ -36,6 +36,11 @@ export interface ApiEstablishment {
   price_from?: number;
   price_to?: number;
   courts?: ApiCourt[];
+
+  // Política de cancelamento
+  cancel_policy_enabled: boolean;
+  cancel_limit_hours: number;
+  cancel_fee_percent: number;
 }
 
 export interface CreateEstablishmentDto {
@@ -228,6 +233,23 @@ export class EstablishmentService {
       console.error('[EstablishmentService] syncProfile error', err);
       throw err;
     }
+  }
+
+  /**
+   * Salva a política de cancelamento no banco.
+   * PATCH /api/establishments/me com os três campos de política.
+   */
+  async syncCancelPolicy(data: {
+    cancel_policy_enabled: boolean;
+    cancel_limit_hours: number;
+    cancel_fee_percent: number;
+  }): Promise<void> {
+    if (!this._initialized()) await this.init();
+    if (!this.hasEstablishment()) throw new Error('Estabelecimento não encontrado');
+    const res = await firstValueFrom(
+      this.api.patch<{ establishment: ApiEstablishment }>('/establishments/me', data)
+    );
+    this._establishment.set(res.establishment);
   }
 
   /** Chamado no logout para limpar o estado */
