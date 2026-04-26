@@ -196,7 +196,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   navItems = [
     { label: 'Dashboard',     path: '/',             icon: 'dashboard',         accent: false },
-    { label: 'Agendamentos',  path: '/agendamentos', icon: 'calendar_month',    accent: false },
     { label: 'Quadras',       path: '/quadras',      icon: 'sports_volleyball', accent: false },
     { label: 'Clientes',      path: '/clientes',     icon: 'group',             accent: false },
     { label: 'Mensalistas',   path: '/mensalistas',  icon: 'card_membership',   accent: false },
@@ -210,7 +209,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   bottomNavItems = [
     { label: 'Dashboard',    shortLabel: 'Início',   path: '/',            icon: 'dashboard'         },
-    { label: 'Agendamentos', shortLabel: 'Agenda',   path: '/agendamentos', icon: 'calendar_month'   },
     { label: 'Quadras',      shortLabel: 'Quadras',  path: '/quadras',      icon: 'sports_volleyball' },
     { label: 'Clientes',     shortLabel: 'Clientes', path: '/clientes',     icon: 'group'             },
     { label: 'Reservas',     shortLabel: 'Reservar', path: '/reservas',     icon: 'shopping_cart'     },
