@@ -336,30 +336,40 @@ interface ThemeOption {
           <!-- Tempo limite -->
           <div>
             <label class="info-label">Cancelamento gratuito até</label>
-            <select class="input" [(ngModel)]="cancelPolicy.limit_hours">
-              <option [ngValue]="0">Sempre gratuito (sem limite de tempo)</option>
-              <option [ngValue]="1">1 hora antes do horário</option>
-              <option [ngValue]="2">2 horas antes do horário</option>
-              <option [ngValue]="3">3 horas antes do horário</option>
-              <option [ngValue]="6">6 horas antes do horário</option>
-              <option [ngValue]="12">12 horas antes do horário</option>
-              <option [ngValue]="24">24 horas antes do horário</option>
-            </select>
+            <div class="info-input-wrap">
+              <span class="material-icons info-icon">timer</span>
+              <input class="input info-input"
+                     style="font-variant-numeric:tabular-nums;letter-spacing:0.06em;font-family:monospace"
+                     [value]="limitHoursDisplay"
+                     placeholder="00:00:00"
+                     maxlength="10"
+                     (input)="onLimitHoursInput($event)"
+                     (focus)="onLimitHoursFocus($event)" />
+            </div>
+            <p class="text-xs mt-1.5" style="color:var(--muted-foreground)">
+              <span class="material-icons" style="font-size:0.7rem;vertical-align:middle">info</span>
+              Digite o número de horas antes do início — <strong style="color:var(--foreground)">00:00:00</strong> = sempre gratuito
+            </p>
           </div>
 
           <!-- Taxa após o limite -->
           <div *ngIf="cancelPolicy.limit_hours > 0">
             <label class="info-label">Taxa cobrada após o limite</label>
-            <div class="grid grid-cols-4 gap-2">
-              <button *ngFor="let fee of feePcts"
-                      (click)="cancelPolicy.fee_percent = fee"
-                      class="py-2.5 rounded-xl text-sm font-heading font-bold border-2 transition-all"
-                      [style.border-color]="cancelPolicy.fee_percent === fee ? 'var(--primary)' : 'var(--border)'"
-                      [style.background]="cancelPolicy.fee_percent === fee ? 'hsl(152,69%,40%,0.08)' : 'var(--card)'"
-                      [style.color]="cancelPolicy.fee_percent === fee ? 'var(--primary)' : 'var(--muted-foreground)'">
-                {{ fee === 0 ? 'Grátis' : fee + '%' }}
-              </button>
+            <div class="info-input-wrap">
+              <span class="material-icons info-icon">percent</span>
+              <input class="input info-input"
+                     style="font-variant-numeric:tabular-nums;letter-spacing:0.04em;font-family:monospace"
+                     [value]="feePctDisplay"
+                     placeholder="0%"
+                     maxlength="4"
+                     (input)="onFeePctInput($event)"
+                     (focus)="onFeePctFocus($event)" />
             </div>
+            <p class="text-xs mt-1.5" style="color:var(--muted-foreground)">
+              <span class="material-icons" style="font-size:0.7rem;vertical-align:middle">info</span>
+              <strong style="color:var(--foreground)">0%</strong> = cancelamento gratuito mesmo fora do prazo ·
+              <strong style="color:var(--foreground)">100%</strong> = valor total retido
+            </p>
           </div>
 
           <!-- Resumo -->
@@ -579,8 +589,51 @@ export class PerfilComponent implements OnInit, OnDestroy {
   isDragging = false;
   errorMsg = '';
 
-  cancelPolicy: CancellationPolicy = { limit_hours: 1, fee_percent: 0 };
-  feePcts = [0, 25, 50, 100];
+  cancelPolicy: CancellationPolicy = { limit_hours: 0, fee_percent: 0 };
+
+  // Displays formatados para os inputs de máscara
+  limitHoursDisplay = '00:00:00';
+  feePctDisplay = '0%';
+
+  private formatLimitHours(h: number): string {
+    return `${String(h).padStart(2, '0')}:00:00`;
+  }
+
+  onLimitHoursInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const raw = el.value.replace(/\D/g, '');
+    const num = raw === '' ? 0 : Math.min(999, parseInt(raw, 10));
+    this.cancelPolicy.limit_hours = num;
+    this.limitHoursDisplay = this.formatLimitHours(num);
+    el.value = this.limitHoursDisplay;
+    // Posiciona cursor após os dígitos de horas
+    const cursor = String(num).padStart(2, '0').length;
+    try { el.setSelectionRange(cursor, cursor); } catch {}
+  }
+
+  onLimitHoursFocus(event: Event): void {
+    // Seleciona só a parte das horas ao focar
+    const el = event.target as HTMLInputElement;
+    const cursor = String(this.cancelPolicy.limit_hours).padStart(2, '0').length;
+    setTimeout(() => { try { el.setSelectionRange(0, cursor); } catch {} });
+  }
+
+  onFeePctInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const raw = el.value.replace(/\D/g, '');
+    const num = raw === '' ? 0 : Math.min(100, parseInt(raw, 10));
+    this.cancelPolicy.fee_percent = num;
+    this.feePctDisplay = `${num}%`;
+    el.value = this.feePctDisplay;
+    const cursor = String(num).length;
+    try { el.setSelectionRange(cursor, cursor); } catch {}
+  }
+
+  onFeePctFocus(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const cursor = String(this.cancelPolicy.fee_percent).length;
+    setTimeout(() => { try { el.setSelectionRange(0, cursor); } catch {} });
+  }
 
   // ─── Horário de funcionamento ──────────────────────────────────────────────
   openHoursStart = '07:00';
@@ -671,9 +724,10 @@ export class PerfilComponent implements OnInit, OnDestroy {
   get cancelPolicySummary(): string {
     const h = this.cancelPolicy.limit_hours;
     const f = this.cancelPolicy.fee_percent;
+    const hLabel = this.formatLimitHours(h);
     if (h === 0) return 'Clientes podem cancelar a qualquer momento sem custo.';
-    if (f === 0) return `Cancelamento gratuito até ${h}h antes do horário. Após esse prazo, o cancelamento ainda é gratuito.`;
-    return `Cancelamento gratuito até ${h}h antes do horário. Após esse prazo, será cobrada uma taxa de ${f}% do valor já pago.`;
+    if (f === 0) return `Cancelamento gratuito até ${hLabel} (${h}h) antes do horário. Fora do prazo, ainda é gratuito.`;
+    return `Cancelamento gratuito até ${hLabel} (${h}h) antes do horário. Fora do prazo, taxa de ${f}% sobre o valor já pago.`;
   }
 
   saveCancelPolicy(): void {
@@ -715,8 +769,10 @@ export class PerfilComponent implements OnInit, OnDestroy {
         neighborhood: p.neighborhood || '',
         city: p.city || '',
       };
-      // Preload street from stored address (best effort)
-      this.street = p.address || '';
+      // Restaura campos separados persistidos no localStorage
+      this.street      = p.street      || '';
+      this.houseNumber = p.houseNumber || '';
+      this.cep         = p.cep         || '';
     });
 
     // Carrega o horário de funcionamento do estabelecimento (se existir)
@@ -731,6 +787,8 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     const stored = localStorage.getItem('arenaflow_cancel_policy');
     if (stored) this.cancelPolicy = { ...this.cancelPolicy, ...JSON.parse(stored) };
+    this.limitHoursDisplay = this.formatLimitHours(this.cancelPolicy.limit_hours);
+    this.feePctDisplay = `${this.cancelPolicy.fee_percent}%`;
   }
 
   private parseOpenHours(value: string): { start: string; end: string } | null {
@@ -809,8 +867,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     this.savingInfo = true;
     try {
-      // Salva localmente (sidebar, tema, etc.)
-      this.profileService.updateProfile({ ...this.form });
+      // Salva localmente (sidebar, tema, etc.) — inclui campos separados de endereço
+      this.profileService.updateProfile({
+        ...this.form,
+        street:      this.street,
+        houseNumber: this.houseNumber,
+        cep:         this.cep,
+      });
       // Sincroniza com a API: perfil completo + logo atual
       await this.establishmentService.syncProfile({
         name:         this.form.name         || undefined,
