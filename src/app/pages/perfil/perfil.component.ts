@@ -595,27 +595,33 @@ export class PerfilComponent implements OnInit, OnDestroy {
   limitHoursDisplay = '00:00:00';
   feePctDisplay = '0%';
 
+  /** Converte horas decimais → "HH:MM:00" */
   private formatLimitHours(h: number): string {
-    return `${String(h).padStart(2, '0')}:00:00`;
+    const totalMins = Math.round(h * 60);
+    const hours = Math.floor(totalMins / 60);
+    const mins  = totalMins % 60;
+    return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
   }
 
   onLimitHoursInput(event: Event): void {
     const el = event.target as HTMLInputElement;
-    const raw = el.value.replace(/\D/g, '');
-    const num = raw === '' ? 0 : Math.min(999, parseInt(raw, 10));
-    this.cancelPolicy.limit_hours = num;
-    this.limitHoursDisplay = this.formatLimitHours(num);
+    // Extrai apenas dígitos, limite de 4 (HHMM)
+    const digits = el.value.replace(/\D/g, '').slice(0, 4);
+    const hh = parseInt(digits.slice(0, 2) || '0', 10);
+    const mm = Math.min(59, parseInt(digits.slice(2, 4) || '0', 10));
+    this.cancelPolicy.limit_hours = hh + mm / 60;
+    this.limitHoursDisplay = this.formatLimitHours(this.cancelPolicy.limit_hours);
     el.value = this.limitHoursDisplay;
-    // Posiciona cursor após os dígitos de horas
-    const cursor = String(num).padStart(2, '0').length;
+    // Posiciona cursor antes do ":00" dos segundos
+    const cursor = 5; // "HH:MM" = 5 chars
     try { el.setSelectionRange(cursor, cursor); } catch {}
   }
 
   onLimitHoursFocus(event: Event): void {
-    // Seleciona só a parte das horas ao focar
-    const el = event.target as HTMLInputElement;
-    const cursor = String(this.cancelPolicy.limit_hours).padStart(2, '0').length;
-    setTimeout(() => { try { el.setSelectionRange(0, cursor); } catch {} });
+    // Seleciona toda a parte editável (HH:MM) ao focar
+    setTimeout(() => {
+      try { (event.target as HTMLInputElement).setSelectionRange(0, 5); } catch {}
+    });
   }
 
   onFeePctInput(event: Event): void {
@@ -725,9 +731,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
     const h = this.cancelPolicy.limit_hours;
     const f = this.cancelPolicy.fee_percent;
     const hLabel = this.formatLimitHours(h);
+    const totalMins = Math.round(h * 60);
+    const humanLabel = totalMins < 60
+      ? `${totalMins} min`
+      : totalMins % 60 === 0
+        ? `${Math.floor(totalMins / 60)}h`
+        : `${Math.floor(totalMins / 60)}h${String(totalMins % 60).padStart(2, '0')}`;
     if (h === 0) return 'Clientes podem cancelar a qualquer momento sem custo.';
-    if (f === 0) return `Cancelamento gratuito até ${hLabel} (${h}h) antes do horário. Fora do prazo, ainda é gratuito.`;
-    return `Cancelamento gratuito até ${hLabel} (${h}h) antes do horário. Fora do prazo, taxa de ${f}% sobre o valor já pago.`;
+    if (f === 0) return `Cancelamento gratuito até ${hLabel} (${humanLabel}) antes do horário. Fora do prazo, ainda é gratuito.`;
+    return `Cancelamento gratuito até ${hLabel} (${humanLabel}) antes do horário. Fora do prazo, taxa de ${f}% sobre o valor já pago.`;
   }
 
   saveCancelPolicy(): void {
