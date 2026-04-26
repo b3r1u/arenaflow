@@ -339,12 +339,13 @@ interface ThemeOption {
             <div class="info-input-wrap">
               <span class="material-icons info-icon">timer</span>
               <input class="input info-input"
-                     style="font-variant-numeric:tabular-nums;letter-spacing:0.06em;font-family:monospace"
+                     style="font-variant-numeric:tabular-nums;letter-spacing:0.06em;font-family:monospace;caret-color:transparent"
                      [value]="limitHoursDisplay"
                      placeholder="00:00:00"
-                     maxlength="10"
-                     (input)="onLimitHoursInput($event)"
-                     (focus)="onLimitHoursFocus($event)" />
+                     readonly
+                     (keydown)="onLimitHoursKeydown($event)"
+                     (focus)="onLimitHoursFocus($event)"
+                     (paste)="$event.preventDefault()" />
             </div>
             <p class="text-xs mt-1.5" style="color:var(--muted-foreground)">
               <span class="material-icons" style="font-size:0.7rem;vertical-align:middle">info</span>
@@ -595,6 +596,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
   limitHoursDisplay = '00:00:00';
   feePctDisplay = '0%';
 
+  // Buffer [H1, H2, M1, M2] — preenchido da direita para a esquerda
+  private limitBuffer: [number, number, number, number] = [0, 0, 0, 0];
+
   /** Converte horas decimais → "HH:MM:00" */
   private formatLimitHours(h: number): string {
     const totalMins = Math.round(h * 60);
@@ -603,25 +607,53 @@ export class PerfilComponent implements OnInit, OnDestroy {
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
   }
 
-  onLimitHoursInput(event: Event): void {
-    const el = event.target as HTMLInputElement;
-    // Extrai apenas dígitos, limite de 4 (HHMM)
-    const digits = el.value.replace(/\D/g, '').slice(0, 4);
-    const hh = parseInt(digits.slice(0, 2) || '0', 10);
-    const mm = Math.min(59, parseInt(digits.slice(2, 4) || '0', 10));
+  /** Reconstrói limit_hours e display a partir do buffer */
+  private applyLimitBuffer(): void {
+    const [h1, h2, m1, m2] = this.limitBuffer;
+    const hh = h1 * 10 + h2;
+    const mm = m1 * 10 + m2;
     this.cancelPolicy.limit_hours = hh + mm / 60;
     this.limitHoursDisplay = this.formatLimitHours(this.cancelPolicy.limit_hours);
-    el.value = this.limitHoursDisplay;
-    // Posiciona cursor antes do ":00" dos segundos
-    const cursor = 5; // "HH:MM" = 5 chars
-    try { el.setSelectionRange(cursor, cursor); } catch {}
+  }
+
+  onLimitHoursKeydown(event: KeyboardEvent): void {
+    const key = event.key;
+    if (key === 'Tab' || key === 'Enter') return; // permite navegação
+
+    if (/^\d$/.test(key)) {
+      event.preventDefault();
+      // Shift left, novo dígito entra pela direita
+      const shifted: [number, number, number, number] = [
+        this.limitBuffer[1], this.limitBuffer[2], this.limitBuffer[3], parseInt(key),
+      ];
+      // Clampeia minutos em 59
+      if (shifted[2] * 10 + shifted[3] > 59) { shifted[2] = 5; shifted[3] = 9; }
+      this.limitBuffer = shifted;
+    } else if (key === 'Backspace') {
+      event.preventDefault();
+      this.limitBuffer = [0, this.limitBuffer[0], this.limitBuffer[1], this.limitBuffer[2]];
+    } else if (key === 'Delete') {
+      event.preventDefault();
+      this.limitBuffer = [0, 0, 0, 0];
+    } else {
+      event.preventDefault();
+      return;
+    }
+
+    this.applyLimitBuffer();
+    (event.target as HTMLInputElement).value = this.limitHoursDisplay;
   }
 
   onLimitHoursFocus(event: Event): void {
-    // Seleciona toda a parte editável (HH:MM) ao focar
-    setTimeout(() => {
-      try { (event.target as HTMLInputElement).setSelectionRange(0, 5); } catch {}
-    });
+    // Reconstrói buffer a partir do valor atual
+    const totalMins = Math.round(this.cancelPolicy.limit_hours * 60);
+    const hh = Math.floor(totalMins / 60);
+    const mm  = totalMins % 60;
+    this.limitBuffer = [
+      Math.floor(hh / 10), hh % 10,
+      Math.floor(mm / 10), mm % 10,
+    ];
+    setTimeout(() => { try { (event.target as HTMLInputElement).select(); } catch {} });
   }
 
   onFeePctInput(event: Event): void {
