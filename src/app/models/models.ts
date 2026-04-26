@@ -7,21 +7,43 @@ export interface Court {
   description?: string;
 }
 
+export interface BookingPaymentSplit {
+  id: string;
+  player_name: string;
+  amount: number;      // centavos
+  status: 'PENDENTE' | 'PAGO' | 'EXPIRADO';
+  pix_expires_at: string | null;
+}
+
+export interface BookingPaymentGroup {
+  id: string;
+  payment_type: 'SPLIT' | 'DEPOSIT';
+  total_amount: number;   // centavos
+  paid_amount: number;    // centavos
+  status: 'PENDENTE' | 'PARCIAL' | 'PAGO';
+  splits: BookingPaymentSplit[];
+}
+
 export interface Booking {
   id: string;
   client_name: string;
   client_phone?: string;
   court_id: string;
+  court_name?: string;
+  sport_type?: string;
   date: string;
   start_hour: string;
   end_hour: string;
   payment_method?: 'pix' | 'cartão' | 'dinheiro' | '';
-  payment_status: 'pago' | 'pendente' | 'não informado' | 'cancelado';
+  payment_status: 'pago' | 'parcial' | 'pendente' | 'não informado' | 'cancelado';
   total_amount: number;
   paid_amount?: number;
   notes?: string;
   status?: string;
   duration_hours?: number;
+  split_payment?: boolean;
+  num_players?: number;
+  payment_group?: BookingPaymentGroup | null;
 }
 
 export interface Client {
@@ -60,7 +82,10 @@ export interface EstablishmentProfile {
   logoUrl?: string; // base64 ou URL
   phone?: string;
   email?: string;
-  address?: string;
+  address?: string;     // combinado "logradouro, número" — enviado à API
+  street?: string;      // logradouro separado — persiste no localStorage
+  houseNumber?: string; // número separado — persiste no localStorage
+  cep?: string;         // CEP — persiste no localStorage
   neighborhood?: string;
   city?: string;
   theme?: ThemeId;
