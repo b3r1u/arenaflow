@@ -23,6 +23,8 @@ interface AdminBooking {
   payment_status: string;
 }
 
+type AgendaView = 'grade' | 'canceladas';
+
 @Component({
   selector: 'app-agendamentos',
   standalone: true,
@@ -42,8 +44,32 @@ interface AdminBooking {
         </button>
       </div>
 
+      <!-- View tabs -->
+      <div class="flex gap-2 mb-5">
+        <button class="btn-outline text-sm py-1.5 px-4 rounded-full transition-colors"
+                [style.background]="view === 'grade' ? 'var(--primary)' : ''"
+                [style.color]="view === 'grade' ? 'white' : 'var(--muted-foreground)'"
+                [style.border-color]="view === 'grade' ? 'var(--primary)' : 'var(--border)'"
+                (click)="switchView('grade')">
+          Grade do Dia
+        </button>
+        <button class="btn-outline text-sm py-1.5 px-4 rounded-full transition-colors"
+                [style.background]="view === 'canceladas' ? 'hsl(0,72%,51%)' : ''"
+                [style.color]="view === 'canceladas' ? 'white' : 'var(--muted-foreground)'"
+                [style.border-color]="view === 'canceladas' ? 'hsl(0,72%,51%)' : 'var(--border)'"
+                (click)="switchView('canceladas')">
+          Canceladas do Mês
+          <span *ngIf="cancelledBookings.length > 0"
+                class="inline-flex items-center justify-center w-4 h-4 rounded-full text-xs ml-1"
+                [style.background]="view === 'canceladas' ? 'rgba(255,255,255,0.25)' : 'hsl(0,72%,51%)'"
+                style="color:white;font-weight:700">
+            {{ cancelledBookings.length }}
+          </span>
+        </button>
+      </div>
+
       <!-- Date navigator -->
-      <div class="flex items-center gap-3 mb-5">
+      <div class="flex items-center gap-3 mb-5" *ngIf="view === 'grade'">
         <button class="btn-outline p-2" (click)="changeDate(-1)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
         </button>
@@ -56,8 +82,8 @@ interface AdminBooking {
         </button>
       </div>
 
-      <!-- Legenda -->
-      <div class="flex items-center gap-4 mb-4 flex-wrap">
+      <!-- Legenda (só na grade) -->
+      <div class="flex items-center gap-4 mb-4 flex-wrap" *ngIf="view === 'grade'">
         <div class="flex items-center gap-1.5 text-xs" style="color:var(--muted-foreground)">
           <div class="w-3 h-3 rounded" style="background:var(--primary)"></div>
           <span>Reserva</span>
@@ -68,13 +94,62 @@ interface AdminBooking {
         </div>
       </div>
 
-      <!-- Loading spinner -->
-      <div *ngIf="loadingBookings" class="flex items-center justify-center py-16">
+      <!-- ── View: Canceladas do Mês ── -->
+      <div *ngIf="view === 'canceladas'">
+        <div *ngIf="loadingCancelled" class="flex items-center justify-center py-16">
+          <span class="material-icons" style="font-size:2rem;color:var(--muted-foreground);animation:spin 1s linear infinite">refresh</span>
+        </div>
+
+        <div *ngIf="!loadingCancelled && cancelledBookings.length === 0" class="text-center py-16 card">
+          <span class="material-icons" style="font-size:2.5rem;color:var(--border)">cancel</span>
+          <p class="mt-3 font-semibold" style="color:var(--foreground)">Nenhuma reserva cancelada este mês</p>
+          <p class="text-sm mt-1" style="color:var(--muted-foreground)">Reservas canceladas aparecem aqui com os dados de estorno</p>
+        </div>
+
+        <div *ngIf="!loadingCancelled && cancelledBookings.length > 0" class="space-y-3">
+          <div *ngFor="let b of cancelledBookings" class="card overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3"
+                 style="background:hsl(0,72%,51%,0.05);border-bottom:1px solid hsl(0,72%,51%,0.15)">
+              <div>
+                <div class="font-heading font-semibold text-sm" style="color:var(--foreground)">{{ b.client_name }}</div>
+                <div class="text-xs mt-0.5" style="color:var(--muted-foreground)">
+                  {{ b.court_name || 'Quadra' }}
+                  <span *ngIf="b.client_phone"> · {{ b.client_phone }}</span>
+                </div>
+              </div>
+              <span class="badge" style="background:hsl(0,72%,51%,0.1);color:hsl(0,72%,40%);border:1px solid hsl(0,72%,51%,0.25)">
+                cancelada
+              </span>
+            </div>
+            <div class="px-4 py-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+              <div class="flex items-center gap-1" style="color:var(--muted-foreground)">
+                <span class="material-icons" style="font-size:0.85rem">calendar_today</span>
+                {{ formatDateShort(b.date) }}
+              </div>
+              <div class="flex items-center gap-1" style="color:var(--muted-foreground)">
+                <span class="material-icons" style="font-size:0.85rem">schedule</span>
+                {{ b.start_hour }}–{{ b.end_hour }}
+              </div>
+              <div class="flex items-center gap-1 font-semibold" style="color:var(--foreground)">
+                <span class="material-icons" style="font-size:0.85rem">attach_money</span>
+                Total: R\${{ b.total_amount | number:'1.2-2' }}
+              </div>
+              <div class="flex items-center gap-1" [style.color]="b.paid_amount > 0 ? 'hsl(0,72%,51%)' : 'var(--muted-foreground)'">
+                <span class="material-icons" style="font-size:0.85rem">{{ b.paid_amount > 0 ? 'undo' : 'money_off' }}</span>
+                {{ b.paid_amount > 0 ? 'Estorno: R\$' + (b.paid_amount | number:'1.2-2') : 'Sem pagamento' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading spinner (grade) -->
+      <div *ngIf="loadingBookings && view === 'grade'" class="flex items-center justify-center py-16">
         <span class="material-icons" style="font-size:2rem;color:var(--muted-foreground);animation:spin 1s linear infinite">refresh</span>
       </div>
 
       <!-- Mobile: booking cards list -->
-      <div *ngIf="!loadingBookings" class="lg:hidden space-y-3">
+      <div *ngIf="!loadingBookings && view === 'grade'" class="lg:hidden space-y-3">
         <ng-container *ngFor="let court of courts">
           <div class="card overflow-hidden">
             <!-- Court header -->
@@ -139,7 +214,7 @@ interface AdminBooking {
       </div>
 
       <!-- Desktop: grid table -->
-      <div *ngIf="!loadingBookings" class="hidden lg:block card overflow-auto mobile-scroll">
+      <div *ngIf="!loadingBookings && view === 'grade'" class="hidden lg:block card overflow-auto mobile-scroll">
         <table class="w-full text-sm">
           <thead>
             <tr style="border-bottom:1px solid var(--border)">
@@ -298,6 +373,10 @@ export class AgendamentosComponent implements OnInit {
   bookings:    AdminBooking[] = [];
   mensalistas: Mensalista[]   = [];
 
+  view: AgendaView    = 'grade';
+  cancelledBookings:  AdminBooking[] = [];
+  loadingCancelled    = false;
+
   currentDate     = new Date();
   loadingBookings = false;
   saving          = false;
@@ -373,6 +452,35 @@ export class AgendamentosComponent implements OnInit {
 
   formatDate(d: Date): string {
     return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+  }
+
+  formatDateShort(date: string): string {
+    const [y, m, d] = date.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  async switchView(v: AgendaView): Promise<void> {
+    this.view = v;
+    if (v === 'canceladas' && this.cancelledBookings.length === 0) {
+      await this.loadCancelledBookings();
+    }
+  }
+
+  async loadCancelledBookings(): Promise<void> {
+    this.loadingCancelled = true;
+    try {
+      const now   = new Date();
+      const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const res   = await firstValueFrom(
+        this.api.get<{ bookings: AdminBooking[] }>(`/admin/bookings/month?month=${month}`)
+      );
+      this.cancelledBookings = res.bookings.filter(b => b.payment_status === 'cancelado');
+    } catch (err) {
+      console.error('[AGENDAMENTOS/CANCELADAS]', err);
+      this.cancelledBookings = [];
+    } finally {
+      this.loadingCancelled = false;
+    }
   }
 
   changeDate(delta: number): void {
