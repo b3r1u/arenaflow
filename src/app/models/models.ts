@@ -4,6 +4,7 @@ export interface Court {
   sport_type: 'ambos' | 'futevôlei' | 'vôlei' | 'beach tennis' | 'futebol';
   status: 'disponível' | 'ocupada' | 'bloqueada';
   hourly_rate: number;
+  mensalista_rate?: number | null;
   description?: string;
 }
 

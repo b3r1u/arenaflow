@@ -10,18 +10,20 @@ export interface ApiCourt {
   sport_type: string;
   status: 'DISPONIVEL' | 'BLOQUEADA';
   hourly_rate: number;
+  mensalista_rate?: number | null;
   description?: string | null;
 }
 
 /** Converte o status do banco (uppercase) para o formato do front */
 function fromApi(c: ApiCourt): Court {
   return {
-    id:          c.id,
-    name:        c.name,
-    sport_type:  c.sport_type as Court['sport_type'],
-    status:      c.status === 'DISPONIVEL' ? 'disponível' : 'bloqueada',
-    hourly_rate: c.hourly_rate,
-    description: c.description ?? undefined,
+    id:              c.id,
+    name:            c.name,
+    sport_type:      c.sport_type as Court['sport_type'],
+    status:          c.status === 'DISPONIVEL' ? 'disponível' : 'bloqueada',
+    hourly_rate:     c.hourly_rate,
+    mensalista_rate: c.mensalista_rate ?? null,
+    description:     c.description ?? undefined,
   };
 }
 
@@ -35,6 +37,7 @@ export interface CourtFormData {
   sport_type: string;
   status: string;
   hourly_rate: number;
+  mensalista_rate?: number | null;
   description?: string;
 }
 
@@ -83,11 +86,12 @@ export class CourtService {
     try {
       const res = await firstValueFrom(
         this.api.post<{ court: ApiCourt }>('/courts', {
-          name:        data.name,
-          sport_type:  data.sport_type,
-          hourly_rate: data.hourly_rate,
-          status:      toApiStatus(data.status),
-          description: data.description || undefined,
+          name:            data.name,
+          sport_type:      data.sport_type,
+          hourly_rate:     data.hourly_rate,
+          mensalista_rate: data.mensalista_rate ?? null,
+          status:          toApiStatus(data.status),
+          description:     data.description || undefined,
         })
       );
       const court = fromApi(res.court);

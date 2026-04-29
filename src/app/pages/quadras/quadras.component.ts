@@ -190,7 +190,12 @@ import { Court } from '../../models/models';
             <h3 class="font-heading font-bold text-lg mb-1" style="color:var(--foreground)">{{ court.name }}</h3>
             <p class="text-sm mb-2" style="color:var(--muted-foreground)">{{ court.sport_type | titlecase }}</p>
             <div class="flex items-center justify-between mt-3 pt-3" style="border-top:1px solid var(--border)">
-              <span class="font-heading font-bold" style="color:var(--primary)">{{ formatBRL(court.hourly_rate) }}/h</span>
+              <div>
+                <span class="font-heading font-bold" style="color:var(--primary)">{{ formatBRL(court.hourly_rate) }}/h</span>
+                <span *ngIf="court.mensalista_rate" class="ml-2 badge badge-accent" style="font-size:0.65rem">
+                  Mensalista {{ formatBRL(court.mensalista_rate) }}/h
+                </span>
+              </div>
               <button class="btn-ghost p-1.5" (click)="editCourt(court); $event.stopPropagation()">
                 <span class="material-icons" style="font-size:1.1rem">edit</span>
               </button>
@@ -264,11 +269,24 @@ import { Court } from '../../models/models';
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Valor/hora (R$)</label>
+            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Valor/hora — Reserva avulsa (R$)</label>
             <input class="input" type="text" inputmode="numeric"
                    [value]="hourlyRateDisplay"
                    (input)="onHourlyRateInput($event)"
                    placeholder="R$ 0,00">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" style="color:var(--foreground)">
+              Valor/hora — Mensalista (R$)
+              <span class="ml-1 text-xs font-normal" style="color:var(--muted-foreground)">(opcional — desconto para plano mensal)</span>
+            </label>
+            <input class="input" type="text" inputmode="numeric"
+                   [value]="mensalistaRateDisplay"
+                   (input)="onMensalistaRateInput($event)"
+                   placeholder="Mesmo que reserva avulsa">
+            <p class="text-xs mt-1" style="color:var(--muted-foreground)">
+              Deixe vazio para cobrar o mesmo valor da reserva avulsa.
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Descrição</label>
@@ -306,7 +324,8 @@ export class QuadrasComponent implements OnInit {
   showModal   = false;
   editingId: string | null = null;
   modalError: string | null = null;
-  hourlyRateDisplay = 'R$ 80,00';
+  hourlyRateDisplay     = 'R$ 80,00';
+  mensalistaRateDisplay = '';   // vazio = sem preço diferenciado
 
   form = this.emptyForm();
 
@@ -361,7 +380,7 @@ export class QuadrasComponent implements OnInit {
   // ─── Quadras ───────────────────────────────────────────────────────────────
 
   emptyForm(): CourtFormData {
-    return { name: '', sport_type: 'futevôlei', status: 'disponível', hourly_rate: 80, description: '' };
+    return { name: '', sport_type: 'futevôlei', status: 'disponível', hourly_rate: 80, mensalista_rate: null, description: '' };
   }
 
   getStatusClass(s: string) {
@@ -382,6 +401,23 @@ export class QuadrasComponent implements OnInit {
     input.value = this.hourlyRateDisplay;
   }
 
+  onMensalistaRateInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const raw = input.value.replace(/\D/g, '');
+    if (!raw) {
+      // Campo vazio → sem preço diferenciado
+      this.mensalistaRateDisplay = '';
+      this.form.mensalista_rate  = null;
+      input.value = '';
+      return;
+    }
+    const cents = parseInt(raw, 10);
+    const value = cents / 100;
+    this.mensalistaRateDisplay = this.formatBRL(value);
+    this.form.mensalista_rate  = value;
+    input.value = this.mensalistaRateDisplay;
+  }
+
   openModal() {
     if (!this.financialActive()) {
       const msg = this.financialService.hasFinancial()
@@ -391,25 +427,28 @@ export class QuadrasComponent implements OnInit {
       return;
     }
     if (this.atLimit()) return;
-    this.form              = this.emptyForm();
-    this.hourlyRateDisplay = this.formatBRL(this.form.hourly_rate);
-    this.editingId         = null;
-    this.modalError        = null;
-    this.showModal         = true;
+    this.form                  = this.emptyForm();
+    this.hourlyRateDisplay     = this.formatBRL(this.form.hourly_rate);
+    this.mensalistaRateDisplay = '';
+    this.editingId             = null;
+    this.modalError            = null;
+    this.showModal             = true;
   }
 
   editCourt(c: Court) {
     this.form = {
-      name:        c.name,
-      sport_type:  c.sport_type,
-      status:      c.status === 'ocupada' ? 'bloqueada' : c.status,
-      hourly_rate: c.hourly_rate,
-      description: c.description || '',
+      name:            c.name,
+      sport_type:      c.sport_type,
+      status:          c.status === 'ocupada' ? 'bloqueada' : c.status,
+      hourly_rate:     c.hourly_rate,
+      mensalista_rate: c.mensalista_rate ?? null,
+      description:     c.description || '',
     };
-    this.hourlyRateDisplay = this.formatBRL(c.hourly_rate);
-    this.editingId         = c.id;
-    this.modalError        = null;
-    this.showModal         = true;
+    this.hourlyRateDisplay     = this.formatBRL(c.hourly_rate);
+    this.mensalistaRateDisplay = c.mensalista_rate ? this.formatBRL(c.mensalista_rate) : '';
+    this.editingId             = c.id;
+    this.modalError            = null;
+    this.showModal             = true;
   }
 
   async saveCourt() {
