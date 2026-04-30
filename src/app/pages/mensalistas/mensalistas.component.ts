@@ -1,19 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { ApiService } from '../../services/api.service';
 import { DataService } from '../../services/data.service';
 import { ToastService } from '../../services/toast.service';
-import { Court, DiaSemana, Mensalista } from '../../models/models';
+import { Court } from '../../models/models';
 
-const DIAS: { value: DiaSemana; label: string }[] = [
-  { value: 'domingo', label: 'Domingo'       },
-  { value: 'segunda', label: 'Segunda-feira' },
-  { value: 'terca',   label: 'Terça-feira'   },
-  { value: 'quarta',  label: 'Quarta-feira'  },
-  { value: 'quinta',  label: 'Quinta-feira'  },
-  { value: 'sexta',   label: 'Sexta-feira'   },
-  { value: 'sabado',  label: 'Sábado'        },
-];
+const DAY_NAMES = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+interface AdminMensalista {
+  id:             string;
+  client_name:    string;
+  client_phone:   string | null;
+  group_name:     string | null;
+  court_id:       string;
+  day_of_week:    number;
+  start_hour:     string;
+  end_hour:       string;
+  status:         'ATIVO' | 'INATIVO' | 'EXPIRADO';
+  payment_status: 'PAGO' | 'PENDENTE' | 'CANCELADO';
+  valid_until:    string | null;
+  created_at:     string;
+  court: {
+    name:            string;
+    hourly_rate:     number;
+    mensalista_rate: number | null;
+  };
+}
 
 @Component({
   selector: 'app-mensalistas',
@@ -25,18 +39,20 @@ const DIAS: { value: DiaSemana; label: string }[] = [
       <div class="flex items-center justify-between mb-6">
         <div>
           <h1 class="font-heading font-bold text-2xl lg:text-3xl" style="color:var(--foreground)">Mensalistas</h1>
-          <p class="text-sm mt-1" style="color:var(--muted-foreground)">Grupos com horário fixo semanal</p>
+          <p class="text-sm mt-1" style="color:var(--muted-foreground)">Horários fixos semanais contratados pelos clientes</p>
         </div>
-        <button class="btn-primary" (click)="openModal()">
-          <span class="material-icons" style="font-size:1rem">add</span> Novo Mensalista
+        <button class="btn-outline flex items-center gap-2" (click)="load()" [disabled]="loading">
+          <span class="material-icons" style="font-size:1rem"
+                [style.animation]="loading ? 'spin 1s linear infinite' : 'none'">refresh</span>
+          Atualizar
         </button>
       </div>
 
-      <!-- Regra de negócio: info box -->
+      <!-- Info box -->
       <div class="flex items-start gap-3 p-4 rounded-xl mb-5 text-sm"
            style="background-color:hsl(36,95%,55%,0.08);border:1px solid hsl(36,95%,55%,0.25);color:hsl(36,55%,32%)">
         <span class="material-icons flex-shrink-0" style="font-size:1.1rem;margin-top:1px">info</span>
-        <span>Mensalistas <strong>ativos</strong> com pagamento <strong>confirmado</strong> bloqueiam automaticamente o horário para reservas avulsas.</span>
+        <span>Mensalistas <strong>ativos</strong> com pagamento <strong>confirmado</strong> bloqueiam automaticamente o horário para reservas avulsas. Clientes criam e pagam pelo app.</span>
       </div>
 
       <!-- Filtros -->
@@ -47,299 +63,224 @@ const DIAS: { value: DiaSemana; label: string }[] = [
         </select>
         <select class="select" style="width:auto;min-width:160px" [(ngModel)]="filterDay">
           <option value="">Todos os dias</option>
-          <option *ngFor="let d of diasOptions" [value]="d.value">{{ d.label }}</option>
+          <option *ngFor="let d of dayOptions" [value]="d.value">{{ d.label }}</option>
         </select>
-        <label class="flex items-center gap-2 cursor-pointer select-none">
-          <label class="toggle">
-            <input type="checkbox" [(ngModel)]="filterOnlyActive">
-            <span class="toggle-slider"></span>
-          </label>
-          <span class="text-sm font-medium" style="color:var(--foreground)">Apenas ativos</span>
-        </label>
-        <span class="text-xs ml-auto" style="color:var(--muted-foreground)">{{ filteredMensalistas.length }} resultado(s)</span>
+        <select class="select" style="width:auto;min-width:160px" [(ngModel)]="filterStatus">
+          <option value="">Todos os status</option>
+          <option value="ATIVO">Ativos</option>
+          <option value="PENDENTE">Aguardando pagamento</option>
+          <option value="EXPIRADO">Expirados</option>
+          <option value="CANCELADO">Cancelados</option>
+        </select>
+        <span class="text-xs ml-auto" style="color:var(--muted-foreground)">{{ filtered.length }} resultado(s)</span>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-16" style="color:var(--muted-foreground)">
+        <span class="material-icons" style="font-size:2.5rem;animation:spin 1s linear infinite">refresh</span>
+        <p class="mt-3 text-sm">Carregando mensalistas...</p>
       </div>
 
       <!-- Grid de cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngIf="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-        <div *ngFor="let m of filteredMensalistas" class="card p-5 flex flex-col">
+        <div *ngFor="let m of filtered" class="card p-5 flex flex-col">
 
           <!-- Ícone + badges -->
           <div class="flex items-start justify-between mb-3">
             <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                 style="background-color:hsl(36,95%,55%,0.12)">
-              <span class="material-icons" style="font-size:1.3rem;color:hsl(36,65%,38%)">card_membership</span>
+                 [style.background]="m.status === 'ATIVO' ? 'hsl(152,69%,40%,0.1)' : 'var(--muted)'">
+              <span class="material-icons" style="font-size:1.3rem"
+                    [style.color]="m.status === 'ATIVO' ? 'var(--primary)' : 'var(--muted-foreground)'">
+                card_membership
+              </span>
             </div>
             <div class="flex flex-wrap gap-1.5 justify-end">
-              <span class="badge" [ngClass]="m.payment_status === 'confirmado' ? 'badge-primary' : 'badge-accent'">
-                {{ m.payment_status === 'confirmado' ? 'Pago' : 'Pendente' }}
-              </span>
-              <span class="badge" [ngClass]="m.active ? 'badge-primary' : 'badge-muted'">
-                {{ m.active ? 'Ativo' : 'Inativo' }}
-              </span>
+              <span class="badge" [ngClass]="paymentBadge(m)">{{ paymentLabel(m) }}</span>
+              <span class="badge" [ngClass]="statusBadge(m)">{{ statusLabel(m) }}</span>
             </div>
           </div>
 
-          <!-- Nome -->
-          <h3 class="font-heading font-bold text-base mb-2" style="color:var(--foreground)">{{ m.group_name }}</h3>
+          <!-- Nome do cliente / grupo -->
+          <h3 class="font-heading font-bold text-base mb-0.5" style="color:var(--foreground)">{{ m.group_name || m.client_name }}</h3>
+          <p class="text-xs mb-3" style="color:var(--muted-foreground)">{{ m.group_name ? m.client_name + ' · ' : '' }}{{ m.court.name }}</p>
 
           <!-- Detalhes -->
           <div class="space-y-1.5 flex-1">
             <div class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
-              <span class="material-icons" style="font-size:0.9rem">sports_volleyball</span>
-              <span>{{ getCourtName(m.court_id) }}</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
               <span class="material-icons" style="font-size:0.9rem">calendar_month</span>
-              <span>{{ getDiaLabel(m.day_of_week) }}</span>
+              <span>{{ dayName(m.day_of_week) }}</span>
             </div>
             <div class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
               <span class="material-icons" style="font-size:0.9rem">schedule</span>
               <span>{{ m.start_hour }} – {{ m.end_hour }}</span>
             </div>
-            <div *ngIf="m.monthly_amount" class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
+            <div class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
               <span class="material-icons" style="font-size:0.9rem">payments</span>
-              <span>R\${{ m.monthly_amount }}/mês</span>
+              <span>R\${{ monthlyAmount(m) | number:'1.2-2' }}/mês</span>
             </div>
-            <div *ngIf="m.contact_phone" class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
+            <div *ngIf="m.client_phone" class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
               <span class="material-icons" style="font-size:0.9rem">phone</span>
-              <span>{{ m.contact_phone }}</span>
+              <span>{{ m.client_phone }}</span>
+            </div>
+            <div *ngIf="m.valid_until" class="flex items-center gap-2 text-xs" style="color:var(--muted-foreground)">
+              <span class="material-icons" style="font-size:0.9rem">event</span>
+              <span>Válido até {{ m.valid_until | date:'dd/MM/yyyy':'UTC' }}</span>
             </div>
           </div>
 
-          <!-- Aviso: bloqueio ativo -->
-          <div *ngIf="m.active && m.payment_status === 'confirmado'"
+          <!-- Status bar -->
+          <div *ngIf="m.status === 'ATIVO' && m.payment_status === 'PAGO'"
                class="mt-3 flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg"
                style="background-color:hsl(152,69%,40%,0.08);color:var(--primary)">
             <span class="material-icons" style="font-size:0.85rem">lock</span>
-            <span>Horário bloqueado para reservas</span>
+            <span>Horário bloqueado para reservas avulsas</span>
           </div>
-          <div *ngIf="m.active && m.payment_status === 'pendente'"
+          <div *ngIf="m.payment_status === 'PENDENTE'"
                class="mt-3 flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg"
                style="background-color:hsl(36,95%,55%,0.08);color:hsl(36,65%,38%)">
-            <span class="material-icons" style="font-size:0.85rem">lock_open</span>
-            <span>Pagamento pendente — horário disponível</span>
+            <span class="material-icons" style="font-size:0.85rem">hourglass_top</span>
+            <span>Aguardando pagamento do cliente</span>
+          </div>
+          <div *ngIf="m.status === 'EXPIRADO'"
+               class="mt-3 flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg"
+               style="background-color:hsl(0,84%,60%,0.07);color:hsl(0,72%,45%)">
+            <span class="material-icons" style="font-size:0.85rem">schedule</span>
+            <span>Vigência encerrada — aguardando renovação</span>
           </div>
 
           <!-- Ações -->
           <div class="flex items-center gap-2 mt-4 pt-3" style="border-top:1px solid var(--border)">
-            <button class="btn-ghost text-xs px-2 py-1.5 flex items-center gap-1 flex-1"
-                    (click)="editMensalista(m)">
-              <span class="material-icons" style="font-size:0.95rem">edit</span> Editar
+            <button *ngIf="m.status === 'ATIVO'"
+                    class="btn-outline text-xs px-3 py-1.5 flex items-center gap-1 w-full"
+                    style="border-color:hsl(0,72%,51%,0.4);color:hsl(0,72%,51%)"
+                    [disabled]="inativando === m.id"
+                    (click)="inativar(m)">
+              <span class="material-icons" style="font-size:0.95rem"
+                    [style.animation]="inativando === m.id ? 'spin 1s linear infinite' : 'none'">
+                {{ inativando === m.id ? 'refresh' : 'block' }}
+              </span>
+              {{ inativando === m.id ? 'Inativando...' : 'Inativar mensalista' }}
             </button>
-            <label class="toggle flex-shrink-0" [title]="m.active ? 'Desativar' : 'Ativar'">
-              <input type="checkbox" [checked]="m.active" (change)="toggleActive(m)">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Empty state -->
-        <div *ngIf="filteredMensalistas.length === 0" class="col-span-full text-center py-16" style="color:var(--muted-foreground)">
-          <div class="mb-3" style="color:var(--border)"><span class="material-icons" style="font-size:3rem">card_membership</span></div>
-          <p class="font-medium">Nenhum mensalista encontrado</p>
-          <p class="text-sm mt-1">Clique em "Novo Mensalista" para cadastrar</p>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Modal add/edit -->
-    <div *ngIf="showModal" class="modal-overlay" (click)="closeModal($event)">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="font-heading font-bold text-lg" style="color:var(--foreground)">
-            {{ editingId ? 'Editar Mensalista' : 'Novo Mensalista' }}
-          </h2>
-          <button class="btn-ghost p-1" (click)="closeModal()">
-            <span class="material-icons" style="font-size:1.1rem">close</span>
-          </button>
-        </div>
-
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Nome do grupo / responsável *</label>
-            <input class="input" [(ngModel)]="form.group_name" placeholder="Ex: Grupo da Manhã">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Quadra *</label>
-            <select class="select" [(ngModel)]="form.court_id">
-              <option value="">Selecione...</option>
-              <option *ngFor="let c of courts" [value]="c.id">{{ c.name }}</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Dia da semana *</label>
-            <select class="select" [(ngModel)]="form.day_of_week">
-              <option *ngFor="let d of diasOptions" [value]="d.value">{{ d.label }}</option>
-            </select>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Início *</label>
-              <select class="select" [(ngModel)]="form.start_hour">
-                <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Fim *</label>
-              <select class="select" [(ngModel)]="form.end_hour">
-                <option *ngFor="let h of endHours" [value]="h">{{ h }}</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Valor mensal (R$)</label>
-            <input class="input" type="number" [(ngModel)]="form.monthly_amount" min="0">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Telefone de contato</label>
-            <input class="input" [(ngModel)]="form.contact_phone" placeholder="(99) 99999-9999">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Status de pagamento</label>
-            <select class="select" [(ngModel)]="form.payment_status">
-              <option value="pendente">Pendente</option>
-              <option value="confirmado">Confirmado (bloqueia horário)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Observações</label>
-            <textarea class="textarea" [(ngModel)]="form.notes" rows="2" placeholder="Alguma observação?"></textarea>
-          </div>
-          <div class="flex items-center gap-3 py-1">
-            <label class="toggle">
-              <input type="checkbox" [(ngModel)]="form.active">
-              <span class="toggle-slider"></span>
-            </label>
-            <span class="text-sm font-medium" style="color:var(--foreground)">
-              {{ form.active ? 'Mensalista ativo' : 'Mensalista inativo' }}
+            <span *ngIf="m.status !== 'ATIVO'"
+                  class="text-xs w-full text-center" style="color:var(--muted-foreground)">
+              Sem ações disponíveis
             </span>
           </div>
         </div>
 
-        <div class="flex gap-3 mt-6">
-          <button class="btn-outline flex-1" (click)="closeModal()">Cancelar</button>
-          <button *ngIf="editingId"
-                  class="btn-outline flex-1"
-                  style="border-color:var(--destructive);color:var(--destructive)"
-                  (click)="deleteMensalista()">Excluir</button>
-          <button class="btn-primary flex-1"
-                  (click)="saveMensalista()"
-                  [disabled]="!form.group_name || !form.court_id">
-            {{ editingId ? 'Salvar' : 'Cadastrar' }}
-          </button>
+        <!-- Empty state -->
+        <div *ngIf="filtered.length === 0" class="col-span-full text-center py-16" style="color:var(--muted-foreground)">
+          <div class="mb-3"><span class="material-icons" style="font-size:3rem;color:var(--border)">card_membership</span></div>
+          <p class="font-medium">Nenhum mensalista encontrado</p>
+          <p class="text-sm mt-1">Os clientes criam mensalistas pelo app de reservas.</p>
         </div>
+
       </div>
     </div>
   `
 })
 export class MensalistasComponent implements OnInit {
-  courts:      Court[]      = [];
-  mensalistas: Mensalista[] = [];
-  showModal   = false;
-  editingId:  string | null = null;
+  courts:      Court[]            = [];
+  mensalistas: AdminMensalista[]  = [];
+  loading    = false;
+  inativando: string | null       = null;
 
-  filterCourt     = '';
-  filterDay       = '';
-  filterOnlyActive = false;
+  filterCourt  = '';
+  filterDay    = '';
+  filterStatus = '';
 
-  diasOptions = DIAS;
-  hours    = Array.from({ length: 17 }, (_, i) => `${(i + 7).toString().padStart(2, '0')}:00`);
-  get endHours() { return this.hours.slice(1); }
+  dayOptions = DAY_NAMES.map((label, value) => ({ value, label }));
 
-  form = this.emptyForm();
+  constructor(
+    private api:  ApiService,
+    private data: DataService,
+    private toast: ToastService,
+  ) {}
 
-  constructor(private data: DataService, private toast: ToastService) {}
-
-  ngOnInit() {
-    this.data.courts$.subscribe(c      => this.courts      = c);
-    this.data.mensalistas$.subscribe(m => this.mensalistas = m);
+  ngOnInit(): void {
+    this.data.courts$.subscribe(c => this.courts = c);
+    this.load();
   }
 
-  get filteredMensalistas(): Mensalista[] {
+  async load(): Promise<void> {
+    this.loading = true;
+    try {
+      this.mensalistas = await firstValueFrom(
+        this.api.get<AdminMensalista[]>('/admin/mensalistas')
+      );
+    } catch (err: any) {
+      this.toast.show(err?.error?.error || 'Erro ao carregar mensalistas.');
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  get filtered(): AdminMensalista[] {
     return this.mensalistas.filter(m => {
-      if (this.filterCourt    && m.court_id    !== this.filterCourt) return false;
-      if (this.filterDay      && m.day_of_week !== this.filterDay)   return false;
-      if (this.filterOnlyActive && !m.active)                        return false;
+      if (this.filterCourt && m.court_id !== this.filterCourt) return false;
+      if (this.filterDay !== '' && m.day_of_week !== Number(this.filterDay)) return false;
+      if (this.filterStatus) {
+        if (this.filterStatus === 'PENDENTE') return m.payment_status === 'PENDENTE';
+        if (this.filterStatus === 'CANCELADO') return m.payment_status === 'CANCELADO';
+        return m.status === this.filterStatus;
+      }
       return true;
     });
   }
 
-  getCourtName(id: string): string {
-    return this.courts.find(c => c.id === id)?.name || 'Quadra';
+  dayName(dow: number): string {
+    return DAY_NAMES[dow] ?? String(dow);
   }
 
-  getDiaLabel(day: DiaSemana): string {
-    return DIAS.find(d => d.value === day)?.label || day;
+  monthlyAmount(m: AdminMensalista): number {
+    const rate     = m.court.mensalista_rate ?? m.court.hourly_rate;
+    const duration = parseInt(m.end_hour) - parseInt(m.start_hour);
+    return duration * rate;
   }
 
-  emptyForm() {
-    return {
-      group_name:     '',
-      court_id:       '',
-      day_of_week:    'domingo' as DiaSemana,
-      start_hour:     '08:00',
-      end_hour:       '10:00',
-      monthly_amount: 0,
-      contact_phone:  '',
-      payment_status: 'pendente' as 'confirmado' | 'pendente',
-      notes:          '',
-      active:         true,
-    };
+  statusLabel(m: AdminMensalista): string {
+    if (m.status === 'ATIVO')    return 'Ativo';
+    if (m.status === 'EXPIRADO') return 'Expirado';
+    if (m.payment_status === 'CANCELADO') return 'Cancelado';
+    return 'Inativo';
   }
 
-  openModal() {
-    this.form      = this.emptyForm();
-    this.editingId = null;
-    this.showModal = true;
+  statusBadge(m: AdminMensalista): string {
+    if (m.status === 'ATIVO')    return 'badge-primary';
+    if (m.status === 'EXPIRADO') return 'badge-accent';
+    return 'badge-muted';
   }
 
-  editMensalista(m: Mensalista) {
-    this.form = {
-      group_name:     m.group_name,
-      court_id:       m.court_id,
-      day_of_week:    m.day_of_week,
-      start_hour:     m.start_hour,
-      end_hour:       m.end_hour,
-      monthly_amount: m.monthly_amount ?? 0,
-      contact_phone:  m.contact_phone  ?? '',
-      payment_status: m.payment_status,
-      notes:          m.notes          ?? '',
-      active:         m.active,
-    };
-    this.editingId = m.id;
-    this.showModal = true;
+  paymentLabel(m: AdminMensalista): string {
+    if (m.payment_status === 'PAGO')      return 'Pago';
+    if (m.payment_status === 'PENDENTE')  return 'Aguardando PIX';
+    if (m.payment_status === 'CANCELADO') return 'Cancelado';
+    return m.payment_status;
   }
 
-  saveMensalista() {
-    if (!this.form.group_name || !this.form.court_id) return;
-    if (this.editingId) {
-      this.data.updateMensalista(this.editingId, this.form);
-      this.toast.show('Mensalista atualizado!');
-    } else {
-      this.data.addMensalista(this.form);
-      this.toast.show('Mensalista cadastrado!');
+  paymentBadge(m: AdminMensalista): string {
+    if (m.payment_status === 'PAGO')      return 'badge-primary';
+    if (m.payment_status === 'PENDENTE')  return 'badge-accent';
+    return 'badge-muted';
+  }
+
+  async inativar(m: AdminMensalista): Promise<void> {
+    if (this.inativando) return;
+    this.inativando = m.id;
+    try {
+      await firstValueFrom(
+        this.api.patch<{ ok: boolean }>(`/admin/mensalistas/${m.id}/inativar`, {})
+      );
+      // Atualiza localmente sem recarregar tudo
+      this.mensalistas = this.mensalistas.map(x =>
+        x.id === m.id ? { ...x, status: 'INATIVO' } : x
+      );
+      this.toast.show(`Mensalista de ${m.client_name} inativado.`);
+    } catch (err: any) {
+      this.toast.show(err?.error?.error || 'Erro ao inativar. Tente novamente.');
+    } finally {
+      this.inativando = null;
     }
-    this.closeModal();
-  }
-
-  deleteMensalista() {
-    if (this.editingId) {
-      this.data.deleteMensalista(this.editingId);
-      this.toast.show('Mensalista excluído!');
-      this.closeModal();
-    }
-  }
-
-  toggleActive(m: Mensalista) {
-    this.data.updateMensalista(m.id, { active: !m.active });
-    this.toast.show(m.active ? 'Mensalista desativado.' : 'Mensalista ativado!');
-  }
-
-  closeModal(e?: MouseEvent) {
-    if (e && e.target !== e.currentTarget) return;
-    this.showModal = false;
-    this.editingId = null;
   }
 }
