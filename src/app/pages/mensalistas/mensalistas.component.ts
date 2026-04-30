@@ -236,7 +236,7 @@ export class MensalistasComponent implements OnInit {
   monthlyAmount(m: AdminMensalista): number {
     const rate     = m.court.mensalista_rate ?? m.court.hourly_rate;
     const duration = parseInt(m.end_hour) - parseInt(m.start_hour);
-    return duration * rate;
+    return duration * rate * 4;
   }
 
   statusLabel(m: AdminMensalista): string {
