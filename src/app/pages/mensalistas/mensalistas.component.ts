@@ -22,6 +22,7 @@ interface AdminMensalista {
   payment_status: 'PAGO' | 'PENDENTE' | 'CANCELADO';
   valid_until:    string | null;
   created_at:     string;
+  updated_at:     string;
   court: {
     name:            string;
     hourly_rate:     number;
@@ -97,7 +98,7 @@ interface AdminMensalista {
             </div>
             <div class="flex flex-wrap gap-1.5 justify-end">
               <span class="badge" [ngClass]="paymentBadge(m)">{{ paymentLabel(m) }}</span>
-              <span class="badge" [ngClass]="statusBadge(m)">{{ statusLabel(m) }}</span>
+              <span *ngIf="m.payment_status !== 'CANCELADO'" class="badge" [ngClass]="statusBadge(m)">{{ statusLabel(m) }}</span>
             </div>
           </div>
 
@@ -147,6 +148,12 @@ interface AdminMensalista {
                style="background-color:hsl(0,84%,60%,0.07);color:hsl(0,72%,45%)">
             <span class="material-icons" style="font-size:0.85rem">schedule</span>
             <span>Vigência encerrada — aguardando renovação</span>
+          </div>
+          <div *ngIf="m.payment_status === 'CANCELADO'"
+               class="mt-3 flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg"
+               style="background-color:hsl(0,0%,0%,0.04);color:var(--muted-foreground);border:1px dashed var(--border)">
+            <span class="material-icons" style="font-size:0.85rem">auto_delete</span>
+            <span>{{ cleanupLabel(m) }}</span>
           </div>
 
           <!-- Ações -->
@@ -216,8 +223,17 @@ export class MensalistasComponent implements OnInit {
     }
   }
 
+  /** Cancelados somem da lista após 3 dias (apenas no front). */
+  private isCancelledAndExpired(m: AdminMensalista): boolean {
+    if (m.payment_status !== 'CANCELADO') return false;
+    const ref  = new Date(m.updated_at || m.created_at);
+    const diff = (Date.now() - ref.getTime()) / (1000 * 60 * 60 * 24);
+    return diff >= 3;
+  }
+
   get filtered(): AdminMensalista[] {
     return this.mensalistas.filter(m => {
+      if (this.isCancelledAndExpired(m)) return false;
       if (this.filterCourt && m.court_id !== this.filterCourt) return false;
       if (this.filterDay !== '' && m.day_of_week !== Number(this.filterDay)) return false;
       if (this.filterStatus) {
@@ -237,6 +253,16 @@ export class MensalistasComponent implements OnInit {
     const rate     = m.court.mensalista_rate ?? m.court.hourly_rate;
     const duration = parseInt(m.end_hour) - parseInt(m.start_hour);
     return duration * rate * 4;
+  }
+
+  cleanupLabel(m: AdminMensalista): string {
+    const ref      = new Date(m.updated_at || m.created_at);
+    const elapsedH = (Date.now() - ref.getTime()) / (1000 * 60 * 60);
+    const remaining = Math.ceil(72 - elapsedH); // 72h = 3 dias
+    if (remaining <= 0)  return 'Removido em breve';
+    if (remaining < 24) return `Limpo em menos de 1 dia`;
+    const days = Math.ceil(remaining / 24);
+    return `Limpo em ${days} dia${days > 1 ? 's' : ''}`;
   }
 
   statusLabel(m: AdminMensalista): string {
