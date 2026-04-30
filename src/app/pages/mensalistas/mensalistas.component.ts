@@ -195,7 +195,7 @@ export class MensalistasComponent implements OnInit {
 
   filterCourt  = '';
   filterDay    = '';
-  filterStatus = '';
+  filterStatus = 'ATIVO';
 
   dayOptions = DAY_NAMES.map((label, value) => ({ value, label }));
 
