@@ -9,7 +9,7 @@ interface Promotion {
   id:               string;
   title:            string;
   description:      string | null;
-  type:             'DESCONTO' | 'EVENTO' | 'CAMPEONATO';
+  type:             'DESCONTO' | 'EVENTO';
   discount_percent: number | null;
   start_date:       string;
   end_date:         string | null;
@@ -174,7 +174,6 @@ interface Promotion {
               <select class="select" [(ngModel)]="form.type">
                 <option value="DESCONTO">Desconto</option>
                 <option value="EVENTO">Evento</option>
-                <option value="CAMPEONATO">Campeonato</option>
               </select>
             </div>
             <div *ngIf="form.type === 'DESCONTO'">
@@ -265,7 +264,7 @@ export class PromocoesComponent implements OnInit {
   emptyForm() {
     return {
       title: '', description: '',
-      type: 'DESCONTO' as 'DESCONTO' | 'EVENTO' | 'CAMPEONATO',
+      type: 'DESCONTO' as 'DESCONTO' | 'EVENTO',
       discount_percent: null as number | null,
       start_date: '', end_date: '', start_hour: '', end_hour: '',
       active: true,
@@ -357,37 +356,32 @@ export class PromocoesComponent implements OnInit {
   }
 
   typeIcon(type: string): string {
-    if (type === 'DESCONTO')    return 'percent';
-    if (type === 'EVENTO')      return 'celebration';
-    if (type === 'CAMPEONATO')  return 'emoji_events';
+    if (type === 'DESCONTO') return 'percent';
+    if (type === 'EVENTO')   return 'celebration';
     return 'local_offer';
   }
 
   typeLabel(type: string): string {
-    if (type === 'DESCONTO')    return 'Desconto';
-    if (type === 'EVENTO')      return 'Evento';
-    if (type === 'CAMPEONATO')  return 'Campeonato';
+    if (type === 'DESCONTO') return 'Desconto';
+    if (type === 'EVENTO')   return 'Evento';
     return type;
   }
 
   typeIconBg(type: string): string {
-    if (type === 'DESCONTO')   return 'hsl(152,69%,40%,0.1)';
-    if (type === 'EVENTO')     return 'hsl(36,95%,55%,0.1)';
-    if (type === 'CAMPEONATO') return 'hsl(217,91%,60%,0.1)';
+    if (type === 'DESCONTO') return 'hsl(152,69%,40%,0.1)';
+    if (type === 'EVENTO')   return 'hsl(36,95%,55%,0.1)';
     return 'var(--muted)';
   }
 
   typeIconColor(type: string): string {
-    if (type === 'DESCONTO')   return 'var(--primary)';
-    if (type === 'EVENTO')     return 'hsl(36,75%,45%)';
-    if (type === 'CAMPEONATO') return 'hsl(217,91%,55%)';
+    if (type === 'DESCONTO') return 'var(--primary)';
+    if (type === 'EVENTO')   return 'hsl(36,75%,45%)';
     return 'var(--muted-foreground)';
   }
 
   typeTagBg(type: string): string {
-    if (type === 'DESCONTO')   return 'hsl(152,69%,40%,0.08)';
-    if (type === 'EVENTO')     return 'hsl(36,95%,55%,0.08)';
-    if (type === 'CAMPEONATO') return 'hsl(217,91%,60%,0.08)';
+    if (type === 'DESCONTO') return 'hsl(152,69%,40%,0.08)';
+    if (type === 'EVENTO')   return 'hsl(36,95%,55%,0.08)';
     return 'var(--muted)';
   }
 }
