@@ -86,16 +86,16 @@ interface Plan {
         <div class="inline-flex items-center gap-2 p-1 rounded-xl" style="background:var(--muted)">
           <button (click)="annual = false"
                   class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150"
-                  [style.background]="!annual ? 'white' : 'transparent'"
+                  [style.background]="!annual ? 'var(--card)' : 'transparent'"
                   [style.color]="!annual ? 'var(--foreground)' : 'var(--muted-foreground)'"
-                  [style.box-shadow]="!annual ? '0 1px 4px rgba(0,0,0,0.08)' : 'none'">
+                  [style.box-shadow]="!annual ? '0 1px 4px rgba(0,0,0,0.12)' : 'none'">
             Mensal
           </button>
           <button (click)="annual = true"
                   class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5"
-                  [style.background]="annual ? 'white' : 'transparent'"
+                  [style.background]="annual ? 'var(--card)' : 'transparent'"
                   [style.color]="annual ? 'var(--foreground)' : 'var(--muted-foreground)'"
-                  [style.box-shadow]="annual ? '0 1px 4px rgba(0,0,0,0.08)' : 'none'">
+                  [style.box-shadow]="annual ? '0 1px 4px rgba(0,0,0,0.12)' : 'none'">
             Anual
             <span class="text-xs font-semibold px-1.5 py-0.5 rounded-md" style="background:hsl(152,69%,40%,0.12);color:var(--primary)">-20%</span>
           </button>
