@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { ToastService, ToastMessage } from '../services/toast.service';
@@ -39,15 +39,17 @@ import { Subscription, filter } from 'rxjs';
 
         <!-- Nav -->
         <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          <a *ngFor="let item of navItems"
+          <a *ngFor="let item of navItems()"
              [routerLink]="item.path"
              routerLinkActive="nav-active"
              [routerLinkActiveOptions]="{exact: item.path === '/'}"
              (click)="sidebarOpen = false"
              class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 nav-item"
-             [class.nav-accent]="item.accent">
+             [class.nav-accent]="item.accent"
+             [class.nav-locked]="item.locked">
             <span class="material-icons" style="font-size:1.2rem;width:1.4rem;text-align:center">{{ item.icon }}</span>
-            <span>{{ item.label }}</span>
+            <span class="flex-1">{{ item.label }}</span>
+            <span *ngIf="item.locked" class="material-icons nav-lock-icon" style="font-size:0.9rem;opacity:0.55">lock</span>
           </a>
         </nav>
 
@@ -177,6 +179,12 @@ import { Subscription, filter } from 'rxjs';
     .nav-active.nav-accent::after {
       display: none;
     }
+    .nav-locked {
+      opacity: 0.65;
+    }
+    .nav-locked:hover {
+      opacity: 0.85;
+    }
     .toast-error {
       background-color: #ef4444 !important;
     }
@@ -194,18 +202,22 @@ export class LayoutComponent implements OnInit, OnDestroy {
     return (this.profile?.name || 'AF').split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase();
   }
 
-  navItems = [
-    { label: 'Dashboard',     path: '/',             icon: 'dashboard',         accent: false },
-    { label: 'Quadras',       path: '/quadras',      icon: 'sports_volleyball', accent: false },
-    { label: 'Clientes',      path: '/clientes',     icon: 'group',             accent: false },
-    { label: 'Mensalistas',   path: '/mensalistas',  icon: 'card_membership',   accent: false },
-    { label: 'Promoções',     path: '/promocoes',    icon: 'local_offer',       accent: false },
-    { label: 'Relatórios',    path: '/relatorios',   icon: 'bar_chart',         accent: false },
-    { label: 'Reservas',      path: '/reservas',     icon: 'shopping_cart',     accent: false },
-    { label: 'Financeiro',    path: '/financeiro',   icon: 'account_balance',   accent: false },
-    { label: 'Perfil',        path: '/perfil',       icon: 'settings',          accent: false },
-    { label: 'Planos',        path: '/planos',       icon: 'workspace_premium', accent: true  },
-  ];
+  /** Nav items derivados do plano ativo — itens bloqueados exibem ícone de cadeado */
+  navItems = computed(() => {
+    const f = this.establishmentService.planFeatures();
+    return [
+      { label: 'Dashboard',   path: '/',            icon: 'dashboard',         accent: false, locked: false },
+      { label: 'Quadras',     path: '/quadras',     icon: 'sports_volleyball', accent: false, locked: false },
+      { label: 'Clientes',    path: '/clientes',    icon: 'group',             accent: false, locked: false },
+      { label: 'Mensalistas', path: '/mensalistas', icon: 'card_membership',   accent: false, locked: !f.mensalistas },
+      { label: 'Promoções',   path: '/promocoes',   icon: 'local_offer',       accent: false, locked: !f.promotions },
+      { label: 'Relatórios',  path: '/relatorios',  icon: 'bar_chart',         accent: false, locked: !f.advanced_reports },
+      { label: 'Reservas',    path: '/reservas',    icon: 'shopping_cart',     accent: false, locked: false },
+      { label: 'Financeiro',  path: '/financeiro',  icon: 'account_balance',   accent: false, locked: false },
+      { label: 'Perfil',      path: '/perfil',      icon: 'settings',          accent: false, locked: false },
+      { label: 'Planos',      path: '/planos',      icon: 'workspace_premium', accent: true,  locked: false },
+    ];
+  });
 
   bottomNavItems = [
     { label: 'Dashboard',    shortLabel: 'Início',   path: '/',            icon: 'dashboard'         },
@@ -241,13 +253,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.subs.push(
       this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
         const url = e.urlAfterRedirects || e.url;
-        const match = this.navItems.find(n => n.path === '/' ? url === '/' : url.startsWith(n.path));
+        const match = this.navItems().find(n => n.path === '/' ? url === '/' : url.startsWith(n.path));
         this.currentPageLabel = match?.label || '';
         if (!this.isDesktop) this.sidebarOpen = false;
       })
     );
     // set initial label
-    const cur = this.navItems.find(n => n.path === '/' ? this.router.url === '/' : this.router.url.startsWith(n.path));
+    const cur = this.navItems().find(n => n.path === '/' ? this.router.url === '/' : this.router.url.startsWith(n.path));
     this.currentPageLabel = cur?.label || '';
   }
 

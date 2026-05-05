@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { DataService } from '../../services/data.service';
 import { ToastService } from '../../services/toast.service';
+import { EstablishmentService } from '../../services/establishment.service';
 import { Court } from '../../models/models';
 
 const DAY_NAMES = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
@@ -33,9 +35,34 @@ interface AdminMensalista {
 @Component({
   selector: 'app-mensalistas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div>
+
+      <!-- Upgrade wall — exibida quando plano não inclui mensalistas -->
+      <ng-container *ngIf="!features().mensalistas">
+        <div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+          <div class="w-20 h-20 rounded-full flex items-center justify-center mb-5"
+               style="background:linear-gradient(135deg,hsl(152,69%,40%,0.12),hsl(152,69%,40%,0.06))">
+            <span class="material-icons" style="font-size:2.2rem;color:var(--primary)">card_membership</span>
+          </div>
+          <h2 class="font-heading font-bold text-2xl mb-2" style="color:var(--foreground)">Mensalistas</h2>
+          <p class="text-sm mb-1" style="color:var(--muted-foreground);max-width:360px">
+            Gerencie horários fixos semanais com pagamentos recorrentes via PIX.
+          </p>
+          <p class="text-xs mb-6 font-medium" style="color:var(--muted-foreground)">
+            Disponível a partir do plano <strong>Essencial</strong>.
+          </p>
+          <a routerLink="/planos" class="btn-primary flex items-center gap-2">
+            <span class="material-icons" style="font-size:1rem">workspace_premium</span>
+            Ver Planos
+          </a>
+        </div>
+      </ng-container>
+
+      <!-- Conteúdo real — exibido apenas quando feature está disponível -->
+      <ng-container *ngIf="features().mensalistas">
+
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
@@ -184,6 +211,8 @@ interface AdminMensalista {
         </div>
 
       </div>
+
+      </ng-container><!-- /features().mensalistas -->
     </div>
   `
 })
@@ -199,15 +228,18 @@ export class MensalistasComponent implements OnInit {
 
   dayOptions = DAY_NAMES.map((label, value) => ({ value, label }));
 
+  features = this.establishmentService.planFeatures;
+
   constructor(
     private api:  ApiService,
     private data: DataService,
     private toast: ToastService,
+    private establishmentService: EstablishmentService,
   ) {}
 
   ngOnInit(): void {
     this.data.courts$.subscribe(c => this.courts = c);
-    this.load();
+    if (this.features().mensalistas) this.load();
   }
 
   async load(): Promise<void> {

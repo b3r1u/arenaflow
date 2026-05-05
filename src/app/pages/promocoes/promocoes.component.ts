@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
+import { EstablishmentService } from '../../services/establishment.service';
 
 interface Promotion {
   id:               string;
@@ -22,9 +24,34 @@ interface Promotion {
 @Component({
   selector: 'app-promocoes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div>
+
+      <!-- Upgrade wall -->
+      <ng-container *ngIf="!features().promotions">
+        <div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+          <div class="w-20 h-20 rounded-full flex items-center justify-center mb-5"
+               style="background:linear-gradient(135deg,hsl(152,69%,40%,0.12),hsl(152,69%,40%,0.06))">
+            <span class="material-icons" style="font-size:2.2rem;color:var(--primary)">local_offer</span>
+          </div>
+          <h2 class="font-heading font-bold text-2xl mb-2" style="color:var(--foreground)">Promoções & Eventos</h2>
+          <p class="text-sm mb-1" style="color:var(--muted-foreground);max-width:380px">
+            Crie descontos e eventos especiais que aparecem automaticamente no app de reservas.
+          </p>
+          <p class="text-xs mb-6 font-medium" style="color:var(--muted-foreground)">
+            Disponível a partir do plano <strong>Essencial</strong>.
+          </p>
+          <a routerLink="/planos" class="btn-primary flex items-center gap-2">
+            <span class="material-icons" style="font-size:1rem">workspace_premium</span>
+            Ver Planos
+          </a>
+        </div>
+      </ng-container>
+
+      <!-- Conteúdo real -->
+      <ng-container *ngIf="features().promotions">
+
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
@@ -141,10 +168,11 @@ interface Promotion {
           <p class="text-sm mt-1">Crie descontos ou eventos para atrair mais clientes.</p>
         </div>
       </div>
+      </ng-container><!-- /features().promotions -->
     </div>
 
-    <!-- Modal -->
-    <div *ngIf="showModal" class="modal-overlay" (click)="closeModal($event)">
+    <!-- Modal (apenas visível quando feature disponível) -->
+    <div *ngIf="showModal && features().promotions" class="modal-overlay" (click)="closeModal($event)">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between mb-5">
           <h2 class="font-heading font-bold text-lg" style="color:var(--foreground)">
@@ -245,9 +273,17 @@ export class PromocoesComponent implements OnInit {
   hours = Array.from({ length: 17 }, (_, i) => `${(i + 7).toString().padStart(2, '0')}:00`);
   form  = this.emptyForm();
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  features = this.establishmentService.planFeatures;
 
-  ngOnInit(): void { this.load(); }
+  constructor(
+    private api:   ApiService,
+    private toast: ToastService,
+    private establishmentService: EstablishmentService,
+  ) {}
+
+  ngOnInit(): void {
+    if (this.features().promotions) this.load();
+  }
 
   async load(): Promise<void> {
     this.loading = true;

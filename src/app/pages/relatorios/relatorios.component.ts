@@ -1,18 +1,45 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexFill, ApexStroke,
          ApexGrid, ApexXAxis, ApexYAxis, ApexTooltip, ApexDataLabels, ApexMarkers } from 'ng-apexcharts';
 import { DataService } from '../../services/data.service';
 import { DashboardService } from '../../services/dashboard.service';
+import { EstablishmentService } from '../../services/establishment.service';
 import { Booking } from '../../models/models';
 
 @Component({
   selector: 'app-relatorios',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgApexchartsModule],
+  imports: [CommonModule, FormsModule, RouterLink, NgApexchartsModule],
   template: `
     <div>
+
+      <!-- Upgrade wall -->
+      <ng-container *ngIf="!features().advanced_reports">
+        <div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+          <div class="w-20 h-20 rounded-full flex items-center justify-center mb-5"
+               style="background:linear-gradient(135deg,hsl(221,83%,53%,0.12),hsl(221,83%,53%,0.06))">
+            <span class="material-icons" style="font-size:2.2rem;color:hsl(221,83%,53%)">bar_chart</span>
+          </div>
+          <h2 class="font-heading font-bold text-2xl mb-2" style="color:var(--foreground)">Relatórios Avançados</h2>
+          <p class="text-sm mb-1" style="color:var(--muted-foreground);max-width:380px">
+            Análise de faturamento, ocupação e performance das quadras com gráficos detalhados.
+          </p>
+          <p class="text-xs mb-6 font-medium" style="color:var(--muted-foreground)">
+            Disponível a partir do plano <strong>Pro</strong>.
+          </p>
+          <a routerLink="/planos" class="btn-primary flex items-center gap-2">
+            <span class="material-icons" style="font-size:1rem">workspace_premium</span>
+            Ver Planos
+          </a>
+        </div>
+      </ng-container>
+
+      <!-- Conteúdo real -->
+      <ng-container *ngIf="features().advanced_reports">
+
       <!-- Header -->
       <div class="flex items-start justify-between mb-6 gap-3">
         <div>
@@ -160,6 +187,8 @@ import { Booking } from '../../models/models';
           </div>
         </div>
       </div>
+
+      </ng-container><!-- /features().advanced_reports -->
     </div>
   `
 })
@@ -232,8 +261,17 @@ export class RelatoriosComponent implements OnInit {
   chartDataLabels: ApexDataLabels = { enabled: false };
   chartMarkers: ApexMarkers = { size: 0, hover: { size: 6, sizeOffset: 2 } };
 
-  constructor(private data: DataService, private dashboard: DashboardService) {}
-  ngOnInit() { this.calcStats(); }
+  features = this.establishmentService.planFeatures;
+
+  constructor(
+    private data: DataService,
+    private dashboard: DashboardService,
+    private establishmentService: EstablishmentService,
+  ) {}
+
+  ngOnInit() {
+    if (this.features().advanced_reports) this.calcStats();
+  }
 
   async calcStats() {
     try {

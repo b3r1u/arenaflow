@@ -83,6 +83,29 @@ export class EstablishmentService {
     return sub.days_remaining ?? null;
   });
 
+  /** Features disponíveis com base no plano ativo — derivadas localmente do slug */
+  readonly planFeatures = computed(() => {
+    const slug = this._subscription()?.plan?.slug ?? 'free';
+
+    const map: Record<string, {
+      max_courts:         number;
+      mensalistas:        boolean;
+      promotions:         boolean;
+      advanced_reports:   boolean;
+      split_payment:      boolean;
+      multi_user:         boolean;
+      dashboard_advanced: boolean;
+      commission_percent: number;
+    }> = {
+      free:      { max_courts: 1,  mensalistas: false, promotions: false, advanced_reports: false, split_payment: false, multi_user: false, dashboard_advanced: false, commission_percent: 8 },
+      essencial: { max_courts: 2,  mensalistas: true,  promotions: true,  advanced_reports: false, split_payment: false, multi_user: false, dashboard_advanced: true,  commission_percent: 5 },
+      pro:       { max_courts: 5,  mensalistas: true,  promotions: true,  advanced_reports: true,  split_payment: true,  multi_user: false, dashboard_advanced: true,  commission_percent: 3 },
+      business:  { max_courts: 10, mensalistas: true,  promotions: true,  advanced_reports: true,  split_payment: true,  multi_user: true,  dashboard_advanced: true,  commission_percent: 0 },
+    };
+
+    return map[slug] ?? map['free'];
+  });
+
   constructor(
     private api: ApiService,
     private profileService: ProfileService,
