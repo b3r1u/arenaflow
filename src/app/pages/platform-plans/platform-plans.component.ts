@@ -19,13 +19,13 @@ interface PlatformPlan {
 }
 
 const FEATURE_OPTIONS = [
-  { key: 'app_cliente',        label: 'App Cliente (reservas)'   },
-  { key: 'mensalistas',        label: 'Mensalistas'              },
-  { key: 'promotions',         label: 'Promoções & Eventos'      },
-  { key: 'advanced_reports',   label: 'Relatórios Avançados'     },
-  { key: 'split_payment',      label: 'Divisão de Pagamento'     },
-  { key: 'dashboard_advanced', label: 'Dashboard Avançado'       },
-  { key: 'multi_user',         label: 'Múltiplos Usuários'       },
+  { key: 'app_cliente',        label: 'App Cliente',        icon: 'smartphone'         },
+  { key: 'mensalistas',        label: 'Mensalistas',        icon: 'card_membership'    },
+  { key: 'promotions',         label: 'Promoções',          icon: 'local_offer'        },
+  { key: 'advanced_reports',   label: 'Rel. Avançados',     icon: 'bar_chart'          },
+  { key: 'split_payment',      label: 'Divisão Pagamento',  icon: 'group'              },
+  { key: 'dashboard_advanced', label: 'Dashboard Avançado', icon: 'dashboard'          },
+  { key: 'multi_user',         label: 'Multi-usuário',      icon: 'manage_accounts'    },
 ];
 
 @Component({
@@ -98,11 +98,11 @@ const FEATURE_OPTIONS = [
           <!-- Features -->
           <div class="flex flex-wrap gap-1 flex-1">
             <span *ngFor="let f of plan.features"
-                  class="text-xs px-1.5 py-0.5 rounded"
-                  style="background:hsl(152,69%,40%,0.08);color:var(--primary)">
+                  class="px-1.5 py-0.5 rounded"
+                  style="font-size:0.65rem;line-height:1.3;background:hsl(152,69%,40%,0.08);color:var(--primary)">
               {{ featureLabel(f) }}
             </span>
-            <span *ngIf="plan.features.length === 0" class="text-xs" style="color:var(--muted-foreground)">Sem features</span>
+            <span *ngIf="plan.features.length === 0" style="font-size:0.7rem;color:var(--muted-foreground)">Sem features</span>
           </div>
 
           <!-- Pagar.me status -->
@@ -180,9 +180,12 @@ const FEATURE_OPTIONS = [
             <!-- Preço + Quadras -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Preço mensal (R$) <span style="color:var(--destructive)">*</span></label>
-                <input class="input" type="number" min="0" step="0.01" [(ngModel)]="form.price" placeholder="0.00" />
-                <p class="text-xs mt-1" style="color:var(--muted-foreground)">0 = plano gratuito</p>
+                <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Preço mensal <span style="color:var(--destructive)">*</span></label>
+                <input class="input" type="text" inputmode="numeric"
+                       [value]="priceDisplay"
+                       (input)="onPriceInput($event)"
+                       placeholder="R$ 0,00" />
+                <p class="text-xs mt-1" style="color:var(--muted-foreground)">R$ 0,00 = plano gratuito</p>
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1.5" style="color:var(--foreground)">Máx. de quadras</label>
@@ -195,14 +198,25 @@ const FEATURE_OPTIONS = [
             <div>
               <label class="block text-sm font-medium mb-2" style="color:var(--foreground)">Funcionalidades incluídas</label>
               <div class="grid grid-cols-2 gap-2">
-                <label *ngFor="let opt of featureOptions"
-                       class="flex items-center gap-2 p-2 rounded-lg cursor-pointer"
-                       style="border:1px solid var(--border)">
-                  <input type="checkbox"
-                         [checked]="form.features.includes(opt.key)"
-                         (change)="toggleFeature(opt.key)" />
-                  <span class="text-sm" style="color:var(--foreground)">{{ opt.label }}</span>
-                </label>
+                <button *ngFor="let opt of featureOptions"
+                        type="button"
+                        (click)="toggleFeature(opt.key)"
+                        class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all duration-150"
+                        [style.border]="form.features.includes(opt.key) ? '1.5px solid var(--primary)' : '1.5px solid var(--border)'"
+                        [style.background]="form.features.includes(opt.key) ? 'hsl(152,69%,40%,0.07)' : 'transparent'">
+                  <span class="material-icons flex-shrink-0 transition-colors"
+                        style="font-size:1rem"
+                        [style.color]="form.features.includes(opt.key) ? 'var(--primary)' : 'var(--muted-foreground)'">
+                    {{ opt.icon }}
+                  </span>
+                  <span class="text-xs font-medium transition-colors"
+                        [style.color]="form.features.includes(opt.key) ? 'var(--foreground)' : 'var(--muted-foreground)'">
+                    {{ opt.label }}
+                  </span>
+                  <span *ngIf="form.features.includes(opt.key)"
+                        class="ml-auto material-icons flex-shrink-0"
+                        style="font-size:0.85rem;color:var(--primary)">check</span>
+                </button>
               </div>
             </div>
 
@@ -241,6 +255,7 @@ export class PlatformPlansComponent implements OnInit {
 
   featureOptions = FEATURE_OPTIONS;
 
+  priceDisplay = 'R$ 0,00';
   form = this.emptyForm();
 
   constructor(
@@ -263,9 +278,10 @@ export class PlatformPlansComponent implements OnInit {
   }
 
   openCreate(): void {
-    this.form      = this.emptyForm();
-    this.editingId = null;
-    this.showModal = true;
+    this.form         = this.emptyForm();
+    this.priceDisplay = this.formatBRL(0);
+    this.editingId    = null;
+    this.showModal    = true;
   }
 
   openEdit(plan: PlatformPlan): void {
@@ -278,8 +294,9 @@ export class PlatformPlansComponent implements OnInit {
       features:    [...plan.features],
       active:      plan.active,
     };
-    this.editingId = plan.id;
-    this.showModal = true;
+    this.priceDisplay = this.formatBRL(plan.price);
+    this.editingId    = plan.id;
+    this.showModal    = true;
   }
 
   closeModal(e?: MouseEvent): void {
@@ -340,6 +357,20 @@ export class PlatformPlansComponent implements OnInit {
     } finally {
       this.syncing = null;
     }
+  }
+
+  formatBRL(value: number): string {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  onPriceInput(event: Event): void {
+    const input  = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const cents  = parseInt(digits || '0', 10);
+    const value  = cents / 100;
+    this.priceDisplay = this.formatBRL(value);
+    this.form.price   = value;
+    input.value       = this.priceDisplay;
   }
 
   featureLabel(key: string): string {

@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { EstablishmentService } from '../../services/establishment.service';
+import { ApiService } from '../../services/api.service';
 
 type Mode = 'login' | 'register' | 'reset';
 type Phase = 'browse' | 'selected';
@@ -853,10 +854,26 @@ interface PlanOption {
     </div>
   `
 })
-export class LoginComponent {
+// Mapeamento de feature-key → { icon, title, desc } para o painel de detalhes
+const FEATURE_MAP: Record<string, { icon: string; title: string; desc: string }> = {
+  app_cliente:        { icon: 'smartphone',      title: 'App Cliente',           desc: 'Clientes reservam online 24h' },
+  mensalistas:        { icon: 'card_membership', title: 'Mensalistas',           desc: 'Horários fixos semanais com PIX recorrente' },
+  promotions:         { icon: 'local_offer',     title: 'Promoções & Eventos',   desc: 'Descontos e eventos exibidos no app' },
+  advanced_reports:   { icon: 'bar_chart',       title: 'Relatórios Avançados',  desc: 'Faturamento, ocupação e performance' },
+  split_payment:      { icon: 'group',           title: 'Divisão de Pagamento',  desc: 'Clientes dividem o custo da quadra' },
+  dashboard_advanced: { icon: 'dashboard',       title: 'Dashboard Avançado',    desc: 'Métricas em tempo real completas' },
+  multi_user:         { icon: 'manage_accounts', title: 'Multi-usuário',         desc: 'Múltiplos colaboradores no painel' },
+};
+
+function featureToDisplay(key: string): { icon: string; title: string; desc: string } {
+  return FEATURE_MAP[key] ?? { icon: 'check_circle', title: key, desc: '' };
+}
+
+export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private establishmentService = inject(EstablishmentService);
+  private api = inject(ApiService);
 
   phase: Phase = 'browse';
   mobileStep: MobileStep = 'landing';
@@ -879,11 +896,41 @@ export class LoginComponent {
     ],
   };
 
-  paidPlans: PlanOption[] = [
-    { id: 'essencial', name: 'Essencial', priceLabel: 'R$ 89',  price: 89,  courts: '2 quadras',  available: false, popular: false, features: [] },
-    { id: 'pro',       name: 'Pro',       priceLabel: 'R$ 159', price: 159, courts: '5 quadras',  available: false, popular: true,  features: [] },
-    { id: 'business',  name: 'Business',  priceLabel: 'R$ 269', price: 269, courts: 'Ilimitadas', available: false, popular: false, features: [] },
-  ];
+  paidPlans: PlanOption[] = [];
+
+  ngOnInit(): void {
+    this.api.get<{ plans: any[] }>('/plans').subscribe({
+      next: ({ plans }) => {
+        this.paidPlans = plans
+          .filter(p => p.slug !== 'free' && p.active !== false)
+          .sort((a, b) => a.price - b.price)
+          .map(p => ({
+            id:         p.slug,
+            name:       p.name,
+            priceLabel: p.price === 0 ? 'Grátis' : `R$ ${Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            price:      p.price,
+            courts:     p.max_courts ? `${p.max_courts} quadra${p.max_courts > 1 ? 's' : ''}` : 'Ilimitadas',
+            available:  !!p.pagarme_plan_id,   // disponível apenas quando já criado no Pagar.me
+            popular:    p.slug === 'pro',
+            features:   (p.features as string[]).map(featureToDisplay),
+          }));
+
+        // Atualiza freePlan com dados reais se existirem
+        const free = plans.find(p => p.slug === 'free');
+        if (free) {
+          this.freePlan = {
+            ...this.freePlan,
+            name:    free.name,
+            courts:  free.max_courts ? `${free.max_courts} quadra` : '1 quadra',
+            features: free.features?.length
+              ? (free.features as string[]).map(featureToDisplay)
+              : this.freePlan.features,
+          };
+        }
+      },
+      error: () => { /* mantém os valores padrão em caso de falha */ }
+    });
+  }
 
   steps = [
     { title: 'Escolha seu plano',    desc: 'Comece grátis, sem cartão.' },
