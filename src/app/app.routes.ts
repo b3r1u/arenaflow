@@ -20,6 +20,7 @@ export const routes: Routes = [
       { path: 'perfil', loadComponent: () => import('./pages/perfil/perfil.component').then(m => m.PerfilComponent) },
       { path: 'planos', loadComponent: () => import('./pages/planos/planos.component').then(m => m.PlanosComponent) },
       { path: 'financeiro', loadComponent: () => import('./pages/financeiro/financeiro.component').then(m => m.FinanceiroComponent) },
+      { path: 'platform/plans', loadComponent: () => import('./pages/platform-plans/platform-plans.component').then(m => m.PlatformPlansComponent) },
     ]
   },
   { path: '**', redirectTo: '' }

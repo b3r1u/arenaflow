@@ -202,10 +202,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
     return (this.profile?.name || 'AF').split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase();
   }
 
+  private readonly PLATFORM_ADMIN_EMAIL = 'connectsolve.ti@gmail.com';
+
   /** Nav items derivados do plano ativo — itens bloqueados exibem ícone de cadeado */
   navItems = computed(() => {
-    const f = this.establishmentService.planFeatures();
-    return [
+    const f            = this.establishmentService.planFeatures();
+    const isPlatformAdmin = this.googleUser()?.email === this.PLATFORM_ADMIN_EMAIL;
+    const items = [
       { label: 'Dashboard',   path: '/',            icon: 'dashboard',         accent: false, locked: false },
       { label: 'Quadras',     path: '/quadras',     icon: 'sports_volleyball', accent: false, locked: false },
       { label: 'Clientes',    path: '/clientes',    icon: 'group',             accent: false, locked: false },
@@ -217,6 +220,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
       { label: 'Perfil',      path: '/perfil',      icon: 'settings',          accent: false, locked: false },
       { label: 'Planos',      path: '/planos',      icon: 'workspace_premium', accent: true,  locked: false },
     ];
+    if (isPlatformAdmin) {
+      items.push({ label: 'Gestão de Planos', path: '/platform/plans', icon: 'admin_panel_settings', accent: false, locked: false });
+    }
+    return items;
   });
 
   bottomNavItems = [
