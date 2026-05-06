@@ -10,6 +10,21 @@ type Mode = 'login' | 'register' | 'reset';
 type Phase = 'browse' | 'selected';
 type MobileStep = 'landing' | 'auth';
 
+// Mapeamento de feature-key → { icon, title, desc } para o painel de detalhes
+const FEATURE_MAP: Record<string, { icon: string; title: string; desc: string }> = {
+  app_cliente:        { icon: 'smartphone',      title: 'App Cliente',           desc: 'Clientes reservam online 24h' },
+  mensalistas:        { icon: 'card_membership', title: 'Mensalistas',           desc: 'Horários fixos semanais com PIX recorrente' },
+  promotions:         { icon: 'local_offer',     title: 'Promoções & Eventos',   desc: 'Descontos e eventos exibidos no app' },
+  advanced_reports:   { icon: 'bar_chart',       title: 'Relatórios Avançados',  desc: 'Faturamento, ocupação e performance' },
+  split_payment:      { icon: 'group',           title: 'Divisão de Pagamento',  desc: 'Clientes dividem o custo da quadra' },
+  dashboard_advanced: { icon: 'dashboard',       title: 'Dashboard Avançado',    desc: 'Métricas em tempo real completas' },
+  multi_user:         { icon: 'manage_accounts', title: 'Multi-usuário',         desc: 'Múltiplos colaboradores no painel' },
+};
+
+function featureToDisplay(key: string): { icon: string; title: string; desc: string } {
+  return FEATURE_MAP[key] ?? { icon: 'check_circle', title: key, desc: '' };
+}
+
 interface PlanOption {
   id: string; name: string; priceLabel: string; price: number;
   courts: string; features: { icon: string; title: string; desc: string }[];
@@ -854,21 +869,6 @@ interface PlanOption {
     </div>
   `
 })
-// Mapeamento de feature-key → { icon, title, desc } para o painel de detalhes
-const FEATURE_MAP: Record<string, { icon: string; title: string; desc: string }> = {
-  app_cliente:        { icon: 'smartphone',      title: 'App Cliente',           desc: 'Clientes reservam online 24h' },
-  mensalistas:        { icon: 'card_membership', title: 'Mensalistas',           desc: 'Horários fixos semanais com PIX recorrente' },
-  promotions:         { icon: 'local_offer',     title: 'Promoções & Eventos',   desc: 'Descontos e eventos exibidos no app' },
-  advanced_reports:   { icon: 'bar_chart',       title: 'Relatórios Avançados',  desc: 'Faturamento, ocupação e performance' },
-  split_payment:      { icon: 'group',           title: 'Divisão de Pagamento',  desc: 'Clientes dividem o custo da quadra' },
-  dashboard_advanced: { icon: 'dashboard',       title: 'Dashboard Avançado',    desc: 'Métricas em tempo real completas' },
-  multi_user:         { icon: 'manage_accounts', title: 'Multi-usuário',         desc: 'Múltiplos colaboradores no painel' },
-};
-
-function featureToDisplay(key: string): { icon: string; title: string; desc: string } {
-  return FEATURE_MAP[key] ?? { icon: 'check_circle', title: key, desc: '' };
-}
-
 export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
