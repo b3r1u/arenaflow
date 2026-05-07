@@ -824,7 +824,8 @@ interface PlanOption {
               <span (click)="scrollToSection('section-sobre')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Sobre</span>
             </div>
             <button (click)="goToLogin()" style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:0.38rem 1rem;border-radius:2rem;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
-              Entrar <span class="material-icons" style="font-size:0.85rem">north_east</span>
+              <ng-container *ngIf="showLoginForm && phase === 'browse'">Fechar <span class="material-icons" style="font-size:0.85rem">close</span></ng-container>
+              <ng-container *ngIf="!(showLoginForm && phase === 'browse')">Entrar <span class="material-icons" style="font-size:0.85rem">north_east</span></ng-container>
             </button>
           </nav>
 
@@ -1576,6 +1577,11 @@ export class LoginComponent implements OnInit {
   }
 
   goToLogin() {
+    // Toggle: se o painel já está aberto (sem plano selecionado), fecha
+    if (this.showLoginForm && this.phase === 'browse') {
+      this.showLoginForm = false;
+      return;
+    }
     this.selectedPlan = null;
     this.mode = 'login';
     this.showLoginForm = true;
