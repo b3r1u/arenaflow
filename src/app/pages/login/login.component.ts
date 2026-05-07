@@ -225,9 +225,14 @@ interface PlanOption {
       flex: 0 0 420px; display: flex; align-items: center; justify-content: center;
       padding: 2rem; position: relative;
       border-left: 1px solid rgba(255,255,255,0.07);
-      transition: border-color 1s ease;
+      transition: flex-basis 1.2s cubic-bezier(0.16,1,0.3,1),
+                  opacity 0.7s ease,
+                  padding 1.2s ease,
+                  border-color 1s ease;
+      overflow: hidden;
     }
     .d-login.left-mode { border-left: none; border-right: 1px solid rgba(255,255,255,0.07); }
+    .d-login.hidden { flex-basis: 0; opacity: 0; padding: 0; border-color: transparent; pointer-events: none; }
 
     /* Plan detail column */
     .d-detail {
@@ -798,7 +803,7 @@ interface PlanOption {
             </div>
 
             <!-- ── Etapa 2: Stats ─────────────────── -->
-            <div id="section-planos" style="padding:0 2.5rem 2rem">
+            <div style="padding:0 2.5rem 2rem">
               <div class="stats-strip">
                 <div class="stats-col">
                   <span class="material-icons" style="font-size:1.25rem;color:#4ade80">emoji_events</span>
@@ -857,7 +862,7 @@ interface PlanOption {
             </div>
 
             <!-- ── Etapa 4: CTA ───────────────────── -->
-            <div id="section-sobre" style="padding:0 2.5rem 2rem">
+            <div style="padding:0 2.5rem 2rem">
               <div class="cta-block">
                 <div style="position:absolute;top:-70px;right:-70px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none"></div>
                 <div style="position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;border-radius:50%;background:rgba(0,0,0,0.08);pointer-events:none"></div>
@@ -877,7 +882,7 @@ interface PlanOption {
             </div>
 
             <!-- ── Planos (funcional) ─────────────── -->
-            <div style="padding:0 2.5rem 2.5rem">
+            <div id="section-planos" style="padding:0 2.5rem 2.5rem">
               <p style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.22);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.75rem">Escolha seu plano</p>
               <div class="d-plan-row">
                 <div class="d-plan-chip avail" (click)="selectPlan(freePlan)">
@@ -897,7 +902,7 @@ interface PlanOption {
               </div>
 
               <!-- Footer Solve -->
-              <div class="d-footer-strip" style="margin-top:1.5rem">
+              <div id="section-sobre" class="d-footer-strip" style="margin-top:1.5rem">
                 <div style="display:flex;align-items:center;gap:0.5rem">
                   <img src="assets/Solve_logo_fundo.png" alt="Solve" style="height:7.2rem;width:auto;display:block">
                   <p style="margin:0;font-size:0.65rem;color:rgba(255,255,255,0.3)">Tecnologia para o seu negócio</p>
@@ -920,7 +925,7 @@ interface PlanOption {
         </div>
 
         <!-- Col 2: Login form -->
-        <div class="d-login" [class.left-mode]="phase === 'selected'">
+        <div class="d-login" [class.left-mode]="phase === 'selected'" [class.hidden]="!showLoginForm && phase === 'browse'">
           <div class="glass-card" [class.anim-slide-l]="phase === 'selected'">
 
             <!-- Plan chip (desktop, when selected) -->
@@ -1208,6 +1213,7 @@ export class LoginComponent implements OnInit {
   authExiting = false;
   mode: Mode = 'login';
   selectedPlan: PlanOption | null = null;
+  showLoginForm = false;
 
   name = ''; email = ''; password = '';
   showPass = false; loading = false; error = ''; success = '';
@@ -1294,7 +1300,7 @@ export class LoginComponent implements OnInit {
     this.selectedPlan = plan;
     this.mode = 'login';
     this.error = ''; this.success = ''; this.checkoutError = '';
-    // Todos os planos → mesmo painel direito com animação slide
+    this.showLoginForm = true;
     this.phase = 'selected';
     this.landingExiting = true;
     setTimeout(() => {
@@ -1306,12 +1312,14 @@ export class LoginComponent implements OnInit {
   clearSelection() {
     this.selectedPlan = null;
     this.phase = 'browse';
+    this.showLoginForm = true; // mantém o card aberto após trocar plano
     this.error = ''; this.success = '';
   }
 
   goToLogin() {
     this.selectedPlan = null;
     this.mode = 'login';
+    this.showLoginForm = true;
     this.mobileStep = 'auth';
     this.error = ''; this.success = '';
   }
