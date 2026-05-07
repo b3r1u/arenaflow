@@ -967,6 +967,12 @@ interface PlanOption {
           <input class="glass-input" [value]="cardDocument" (input)="onDocumentInput($event)" type="text" placeholder="CPF do titular" maxlength="14" inputmode="numeric">
         </div>
 
+        <!-- Celular do titular -->
+        <div class="input-wrap">
+          <span class="material-icons input-icon">phone_iphone</span>
+          <input class="glass-input" [value]="cardPhone" (input)="onPhoneInput($event)" type="text" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric" autocomplete="tel">
+        </div>
+
         <p *ngIf="checkoutError" style="font-size:0.78rem;color:#f87171;margin:0.5rem 0 0.5rem">{{ checkoutError }}</p>
 
         <button class="btn-google" (click)="submitPayment()" [disabled]="checkoutLoading" style="margin-top:0.5rem;width:100%">
@@ -1159,9 +1165,18 @@ export class LoginComponent implements OnInit {
     (e.target as HTMLInputElement).value = fmt;
   }
 
+  onPhoneInput(e: Event) {
+    const raw = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 11);
+    let fmt = raw;
+    if (raw.length > 2)  fmt = '(' + raw.slice(0, 2) + ') ' + raw.slice(2);
+    if (raw.length > 7)  fmt = '(' + raw.slice(0, 2) + ') ' + raw.slice(2, 7) + '-' + raw.slice(7);
+    this.cardPhone = fmt;
+    (e.target as HTMLInputElement).value = fmt;
+  }
+
   async submitPayment() {
-    if (!this.cardNumber || !this.cardHolder || !this.cardExpiry || !this.cardCvv || !this.cardDocument) {
-      this.checkoutError = 'Preencha todos os dados do cartão.';
+    if (!this.cardNumber || !this.cardHolder || !this.cardExpiry || !this.cardCvv || !this.cardDocument || !this.cardPhone) {
+      this.checkoutError = 'Preencha todos os dados do cartão e celular.';
       return;
     }
     this.checkoutError = ''; this.checkoutLoading = true;
