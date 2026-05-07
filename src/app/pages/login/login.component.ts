@@ -989,8 +989,19 @@ interface PlanOption {
           <span *ngIf="checkoutLoading">Processando pagamento...</span>
         </button>
 
-        <button class="back-form-btn" (click)="backFromPayment()" style="margin-top:0.75rem">
-          <span class="material-icons" style="font-size:1rem">arrow_back</span> Voltar aos planos
+        <button (click)="backToLanding()" style="
+            width:100%; margin-top:0.65rem; padding:0.62rem;
+            border-radius:0.75rem; cursor:pointer;
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.12);
+            color:rgba(255,255,255,0.65); font-size:0.85rem; font-weight:600;
+            display:flex; align-items:center; justify-content:center; gap:0.4rem;
+            transition:background 0.2s, border-color 0.2s, color 0.2s;
+          "
+          onmouseover="this.style.background='rgba(255,255,255,0.09)';this.style.borderColor='rgba(255,255,255,0.22)';this.style.color='#fff'"
+          onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.65)'">
+          <span class="material-icons" style="font-size:1rem">arrow_back</span>
+          Voltar à tela inicial
         </button>
 
         <p style="font-size:0.65rem;text-align:center;color:rgba(255,255,255,0.18);margin-top:1rem;margin-bottom:0">
