@@ -973,38 +973,56 @@ interface PlanOption {
           <input class="glass-input" [value]="cardPhone" (input)="onPhoneInput($event)" type="text" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric" autocomplete="tel">
         </div>
 
-        <p *ngIf="checkoutError" style="font-size:0.78rem;color:#f87171;margin:0.5rem 0 0.5rem">{{ checkoutError }}</p>
+        <p *ngIf="checkoutError" style="font-size:0.78rem;color:#f87171;margin:0.5rem 0 0">{{ checkoutError }}</p>
 
-        <button class="btn-google" (click)="submitPayment()" [disabled]="checkoutLoading" style="margin-top:0.5rem;width:100%">
-          <span *ngIf="checkoutLoading" class="material-icons spin-icon" style="font-size:1rem">refresh</span>
-          <ng-container *ngIf="!checkoutLoading">
-            <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0">
-              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6c1.8-5.4 6.9-9.8 13.6-9.8z"/>
-              <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/>
-              <path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/>
-              <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.6 0-12.2-4.4-14.2-10.4l-7.8 6C6.6 42.6 14.6 48 24 48z"/>
-            </svg>
-            Assinar com Google — {{ selectedPlan?.priceLabel }}/mês
-          </ng-container>
-          <span *ngIf="checkoutLoading">Processando pagamento...</span>
-        </button>
+        <!-- Separador visual entre formulário e ações -->
+        <div style="margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:0.75rem">
 
-        <button (click)="backToLanding()" style="
-            width:100%; margin-top:0.65rem; padding:0.62rem;
-            border-radius:0.75rem; cursor:pointer;
-            background:rgba(255,255,255,0.05);
-            border:1px solid rgba(255,255,255,0.12);
-            color:rgba(255,255,255,0.65); font-size:0.85rem; font-weight:600;
-            display:flex; align-items:center; justify-content:center; gap:0.4rem;
-            transition:background 0.2s, border-color 0.2s, color 0.2s;
-          "
-          onmouseover="this.style.background='rgba(255,255,255,0.09)';this.style.borderColor='rgba(255,255,255,0.22)';this.style.color='#fff'"
-          onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.65)'">
-          <span class="material-icons" style="font-size:1rem">arrow_back</span>
-          Voltar à tela inicial
-        </button>
+          <!-- Assinar com Google — discreto -->
+          <button (click)="submitPayment()" [disabled]="checkoutLoading" style="
+              width:100%; padding:0.65rem;
+              border-radius:0.75rem; cursor:pointer;
+              background:rgba(255,255,255,0.06);
+              border:1px solid rgba(255,255,255,0.13);
+              color:rgba(255,255,255,0.75); font-size:0.875rem; font-weight:600;
+              display:flex; align-items:center; justify-content:center; gap:0.6rem;
+              transition:background 0.2s, border-color 0.2s, color 0.2s;
+              opacity: checkoutLoading ? 0.55 : 1;
+            "
+            onmouseover="if(!this.disabled){this.style.background='rgba(255,255,255,0.1)';this.style.borderColor='rgba(255,255,255,0.22)';this.style.color='#fff'}"
+            onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.13)';this.style.color='rgba(255,255,255,0.75)'">
+            <span *ngIf="checkoutLoading" class="material-icons spin-icon" style="font-size:1rem">refresh</span>
+            <ng-container *ngIf="!checkoutLoading">
+              <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0;opacity:0.85">
+                <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6c1.8-5.4 6.9-9.8 13.6-9.8z"/>
+                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/>
+                <path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/>
+                <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.6 0-12.2-4.4-14.2-10.4l-7.8 6C6.6 42.6 14.6 48 24 48z"/>
+              </svg>
+              Assinar com Google — {{ selectedPlan?.priceLabel }}/mês
+            </ng-container>
+            <span *ngIf="checkoutLoading">Processando pagamento...</span>
+          </button>
 
-        <p style="font-size:0.65rem;text-align:center;color:rgba(255,255,255,0.18);margin-top:1rem;margin-bottom:0">
+          <!-- Voltar à tela inicial -->
+          <button (click)="backToLanding()" style="
+              width:100%; padding:0.62rem;
+              border-radius:0.75rem; cursor:pointer;
+              background:rgba(255,255,255,0.04);
+              border:1px solid rgba(255,255,255,0.11);
+              color:rgba(255,255,255,0.55); font-size:0.85rem; font-weight:600;
+              display:flex; align-items:center; justify-content:center; gap:0.4rem;
+              transition:background 0.2s, border-color 0.2s, color 0.2s;
+            "
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.85)'"
+            onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.11)';this.style.color='rgba(255,255,255,0.55)'">
+            <span class="material-icons" style="font-size:0.95rem">arrow_back</span>
+            Voltar à tela inicial
+          </button>
+
+        </div>
+
+        <p style="font-size:0.65rem;text-align:center;color:rgba(255,255,255,0.15);margin-top:1rem;margin-bottom:0">
           Pagamento processado com segurança via Pagar.me · Cancele quando quiser
         </p>
       </ng-template>
