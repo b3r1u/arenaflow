@@ -529,6 +529,17 @@ interface PlanOption {
             </button>
           </div>
 
+          <!-- Hero + Stats com imagem de fundo -->
+          <div style="position:relative;overflow:hidden">
+            <img src="assets/quadraFTV.jpg" alt=""
+                 style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center 70%;z-index:0;opacity:0.58;pointer-events:none;display:block">
+            <div style="position:absolute;inset:0;z-index:1;pointer-events:none;
+                        background:linear-gradient(to right, rgba(5,14,9,0.9) 0%, rgba(5,14,9,0.55) 55%, rgba(5,14,9,0.1) 100%)"></div>
+            <div style="position:absolute;inset:0;z-index:2;pointer-events:none;
+                        background:linear-gradient(to bottom, transparent 40%, rgba(5,14,9,0.75) 72%, #050e09 100%)"></div>
+
+            <div style="position:relative;z-index:3">
+
           <!-- Hero -->
           <div class="m-hero anim-fade-up" style="text-align:left;padding:2rem 1.5rem 1.5rem">
             <!-- Badge -->
@@ -540,7 +551,7 @@ interface PlanOption {
             <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.5rem;color:#fff;margin:0 0 0.875rem;line-height:1.04;letter-spacing:-0.025em">
               GERENCIE<br>SUA ARENA<br><span style="color:#4ade80">COM<br>INTELIGÊNCIA</span>
             </h1>
-            <p style="font-size:0.88rem;color:rgba(255,255,255,0.42);margin:0 0 1.75rem;line-height:1.6">
+            <p style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin:0 0 1.75rem;line-height:1.6">
               Reservas online, gestão de quadras e relatórios em uma única plataforma.
             </p>
             <button class="m-btn-free" (click)="selectPlan(freePlan)">
@@ -550,7 +561,7 @@ interface PlanOption {
           </div>
 
           <!-- Etapa 2: Stats -->
-          <div style="padding:0 1.25rem 1.75rem">
+          <div style="padding:0 1.25rem 2.5rem">
             <div class="stats-strip">
               <div class="stats-col">
                 <span class="material-icons" style="font-size:1.1rem;color:#4ade80">emoji_events</span>
@@ -575,6 +586,9 @@ interface PlanOption {
             </div>
           </div>
 
+            </div><!-- fim z-index:3 -->
+          </div><!-- fim wrapper imagem hero mobile -->
+
           <!-- Etapa 3: Features -->
           <div style="padding:0 1.25rem 1.75rem">
             <div style="margin-bottom:1rem">
@@ -587,15 +601,21 @@ interface PlanOption {
               </h2>
             </div>
             <div class="feat-grid-new">
-              <div class="feat-card-new" *ngFor="let f of features | slice:0:4">
-                <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72));z-index:0"></div>
-                <div style="position:absolute;top:0.75rem;left:0.75rem;width:2rem;height:2rem;border-radius:0.5rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:1">
+              <div class="feat-card-new" *ngFor="let f of features | slice:0:4; let i = index">
+                <img *ngIf="i === 0" src="assets/reservas-quadra.jpg" alt=""
+                     style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                <div style="position:absolute;inset:0;z-index:1;pointer-events:none"
+                     [style.background]="i === 0
+                       ? 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.82) 100%)'
+                       : 'linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.72) 100%)'">
+                </div>
+                <div style="position:absolute;top:0.75rem;left:0.75rem;width:2rem;height:2rem;border-radius:0.5rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:2">
                   <span class="material-icons" style="font-size:0.95rem;color:#4ade80">{{ f.icon }}</span>
                 </div>
-                <div style="position:absolute;bottom:0.65rem;right:0.65rem;width:1.4rem;height:1.4rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:1">
+                <div style="position:absolute;bottom:0.65rem;right:0.65rem;width:1.4rem;height:1.4rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:2">
                   <span class="material-icons" style="font-size:0.6rem;color:#4ade80">north_east</span>
                 </div>
-                <div style="position:relative;z-index:1">
+                <div style="position:relative;z-index:2">
                   <p style="margin:0 0 0.1rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.72rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em">{{ f.title }}</p>
                   <p style="margin:0;font-size:0.62rem;color:rgba(255,255,255,0.45);line-height:1.35">{{ f.desc }}</p>
                 </div>
@@ -818,9 +838,9 @@ interface PlanOption {
             <div style="position:relative;overflow:hidden">
 
               <!-- Imagem de fundo: ocupa todo o wrapper (hero + stats) -->
-              <img src="assets/hero-beach.jpg" alt=""
+              <img src="assets/quadraFTV.jpg" alt=""
                    style="position:absolute;top:0;left:0;width:100%;height:100%;
-                          object-fit:cover;object-position:center 22%;
+                          object-fit:cover;object-position:center 70%;
                           z-index:0;opacity:0.62;pointer-events:none;
                           display:block">
 
@@ -939,14 +959,22 @@ interface PlanOption {
               </div>
               <div class="feat-grid-new">
                 <div class="feat-card-new" *ngFor="let f of features | slice:0:4; let i = index" [style.animation-delay]="(i * 0.08) + 's'">
-                  <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,0.7));z-index:0"></div>
-                  <div style="position:absolute;top:0.85rem;left:0.85rem;width:2.1rem;height:2.1rem;border-radius:0.55rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:1">
+                  <!-- Imagem de fundo apenas no card de Reservas Online 24h (i=0) -->
+                  <img *ngIf="i === 0" src="assets/reservas-quadra.jpg" alt=""
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                  <!-- Overlay: sombra geral + degradê mais forte no bottom -->
+                  <div style="position:absolute;inset:0;z-index:1;pointer-events:none"
+                       [style.background]="i === 0
+                         ? 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.82) 100%)'
+                         : 'linear-gradient(180deg, transparent 35%, rgba(0,0,0,0.7) 100%)'">
+                  </div>
+                  <div style="position:absolute;top:0.85rem;left:0.85rem;width:2.1rem;height:2.1rem;border-radius:0.55rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:2">
                     <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
                   </div>
-                  <div style="position:absolute;bottom:0.75rem;right:0.75rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:1">
+                  <div style="position:absolute;bottom:0.75rem;right:0.75rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:2">
                     <span class="material-icons" style="font-size:0.65rem;color:#4ade80">north_east</span>
                   </div>
-                  <div style="position:relative;z-index:1">
+                  <div style="position:relative;z-index:2">
                     <p style="margin:0 0 0.15rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.78rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em">{{ f.title }}</p>
                     <p style="margin:0;font-size:0.65rem;color:rgba(255,255,255,0.45);line-height:1.35">{{ f.desc }}</p>
                   </div>
