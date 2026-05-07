@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { EstablishmentService } from '../../services/establishment.service';
 import { ApiService } from '../../services/api.service';
+import { firstValueFrom } from 'rxjs';
 
-type Mode = 'login' | 'register' | 'reset';
-type Phase = 'browse' | 'selected';
-type MobileStep = 'landing' | 'auth';
+type Mode = 'login' | 'reset';
+type Phase = 'browse' | 'selected' | 'payment';
+type MobileStep = 'landing' | 'auth' | 'payment';
 
 // Mapeamento de feature-key → { icon, title, desc } para o painel de detalhes
 const FEATURE_MAP: Record<string, { icon: string; title: string; desc: string }> = {
@@ -597,6 +598,13 @@ interface PlanOption {
             <ng-container *ngTemplateOutlet="authForm"></ng-container>
           </div>
         </div>
+
+        <!-- Payment step (mobile) -->
+        <div *ngIf="mobileStep === 'payment'" class="m-auth">
+          <div class="glass-card anim-slide-r" style="margin-top:0.75rem">
+            <ng-container *ngTemplateOutlet="cardForm"></ng-container>
+          </div>
+        </div>
       </div>
 
       <!-- ══════════════════════════════════
@@ -712,7 +720,7 @@ interface PlanOption {
               </button>
             </div>
 
-            <ng-container *ngTemplateOutlet="authForm"></ng-container>
+            <ng-container *ngTemplateOutlet="phase === 'payment' ? cardForm : authForm"></ng-container>
           </div>
         </div>
 
@@ -798,22 +806,12 @@ interface PlanOption {
       ══════════════════════════════════ -->
       <ng-template #authForm>
 
-        <div *ngIf="mode !== 'reset'" class="tab-bar">
-          <button class="tab-btn" [class.active]="mode==='login'"    (click)="setMode('login')">Entrar</button>
-          <button class="tab-btn" [class.active]="mode==='register'" (click)="setMode('register')">Cadastrar</button>
-        </div>
-
         <div *ngIf="mode === 'reset'" style="margin-bottom:1.25rem">
           <button class="back-form-btn" (click)="setMode('login')">
             <span class="material-icons" style="font-size:1rem">arrow_back</span> Voltar
           </button>
           <p style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:#fff;margin:0">Redefinir senha</p>
           <p style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin:0.2rem 0 0">Enviaremos um link para o seu e-mail</p>
-        </div>
-
-        <div *ngIf="mode === 'register'" class="input-wrap">
-          <span class="material-icons input-icon">person</span>
-          <input class="glass-input" [(ngModel)]="name" type="text" placeholder="Seu nome completo" autocomplete="name">
         </div>
 
         <div class="input-wrap">
@@ -826,7 +824,7 @@ interface PlanOption {
           <input class="glass-input" style="padding-right:2.75rem"
                  [(ngModel)]="password"
                  [type]="showPass ? 'text' : 'password'"
-                 [placeholder]="mode==='register' ? 'Senha (mín. 6 caracteres)' : 'Senha'"
+                 placeholder="Senha"
                  autocomplete="current-password">
           <button class="eye-btn" type="button" (click)="showPass = !showPass">
             <span class="material-icons" style="font-size:1rem">{{ showPass ? 'visibility_off' : 'visibility' }}</span>
@@ -866,6 +864,70 @@ interface PlanOption {
           Ao entrar, você concorda com os termos de uso da plataforma.
         </p>
       </ng-template>
+
+      <!-- ══════════════════════════════════
+           TEMPLATE: Card form (checkout)
+      ══════════════════════════════════ -->
+      <ng-template #cardForm>
+        <!-- Chip do plano selecionado -->
+        <div *ngIf="selectedPlan" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;border-radius:0.875rem;background:rgba(34,165,92,0.1);border:1px solid rgba(34,165,92,0.25);margin-bottom:1.25rem">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em">Plano selecionado</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;color:#fff;font-size:1rem">{{ selectedPlan.name }}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;color:#4ade80;font-size:1.1rem">{{ selectedPlan.priceLabel }}</div>
+            <div style="font-size:0.65rem;color:rgba(255,255,255,0.35)">/mês</div>
+          </div>
+        </div>
+
+        <p style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#fff;font-size:0.9rem;margin:0 0 1rem">Dados do cartão de crédito</p>
+
+        <!-- Número do cartão -->
+        <div class="input-wrap">
+          <span class="material-icons input-icon">credit_card</span>
+          <input class="glass-input" [value]="cardNumber" (input)="onCardNumberInput($event)" type="text" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric" autocomplete="cc-number">
+        </div>
+
+        <!-- Nome no cartão -->
+        <div class="input-wrap">
+          <span class="material-icons input-icon">person</span>
+          <input class="glass-input" [(ngModel)]="cardHolder" type="text" placeholder="Nome impresso no cartão" style="text-transform:uppercase" autocomplete="cc-name">
+        </div>
+
+        <!-- Validade + CVV -->
+        <div style="display:flex;gap:0.75rem">
+          <div class="input-wrap" style="flex:1">
+            <span class="material-icons input-icon" style="font-size:0.95rem">date_range</span>
+            <input class="glass-input" [value]="cardExpiry" (input)="onExpiryInput($event)" type="text" placeholder="MM/AA" maxlength="5" inputmode="numeric" autocomplete="cc-exp">
+          </div>
+          <div class="input-wrap" style="flex:1">
+            <span class="material-icons input-icon" style="font-size:0.95rem">lock</span>
+            <input class="glass-input" [(ngModel)]="cardCvv" type="password" placeholder="CVV" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+          </div>
+        </div>
+
+        <!-- CPF do titular -->
+        <div class="input-wrap">
+          <span class="material-icons input-icon">badge</span>
+          <input class="glass-input" [value]="cardDocument" (input)="onDocumentInput($event)" type="text" placeholder="CPF do titular" maxlength="14" inputmode="numeric">
+        </div>
+
+        <p *ngIf="checkoutError" style="font-size:0.78rem;color:#f87171;margin:0.5rem 0 0.5rem">{{ checkoutError }}</p>
+
+        <button class="btn-primary" (click)="submitPayment()" [disabled]="checkoutLoading" style="margin-top:0.5rem">
+          <span *ngIf="checkoutLoading" class="material-icons spin-icon" style="font-size:1rem">refresh</span>
+          {{ checkoutLoading ? 'Processando...' : 'Assinar — ' + selectedPlan?.priceLabel + '/mês' }}
+        </button>
+
+        <button class="back-form-btn" (click)="backToAuth()" style="margin-top:0.75rem">
+          <span class="material-icons" style="font-size:1rem">arrow_back</span> Voltar
+        </button>
+
+        <p style="font-size:0.65rem;text-align:center;color:rgba(255,255,255,0.18);margin-top:1rem;margin-bottom:0">
+          Pagamento processado com segurança via Pagar.me · Cancele quando quiser
+        </p>
+      </ng-template>
     </div>
   `
 })
@@ -884,6 +946,16 @@ export class LoginComponent implements OnInit {
 
   name = ''; email = ''; password = '';
   showPass = false; loading = false; error = ''; success = '';
+
+  // Checkout de cartão (plano pago)
+  checkoutLoading = false;
+  checkoutError   = '';
+  cardNumber  = '';
+  cardHolder  = '';
+  cardExpiry  = '';
+  cardCvv     = '';
+  cardDocument = '';
+  cardPhone    = '';
 
   freePlan: PlanOption = {
     id: 'free', name: 'Free', priceLabel: 'Grátis', price: 0,
@@ -948,15 +1020,14 @@ export class LoginComponent implements OnInit {
   ];
 
   get submitLabel() {
-    if (this.mode === 'login')    return 'Entrar';
-    if (this.mode === 'register') return 'Criar conta grátis';
+    if (this.mode === 'login') return 'Entrar';
     return 'Enviar link de redefinição';
   }
 
   selectPlan(plan: PlanOption) {
     if (!plan.available) return;
     this.selectedPlan = plan;
-    this.mode = 'register';
+    this.mode = 'login';
     this.error = ''; this.success = '';
     // Desktop: anima os painéis imediatamente
     this.phase = 'selected';
@@ -994,17 +1065,67 @@ export class LoginComponent implements OnInit {
 
   setMode(m: Mode) { this.mode = m; this.error = ''; this.success = ''; }
 
+  backToAuth() {
+    this.phase = 'selected';
+    this.mobileStep = 'auth';
+    this.checkoutError = '';
+    this.cardNumber = ''; this.cardHolder = ''; this.cardExpiry = '';
+    this.cardCvv = ''; this.cardDocument = ''; this.cardPhone = '';
+  }
+
+  onCardNumberInput(e: Event) {
+    const raw = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 16);
+    this.cardNumber = raw.replace(/(.{4})/g, '$1 ').trim();
+    (e.target as HTMLInputElement).value = this.cardNumber;
+  }
+
+  onExpiryInput(e: Event) {
+    let raw = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 4);
+    if (raw.length >= 3) raw = raw.slice(0, 2) + '/' + raw.slice(2);
+    this.cardExpiry = raw;
+    (e.target as HTMLInputElement).value = raw;
+  }
+
+  onDocumentInput(e: Event) {
+    const raw = (e.target as HTMLInputElement).value.replace(/\D/g, '').slice(0, 11);
+    const fmt = raw.length <= 3 ? raw
+      : raw.length <= 6 ? raw.slice(0, 3) + '.' + raw.slice(3)
+      : raw.length <= 9 ? raw.slice(0, 3) + '.' + raw.slice(3, 6) + '.' + raw.slice(6)
+      : raw.slice(0, 3) + '.' + raw.slice(3, 6) + '.' + raw.slice(6, 9) + '-' + raw.slice(9);
+    this.cardDocument = fmt;
+    (e.target as HTMLInputElement).value = fmt;
+  }
+
+  async submitPayment() {
+    this.checkoutError = ''; this.checkoutLoading = true;
+    try {
+      const [expMonth, expYear] = this.cardExpiry.split('/');
+      await firstValueFrom(
+        this.api.post('/subscriptions', {
+          plan_slug:         this.selectedPlan!.id,
+          customer_document: this.cardDocument.replace(/\D/g, ''),
+          customer_phone:    this.cardPhone.replace(/\D/g, ''),
+          card: {
+            number:      this.cardNumber.replace(/\D/g, ''),
+            holder_name: this.cardHolder,
+            exp_month:   expMonth,
+            exp_year:    '20' + expYear,
+            cvv:         this.cardCvv,
+          },
+        })
+      );
+      this.establishmentService.setPendingPlan(this.selectedPlan!.id);
+      this.router.navigate(['/']);
+    } catch (e: any) {
+      this.checkoutError = e?.error?.error || 'Erro ao processar o cartão. Verifique os dados e tente novamente.';
+    } finally { this.checkoutLoading = false; }
+  }
+
   async submit() {
     this.error = ''; this.success = ''; this.loading = true;
     try {
       if (this.mode === 'login') {
         await this.auth.loginWithEmail(this.email, this.password);
-        this.router.navigate(['/']);
-      } else if (this.mode === 'register') {
-        if (this.selectedPlan) {
-          this.establishmentService.setPendingPlan(this.selectedPlan.id);
-        }
-        await this.auth.registerWithEmail(this.name, this.email, this.password);
         this.router.navigate(['/']);
       } else {
         await this.auth.resetPassword(this.email);
@@ -1017,8 +1138,29 @@ export class LoginComponent implements OnInit {
 
   async loginWithGoogle() {
     this.loading = true; this.error = '';
-    try { await this.auth.loginWithGoogle(); this.router.navigate(['/']); }
-    catch { this.error = 'Não foi possível entrar com Google. Tente novamente.'; this.loading = false; }
+    try {
+      await this.auth.loginWithGoogle();
+      const planSlug = this.selectedPlan?.id || 'free';
+      const authRes = await firstValueFrom(
+        this.api.post<{ user: any; is_new_user: boolean; pending_plan?: string }>('/auth/me', {
+          role: 'ADMIN',
+          plan_slug: planSlug,
+        })
+      );
+      // Novo usuário com plano pago → vai para checkout
+      if (authRes.is_new_user && planSlug !== 'free') {
+        this.phase = 'payment';
+        this.mobileStep = 'payment';
+        this.loading = false;
+        return;
+      }
+      // Plano free ou usuário existente → dashboard
+      if (planSlug !== 'free') this.establishmentService.setPendingPlan(planSlug);
+      this.router.navigate(['/']);
+    } catch (e: any) {
+      this.error = 'Não foi possível entrar com Google. Tente novamente.';
+      this.loading = false;
+    }
   }
 
   private friendlyError(code: string): string {
