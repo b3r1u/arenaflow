@@ -617,6 +617,41 @@ interface PlanOption {
             </div>
           </div>
 
+          <!-- Sobre (mobile) -->
+          <div class="m-section" style="padding-top:0">
+            <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.75rem">
+              <span style="width:0.45rem;height:0.45rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+              <span style="font-size:0.62rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Sobre o ArenaFlow</span>
+            </div>
+            <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.55rem;color:#fff;margin:0 0 0.85rem;line-height:1.08;letter-spacing:-0.02em">
+              UMA PLATAFORMA CRIADA PARA QUEM <span style="color:#4ade80">GERENCIA ARENAS</span>
+            </h2>
+            <p style="font-size:0.82rem;color:rgba(255,255,255,0.48);margin:0 0 0.75rem;line-height:1.6">
+              O ArenaFlow nasceu de uma necessidade real: gestores perdiam horas com reservas por telefone, planilhas e anotações manuais. Queríamos mudar isso.
+            </p>
+            <p style="font-size:0.82rem;color:rgba(255,255,255,0.48);margin:0 0 1.25rem;line-height:1.6">
+              Centralizamos tudo — reservas online 24h, financeiro, clientes e mensalistas — em um único painel acessível de qualquer dispositivo.
+            </p>
+            <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.25rem">
+              <div *ngFor="let p of sobrePilares" style="display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.75rem;border-radius:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)">
+                <span class="material-icons" style="font-size:0.9rem;color:#4ade80;flex-shrink:0">{{ p.icon }}</span>
+                <span style="font-size:0.78rem;color:rgba(255,255,255,0.55)">{{ p.text }}</span>
+              </div>
+            </div>
+            <!-- Card Solve mobile -->
+            <div style="border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:1.25rem;display:flex;align-items:center;gap:1rem">
+              <img src="assets/Solve_logo_fundo.png" alt="Solve" style="height:4.5rem;width:auto;flex-shrink:0">
+              <div>
+                <p style="margin:0 0 0.3rem;font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.5">
+                  Desenvolvido pela <strong style="color:rgba(255,255,255,0.8)">Solve</strong> — tecnologia para pequenos e médios negócios
+                </p>
+                <a href="mailto:connectsolve.ti@gmail.com" style="display:inline-flex;align-items:center;gap:0.35rem;color:#4ade80;font-size:0.7rem;text-decoration:none">
+                  <span class="material-icons" style="font-size:0.78rem">mail</span>connectsolve.ti&#64;gmail.com
+                </a>
+              </div>
+            </div>
+          </div>
+
           <!-- Planos -->
           <div class="m-section" style="padding-top:0">
             <p class="m-section-title">Escolha seu plano</p>
@@ -886,6 +921,54 @@ interface PlanOption {
               </div>
             </div>
 
+            <!-- ── Sobre ──────────────────────────── -->
+            <div id="section-sobre" style="padding:0 2.5rem 2rem">
+              <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.75rem">
+                <span style="width:0.5rem;height:0.5rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+                <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Sobre o ArenaFlow</span>
+              </div>
+              <div style="display:flex;gap:2rem;align-items:flex-start">
+
+                <!-- Texto -->
+                <div style="flex:1;min-width:0">
+                  <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0 0 1rem;line-height:1.08;letter-spacing:-0.02em">
+                    UMA PLATAFORMA CRIADA<br>PARA QUEM <span style="color:#4ade80">GERENCIA ARENAS</span>
+                  </h2>
+                  <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0 0 0.85rem;line-height:1.65">
+                    O ArenaFlow nasceu de uma necessidade real: gestores de arenas esportivas perdiam horas gerenciando reservas por telefone, planilhas e anotações manuais. Queríamos mudar isso.
+                  </p>
+                  <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0 0 1.25rem;line-height:1.65">
+                    Nossa plataforma centraliza tudo — reservas online 24h, controle financeiro, cadastro de clientes e mensalistas — em um único painel intuitivo, acessível de qualquer dispositivo.
+                  </p>
+                  <!-- Pilares -->
+                  <div style="display:flex;flex-direction:column;gap:0.5rem">
+                    <div *ngFor="let p of sobrePilares" style="display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.75rem;border-radius:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+                      <span class="material-icons" style="font-size:0.9rem;color:#4ade80;flex-shrink:0">{{ p.icon }}</span>
+                      <span style="font-size:0.78rem;color:rgba(255,255,255,0.6)">{{ p.text }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card Solve -->
+                <div style="flex:0 0 200px;border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.75rem">
+                  <img src="assets/Solve_logo_fundo.png" alt="Solve" style="height:6rem;width:auto">
+                  <div style="width:2rem;height:1px;background:rgba(255,255,255,0.1)"></div>
+                  <p style="margin:0;font-size:0.72rem;color:rgba(255,255,255,0.38);line-height:1.5">
+                    Desenvolvido pela <strong style="color:rgba(255,255,255,0.65)">Solve</strong> — tecnologia acessível para pequenos e médios negócios
+                  </p>
+                  <div style="display:flex;flex-direction:column;gap:0.4rem;width:100%">
+                    <a href="mailto:connectsolve.ti@gmail.com" style="display:flex;align-items:center;gap:0.4rem;color:rgba(255,255,255,0.35);font-size:0.68rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                      <span class="material-icons" style="font-size:0.8rem">mail</span>connectsolve.ti&#64;gmail.com
+                    </a>
+                    <a href="https://www.instagram.com/solve.ti" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:0.4rem;color:rgba(255,255,255,0.35);font-size:0.68rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                      <span class="material-icons" style="font-size:0.8rem">photo_camera</span>&#64;solve.ti
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
             <!-- ── Planos (funcional) ─────────────── -->
             <div id="section-planos" style="padding:0 2.5rem 2.5rem">
               <p style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.22);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.75rem">Escolha seu plano</p>
@@ -906,23 +989,10 @@ interface PlanOption {
                 </div>
               </div>
 
-              <!-- Footer Solve -->
-              <div id="section-sobre" class="d-footer-strip" style="margin-top:1.5rem">
-                <div style="display:flex;align-items:center;gap:0.5rem">
-                  <img src="assets/Solve_logo_fundo.png" alt="Solve" style="height:7.2rem;width:auto;display:block">
-                  <p style="margin:0;font-size:0.65rem;color:rgba(255,255,255,0.3)">Tecnologia para o seu negócio</p>
-                </div>
-                <div style="display:flex;align-items:center;gap:1rem">
-                  <a href="mailto:connectsolve.ti@gmail.com" style="display:flex;align-items:center;gap:0.35rem;color:rgba(255,255,255,0.35);font-size:0.7rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-                    <span class="material-icons" style="font-size:0.85rem">mail</span>
-                    connectsolve.ti&#64;gmail.com
-                  </a>
-                  <a href="https://www.instagram.com/solve.ti" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:0.35rem;color:rgba(255,255,255,0.35);font-size:0.7rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-                    <span class="material-icons" style="font-size:0.85rem">photo_camera</span>
-                    &#64;solve.ti
-                  </a>
-                </div>
-                <p style="font-size:0.62rem;color:rgba(255,255,255,0.18);margin:0">© 2025 Solve</p>
+              <!-- Footer -->
+              <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
+                <p style="font-size:0.62rem;color:rgba(255,255,255,0.18);margin:0">© 2025 Solve. Todos os direitos reservados.</p>
+                <p style="font-size:0.62rem;color:rgba(255,255,255,0.18);margin:0">ArenaFlow v1.0</p>
               </div>
             </div>
 
@@ -1285,6 +1355,13 @@ export class LoginComponent implements OnInit {
     { title: 'Escolha seu plano',    desc: 'Comece grátis, sem cartão.' },
     { title: 'Configure sua arena',  desc: 'Quadras, horários e preços.' },
     { title: 'Receba reservas',      desc: 'Clientes agendam 24h pelo app.' },
+  ];
+
+  sobrePilares = [
+    { icon: 'bolt',            text: 'Simplicidade: configure sua arena em minutos, sem treinamento técnico' },
+    { icon: 'groups',          text: 'Foco no gestor: cada funcionalidade foi pensada para o dia a dia da arena' },
+    { icon: 'trending_up',     text: 'Crescimento: acompanhe faturamento e ocupação em tempo real' },
+    { icon: 'verified_user',   text: 'Confiabilidade: infraestrutura segura com 99.9% de disponibilidade' },
   ];
 
   features = [
