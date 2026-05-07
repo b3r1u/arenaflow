@@ -210,15 +210,18 @@ interface PlanOption {
     /* Marketing column */
     .d-marketing {
       flex: 1 1 0; min-width: 0;
-      overflow-y: auto; overflow-x: hidden;
+      overflow: hidden;
       display: flex; flex-direction: column;
       transition: flex-grow 1.4s cubic-bezier(0.16,1,0.3,1),
                   opacity 0.9s ease;
       will-change: flex-grow, opacity;
     }
-    .d-marketing::-webkit-scrollbar { width: 3px; }
-    .d-marketing::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:2px; }
     .d-marketing.collapsed { flex-grow: 0; opacity: 0; pointer-events: none; }
+    .d-mkt-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+    }
+    .d-mkt-scroll::-webkit-scrollbar { width: 3px; }
+    .d-mkt-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:2px; }
 
     /* Login column */
     .d-login {
@@ -733,28 +736,30 @@ interface PlanOption {
 
         <!-- Col 1: Marketing -->
         <div class="d-marketing" [class.collapsed]="phase === 'selected'">
-          <div class="d-mkt-inner anim-fade-up" style="padding:0">
+          <!-- ── Nav (fora do scroll) ──────────────── -->
+          <nav style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;z-index:10;background:rgba(5,14,9,0.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,0.05)">
+            <div style="display:flex;align-items:center;gap:0.55rem">
+              <div style="width:2rem;height:2rem;border-radius:0.5rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center">
+                <span class="material-icons" style="font-size:1.1rem;color:#fff">sports_volleyball</span>
+              </div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.92rem;color:#fff;line-height:1">ArenaFlow</div>
+                <div style="font-size:0.57rem;color:rgba(255,255,255,0.3);line-height:1.3">por Solve</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:1.75rem">
+              <span (click)="scrollToSection('section-planos')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Planos</span>
+              <span (click)="scrollToSection('section-recursos')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Recursos</span>
+              <span (click)="scrollToSection('section-sobre')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Sobre</span>
+            </div>
+            <button (click)="goToLogin()" style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:0.38rem 1rem;border-radius:2rem;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+              Entrar <span class="material-icons" style="font-size:0.85rem">north_east</span>
+            </button>
+          </nav>
 
-            <!-- ── Nav ─────────────────────────────── -->
-            <nav style="display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;position:sticky;top:0;z-index:10;background:rgba(5,14,9,0.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,0.05)">
-              <div style="display:flex;align-items:center;gap:0.55rem">
-                <div style="width:2rem;height:2rem;border-radius:0.5rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center">
-                  <span class="material-icons" style="font-size:1.1rem;color:#fff">sports_volleyball</span>
-                </div>
-                <div>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.92rem;color:#fff;line-height:1">ArenaFlow</div>
-                  <div style="font-size:0.57rem;color:rgba(255,255,255,0.3);line-height:1.3">por Solve</div>
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:1.75rem">
-                <span (click)="scrollToSection('section-planos')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Planos</span>
-                <span (click)="scrollToSection('section-recursos')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Recursos</span>
-                <span (click)="scrollToSection('section-sobre')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Sobre</span>
-              </div>
-              <button (click)="goToLogin()" style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:0.38rem 1rem;border-radius:2rem;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
-                Entrar <span class="material-icons" style="font-size:0.85rem">north_east</span>
-              </button>
-            </nav>
+          <!-- ── Conteúdo rolável ───────────────────── -->
+          <div class="d-mkt-scroll">
+          <div class="d-mkt-inner anim-fade-up" style="padding:0">
 
             <!-- ── Hero ─────────────────────────────── -->
             <div style="display:flex;align-items:center;gap:2rem;padding:3rem 2.5rem 2rem;flex:1;min-height:0">
@@ -922,6 +927,7 @@ interface PlanOption {
             </div>
 
           </div>
+          </div><!-- fim d-mkt-scroll -->
         </div>
 
         <!-- Col 2: Login form -->
@@ -1452,7 +1458,15 @@ export class LoginComponent implements OnInit {
   }
 
   scrollToSection(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Scroll dentro do container rolável (d-mkt-scroll), não no window
+    const scroll = el.closest('.d-mkt-scroll') ?? el.parentElement;
+    if (scroll) {
+      scroll.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   private friendlyError(code: string): string {
