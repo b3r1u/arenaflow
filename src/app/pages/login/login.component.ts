@@ -742,9 +742,9 @@ interface PlanOption {
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:1.75rem">
-                <span style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:default">Planos</span>
-                <span style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:default">Recursos</span>
-                <span style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:default">Sobre</span>
+                <span (click)="scrollToSection('section-planos')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Planos</span>
+                <span (click)="scrollToSection('section-recursos')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Recursos</span>
+                <span (click)="scrollToSection('section-sobre')" style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.01em;cursor:pointer;transition:color 0.2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.38)'">Sobre</span>
               </div>
               <button (click)="goToLogin()" style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:0.38rem 1rem;border-radius:2rem;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
                 Entrar <span class="material-icons" style="font-size:0.85rem">north_east</span>
@@ -798,7 +798,7 @@ interface PlanOption {
             </div>
 
             <!-- ── Etapa 2: Stats ─────────────────── -->
-            <div style="padding:0 2.5rem 2rem">
+            <div id="section-planos" style="padding:0 2.5rem 2rem">
               <div class="stats-strip">
                 <div class="stats-col">
                   <span class="material-icons" style="font-size:1.25rem;color:#4ade80">emoji_events</span>
@@ -824,7 +824,7 @@ interface PlanOption {
             </div>
 
             <!-- ── Etapa 3: Features ──────────────── -->
-            <div style="padding:0 2.5rem 2rem">
+            <div id="section-recursos" style="padding:0 2.5rem 2rem">
               <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.25rem">
                 <div>
                   <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.5rem">
@@ -857,7 +857,7 @@ interface PlanOption {
             </div>
 
             <!-- ── Etapa 4: CTA ───────────────────── -->
-            <div style="padding:0 2.5rem 2rem">
+            <div id="section-sobre" style="padding:0 2.5rem 2rem">
               <div class="cta-block">
                 <div style="position:absolute;top:-70px;right:-70px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none"></div>
                 <div style="position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;border-radius:50%;background:rgba(0,0,0,0.08);pointer-events:none"></div>
@@ -1441,6 +1441,10 @@ export class LoginComponent implements OnInit {
       this.error = 'Não foi possível entrar com Google. Tente novamente.';
       this.loading = false;
     }
+  }
+
+  scrollToSection(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   private friendlyError(code: string): string {
