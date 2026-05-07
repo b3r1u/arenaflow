@@ -460,6 +460,30 @@ interface PlanOption {
     .forgot-btn { background:none; border:none; cursor:pointer; color:#4ade80; font-size:0.75rem; padding:0; }
     .back-form-btn { background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.45); font-size:0.875rem; padding:0; display:flex; align-items:center; gap:0.25rem; margin-bottom:0.75rem; }
     .spin-icon { animation:spin 1s linear infinite; }
+
+    /* ── Stats strip ────────────────────────────── */
+    .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; overflow:hidden; }
+    .stats-col { padding:1.25rem 1rem; border-right:1px solid rgba(255,255,255,0.07); display:flex; flex-direction:column; align-items:flex-start; gap:0.35rem; }
+    .stats-col:last-child { border-right:none; }
+    @media (max-width:700px) {
+      .stats-strip { grid-template-columns:repeat(2,1fr); }
+      .stats-col:nth-child(2) { border-right:none; }
+      .stats-col:nth-child(3), .stats-col:nth-child(4) { border-top:1px solid rgba(255,255,255,0.07); }
+    }
+
+    /* ── Feature cards ──────────────────────────── */
+    .feat-grid-new { display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem; }
+    .feat-card-new {
+      border-radius:1rem; overflow:hidden; position:relative; aspect-ratio:4/3;
+      display:flex; flex-direction:column; justify-content:flex-end; padding:1rem;
+      background:linear-gradient(145deg,rgba(13,50,26,0.9),rgba(4,15,9,0.95));
+      border:1px solid rgba(34,165,92,0.12); transition:border-color 0.2s,transform 0.2s;
+    }
+    .feat-card-new:hover { border-color:rgba(34,165,92,0.35); transform:translateY(-2px); }
+
+    /* ── CTA block ──────────────────────────────── */
+    .cta-block { border-radius:1.5rem; background:linear-gradient(135deg,#1c9e54,#127838); padding:2.5rem; position:relative; overflow:hidden; }
+    @media (max-width:1023px) { .cta-block { padding:1.75rem 1.5rem; border-radius:1.25rem; } }
   `],
   template: `
     <div class="login-root">
@@ -511,28 +535,76 @@ interface PlanOption {
             </button>
           </div>
 
-          <!-- Como funciona -->
-          <div class="m-section" style="padding-top:0">
-            <p class="m-section-title">Como funciona</p>
-            <div class="m-step" *ngFor="let s of steps; let i = index">
-              <div class="m-step-num">{{ i + 1 }}</div>
-              <div>
-                <p style="margin:0 0 0.2rem;font-weight:700;font-size:0.88rem;color:#fff">{{ s.title }}</p>
-                <p style="margin:0;font-size:0.78rem;color:rgba(255,255,255,0.45);line-height:1.45">{{ s.desc }}</p>
+          <!-- Etapa 2: Stats -->
+          <div style="padding:0 1.25rem 1.75rem">
+            <div class="stats-strip">
+              <div class="stats-col">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80">emoji_events</span>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;line-height:1">500+</div>
+                <div style="font-size:0.6rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.04em">Arenas ativas</div>
+              </div>
+              <div class="stats-col">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80">schedule</span>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;line-height:1">24h</div>
+                <div style="font-size:0.6rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.04em">Reservas online</div>
+              </div>
+              <div class="stats-col">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80">verified_user</span>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;line-height:1">99.9%</div>
+                <div style="font-size:0.6rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.04em">Uptime</div>
+              </div>
+              <div class="stats-col">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80">bolt</span>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;line-height:1">14d</div>
+                <div style="font-size:0.6rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.04em">Trial grátis</div>
               </div>
             </div>
           </div>
 
-          <!-- Recursos -->
-          <div class="m-section" style="padding-top:0">
-            <p class="m-section-title">O que você vai ter</p>
-            <div class="m-feat-grid">
-              <div class="m-feat-card" *ngFor="let f of features">
-                <div class="m-feat-icon">
-                  <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
+          <!-- Etapa 3: Features -->
+          <div style="padding:0 1.25rem 1.75rem">
+            <div style="margin-bottom:1rem">
+              <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.4rem">
+                <span style="width:0.45rem;height:0.45rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+                <span style="font-size:0.62rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Recursos</span>
+              </div>
+              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.6rem;color:#fff;margin:0;line-height:1.08;letter-spacing:-0.02em">
+                TUDO QUE SUA<br><span style="color:#4ade80">ARENA PRECISA</span>
+              </h2>
+            </div>
+            <div class="feat-grid-new">
+              <div class="feat-card-new" *ngFor="let f of features | slice:0:4">
+                <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72));z-index:0"></div>
+                <div style="position:absolute;top:0.75rem;left:0.75rem;width:2rem;height:2rem;border-radius:0.5rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:1">
+                  <span class="material-icons" style="font-size:0.95rem;color:#4ade80">{{ f.icon }}</span>
                 </div>
-                <p style="margin:0 0 0.2rem;font-weight:700;font-size:0.82rem;color:#fff">{{ f.title }}</p>
-                <p style="margin:0;font-size:0.72rem;color:rgba(255,255,255,0.4);line-height:1.4">{{ f.desc }}</p>
+                <div style="position:absolute;bottom:0.65rem;right:0.65rem;width:1.4rem;height:1.4rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:1">
+                  <span class="material-icons" style="font-size:0.6rem;color:#4ade80">north_east</span>
+                </div>
+                <div style="position:relative;z-index:1">
+                  <p style="margin:0 0 0.1rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.72rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em">{{ f.title }}</p>
+                  <p style="margin:0;font-size:0.62rem;color:rgba(255,255,255,0.45);line-height:1.35">{{ f.desc }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Etapa 4: CTA -->
+          <div style="padding:0 1.25rem 1.75rem">
+            <div class="cta-block">
+              <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none"></div>
+              <div style="position:absolute;bottom:-30px;left:-20px;width:130px;height:130px;border-radius:50%;background:rgba(0,0,0,0.08);pointer-events:none"></div>
+              <div style="position:relative;z-index:1">
+                <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.8rem;color:#fff;margin:0 0 0.65rem;line-height:1.06;letter-spacing:-0.02em">
+                  PRONTO PARA<br>COMEÇAR?
+                </h2>
+                <p style="font-size:0.82rem;color:rgba(255,255,255,0.68);margin:0 0 1.25rem;line-height:1.55">
+                  14 dias grátis, sem cartão de crédito. Cancele quando quiser.
+                </p>
+                <button (click)="selectPlan(freePlan)" style="display:inline-flex;align-items:center;gap:0.5rem;background:#050e09;border:none;color:#fff;padding:0.7rem 1.35rem;border-radius:2rem;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:0.01em">
+                  Começar gratuitamente
+                  <span class="material-icons" style="font-size:0.9rem">north_east</span>
+                </button>
               </div>
             </div>
           </div>
@@ -721,6 +793,85 @@ interface PlanOption {
                 <div style="position:absolute;bottom:24px;right:-28px;background:rgba(5,14,9,0.93);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.09);border-radius:0.875rem;padding:0.5rem 0.8rem;box-shadow:0 8px 28px rgba(0,0,0,0.45);white-space:nowrap;animation:fadeUp 0.6s 0.6s both">
                   <div style="font-size:0.52rem;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Faturamento mês</div>
                   <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.05rem;color:#fff">R$ 4.800</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Etapa 2: Stats ─────────────────── -->
+            <div style="padding:0 2.5rem 2rem">
+              <div class="stats-strip">
+                <div class="stats-col">
+                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">emoji_events</span>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">500+</div>
+                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Arenas ativas</div>
+                </div>
+                <div class="stats-col">
+                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">schedule</span>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">24h</div>
+                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Reservas online</div>
+                </div>
+                <div class="stats-col">
+                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">verified_user</span>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">99.9%</div>
+                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Uptime garantido</div>
+                </div>
+                <div class="stats-col">
+                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">bolt</span>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">14d</div>
+                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Trial gratuito</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Etapa 3: Features ──────────────── -->
+            <div style="padding:0 2.5rem 2rem">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.25rem">
+                <div>
+                  <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.5rem">
+                    <span style="width:0.5rem;height:0.5rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+                    <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Recursos</span>
+                  </div>
+                  <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0;line-height:1.08;letter-spacing:-0.02em">
+                    TUDO QUE SUA<br><span style="color:#4ade80">ARENA PRECISA</span>
+                  </h2>
+                </div>
+                <p style="font-size:0.72rem;color:rgba(255,255,255,0.32);max-width:190px;text-align:right;line-height:1.5;flex-shrink:0;margin:0">
+                  Uma plataforma completa para gestão esportiva profissional
+                </p>
+              </div>
+              <div class="feat-grid-new">
+                <div class="feat-card-new" *ngFor="let f of features | slice:0:4; let i = index" [style.animation-delay]="(i * 0.08) + 's'">
+                  <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,0.7));z-index:0"></div>
+                  <div style="position:absolute;top:0.85rem;left:0.85rem;width:2.1rem;height:2.1rem;border-radius:0.55rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:1">
+                    <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
+                  </div>
+                  <div style="position:absolute;bottom:0.75rem;right:0.75rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:1">
+                    <span class="material-icons" style="font-size:0.65rem;color:#4ade80">north_east</span>
+                  </div>
+                  <div style="position:relative;z-index:1">
+                    <p style="margin:0 0 0.15rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.78rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em">{{ f.title }}</p>
+                    <p style="margin:0;font-size:0.65rem;color:rgba(255,255,255,0.45);line-height:1.35">{{ f.desc }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Etapa 4: CTA ───────────────────── -->
+            <div style="padding:0 2.5rem 2rem">
+              <div class="cta-block">
+                <div style="position:absolute;top:-70px;right:-70px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none"></div>
+                <div style="position:absolute;bottom:-50px;left:-30px;width:180px;height:180px;border-radius:50%;background:rgba(0,0,0,0.08);pointer-events:none"></div>
+                <div style="position:relative;z-index:1">
+                  <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.6rem,2.4vw,2.2rem);color:#fff;margin:0 0 0.7rem;line-height:1.06;letter-spacing:-0.025em">
+                    PRONTO PARA<br>COMEÇAR?
+                  </h2>
+                  <p style="font-size:0.85rem;color:rgba(255,255,255,0.68);margin:0 0 1.5rem;line-height:1.6;max-width:320px">
+                    Comece a gerenciar sua arena de forma profissional. 14 dias grátis, sem cartão de crédito.
+                  </p>
+                  <button (click)="selectPlan(freePlan)" style="display:inline-flex;align-items:center;gap:0.5rem;background:#050e09;border:none;color:#fff;padding:0.75rem 1.5rem;border-radius:2rem;font-size:0.88rem;font-weight:700;cursor:pointer;transition:opacity 0.2s,transform 0.15s;letter-spacing:0.01em" onmouseover="this.style.opacity='0.82';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+                    Começar gratuitamente
+                    <span class="material-icons" style="font-size:0.95rem">north_east</span>
+                  </button>
                 </div>
               </div>
             </div>
