@@ -541,13 +541,20 @@ interface PlanOption {
             </div>
 
             <!-- Pagos -->
-            <p style="font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.05em;margin:0.25rem 0 0.5rem">Em breve</p>
+            <p style="font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.05em;margin:0.25rem 0 0.5rem">Planos pagos</p>
             <div class="m-paid-row">
-              <div class="m-paid-chip" *ngFor="let p of paidPlans">
-                <div style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">{{ p.name }}</div>
-                <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:800;color:rgba(255,255,255,0.7)">{{ p.priceLabel }}</div>
+              <div class="m-paid-chip" *ngFor="let p of paidPlans"
+                   [style.cursor]="p.available ? 'pointer' : 'default'"
+                   [style.border-color]="p.available ? 'rgba(34,165,92,0.35)' : 'rgba(255,255,255,0.07)'"
+                   [style.background]="p.available ? 'rgba(34,165,92,0.07)' : 'rgba(255,255,255,0.03)'"
+                   (click)="p.available && selectPlan(p)">
+                <div [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.45)'"
+                     style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">{{ p.name }}</div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:800;"
+                     [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.7)'">{{ p.priceLabel }}</div>
                 <div style="font-size:0.6rem;color:rgba(255,255,255,0.28);margin-top:0.1rem">/mês</div>
-                <div style="font-size:0.58rem;color:rgba(255,255,255,0.25);margin-top:0.3rem">Em breve</div>
+                <div style="font-size:0.58rem;margin-top:0.3rem"
+                     [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.25)'">{{ p.available ? 'Selecionar' : 'Em breve' }}</div>
               </div>
             </div>
           </div>
@@ -674,11 +681,20 @@ interface PlanOption {
                 <p style="margin:0.1rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.38)">1 quadra</p>
                 <span style="display:inline-block;margin-top:0.3rem;font-size:0.58rem;font-weight:700;color:#4ade80;background:rgba(34,165,92,0.14);padding:0.1rem 0.35rem;border-radius:0.25rem">Selecionar</span>
               </div>
-              <div class="d-plan-chip" *ngFor="let p of paidPlans">
-                <p style="margin:0 0 0.1rem;font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.32);text-transform:uppercase;letter-spacing:0.04em">{{ p.name }}</p>
-                <p style="margin:0;font-size:0.9rem;font-weight:800;color:rgba(255,255,255,0.6);font-family:'Space Grotesk',sans-serif">{{ p.priceLabel }}</p>
+              <div *ngFor="let p of paidPlans"
+                   class="d-plan-chip"
+                   [class.avail]="p.available"
+                   (click)="p.available && selectPlan(p)">
+                <p style="margin:0 0 0.1rem;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em"
+                   [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.32)'">{{ p.name }}</p>
+                <p style="margin:0;font-size:0.9rem;font-weight:800;font-family:'Space Grotesk',sans-serif"
+                   [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.6)'">{{ p.priceLabel }}</p>
                 <p style="margin:0.1rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.28)">{{ p.courts }}</p>
-                <span style="display:inline-block;margin-top:0.3rem;font-size:0.58rem;color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.04);padding:0.1rem 0.35rem;border-radius:0.25rem">Em breve</span>
+                <span style="display:inline-block;margin-top:0.3rem;font-size:0.58rem;padding:0.1rem 0.35rem;border-radius:0.25rem"
+                      [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.25)'"
+                      [style.background]="p.available ? 'rgba(34,165,92,0.14)' : 'rgba(255,255,255,0.04)'">
+                  {{ p.available ? 'Selecionar' : 'Em breve' }}
+                </span>
               </div>
             </div>
 
@@ -785,15 +801,23 @@ interface PlanOption {
             <!-- Outros planos -->
             <div class="d-other-section" style="animation:featureIn 0.5s 0.55s both">
               <p style="margin:0 0 0.2rem;font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.35)">Quer mais recursos?</p>
-              <p style="margin:0 0 0.6rem;font-size:0.72rem;color:rgba(255,255,255,0.22)">Planos pagos com quadras ilimitadas, relatórios avançados e notificações — em breve.</p>
+              <p style="margin:0 0 0.6rem;font-size:0.72rem;color:rgba(255,255,255,0.22)">Escolha um plano pago e desbloqueie quadras ilimitadas, relatórios avançados e muito mais.</p>
               <div class="d-other-grid">
-                <div class="d-other-chip" *ngFor="let p of paidPlans">
+                <div *ngFor="let p of paidPlans"
+                     class="d-other-chip"
+                     [style.cursor]="p.available ? 'pointer' : 'default'"
+                     [style.border-color]="p.available ? 'rgba(34,165,92,0.3)' : 'rgba(255,255,255,0.07)'"
+                     [style.background]="p.available ? 'rgba(34,165,92,0.06)' : 'rgba(255,255,255,0.03)'"
+                     (click)="p.available && selectPlan(p)">
                   <div style="display:flex;align-items:center;justify-content:center;gap:0.3rem;margin-bottom:0.15rem">
                     <span *ngIf="p.popular" class="material-icons" style="font-size:0.72rem;color:#4ade80">star</span>
-                    <span style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.5)">{{ p.name }}</span>
+                    <span style="font-size:0.7rem;font-weight:700;"
+                          [style.color]="p.available ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.5)'">{{ p.name }}</span>
                   </div>
-                  <span style="font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:800;color:rgba(255,255,255,0.65)">{{ p.priceLabel }}</span>
-                  <span style="display:block;font-size:0.58rem;color:rgba(255,255,255,0.24);margin-top:0.25rem">Em breve</span>
+                  <span style="font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:800;"
+                        [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.65)'">{{ p.priceLabel }}</span>
+                  <span style="display:block;font-size:0.58rem;margin-top:0.25rem"
+                        [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.24)'">{{ p.available ? 'Selecionar →' : 'Em breve' }}</span>
                 </div>
               </div>
             </div>
