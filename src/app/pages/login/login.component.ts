@@ -384,6 +384,39 @@ interface PlanOption {
     }
 
     /* Other plans */
+    /* Plan detail redesign */
+    .d-plan-header-card {
+      padding:1.25rem; border-radius:1rem;
+      background:linear-gradient(135deg,rgba(34,165,92,0.14),rgba(16,163,74,0.05));
+      border:1px solid rgba(34,165,92,0.22); margin-bottom:1.25rem;
+      animation:slideInR 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .d-plan-feat-row {
+      display:flex; align-items:flex-start; gap:0.75rem;
+      padding:0.6rem 0; border-bottom:1px solid rgba(255,255,255,0.05);
+      animation:featureIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .d-plan-feat-row:last-child { border-bottom:none; }
+    .d-plan-feat-ico {
+      width:2rem; height:2rem; border-radius:0.5rem;
+      background:rgba(34,165,92,0.12);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .plan-nav-strip {
+      display:flex; gap:0.4rem; padding-top:1rem;
+      margin-top:auto; border-top:1px solid rgba(255,255,255,0.07);
+    }
+    .plan-nav-pill {
+      flex:1; padding:0.5rem 0.2rem; border-radius:0.65rem; text-align:center;
+      font-size:0.68rem; font-weight:700; cursor:pointer; transition:all 0.18s;
+      border:1px solid rgba(255,255,255,0.08); background:transparent;
+      color:rgba(255,255,255,0.35); font-family:'Space Grotesk',sans-serif; line-height:1.3;
+    }
+    .plan-nav-pill.active {
+      background:rgba(34,165,92,0.15); border-color:rgba(34,165,92,0.4); color:#4ade80;
+    }
+    .plan-nav-pill:hover:not(.active) { background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.65); }
+    .plan-nav-pill.unavail { opacity:0.35; cursor:default; pointer-events:none; }
     .d-other-section { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.07); }
     .d-other-grid { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
     .d-other-chip {
@@ -602,7 +635,7 @@ interface PlanOption {
             </button>
           </div>
           <div class="glass-card anim-slide-r" style="margin-top:0.75rem">
-            <ng-container *ngTemplateOutlet="authForm"></ng-container>
+            <ng-container *ngTemplateOutlet="selectedPlan && selectedPlan.price > 0 ? cardForm : authForm"></ng-container>
           </div>
         </div>
 
@@ -736,91 +769,88 @@ interface PlanOption {
               </button>
             </div>
 
-            <ng-container *ngTemplateOutlet="phase === 'payment' ? cardForm : authForm"></ng-container>
+            <ng-container *ngTemplateOutlet="selectedPlan && selectedPlan.price > 0 ? cardForm : authForm"></ng-container>
           </div>
         </div>
 
-        <!-- Col 3: Plan detail (creative) -->
+        <!-- Col 3: Plan detail -->
         <div class="d-detail" [class.visible]="phase === 'selected'">
           <div class="d-detail-bg"></div>
           <div class="d-detail-orb"></div>
 
           <div *ngIf="selectedPlan" class="d-detail-content">
 
-            <button class="d-back-btn" (click)="clearSelection()">
-              <span class="material-icons" style="font-size:0.88rem">arrow_back</span>
-              Trocar plano
-            </button>
-
-            <!-- Plan hero -->
-            <div class="d-plan-hero anim-slide-r">
-              <div style="flex:1">
-                <div class="d-plan-tag">
-                  <span class="material-icons" style="font-size:0.78rem">check_circle</span>
-                  Plano selecionado
-                </div>
-                <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.65rem;color:#fff;margin:0 0 0.35rem;letter-spacing:-0.01em">
-                  {{ selectedPlan.name }}
-                </h2>
-                <p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.38)">{{ selectedPlan.courts }} · gestão completa</p>
-              </div>
-              <div style="text-align:right;flex-shrink:0">
-                <div class="d-plan-price-display">{{ selectedPlan.priceLabel }}</div>
-                <div class="d-plan-price-sub">{{ selectedPlan.price === 0 ? 'para sempre' : '/mês' }}</div>
-              </div>
-            </div>
-
-            <!-- Trial callout -->
-            <div *ngIf="selectedPlan.id === 'free'" class="d-trial-card anim-fade-up" style="animation-delay:0.1s">
-              <div class="d-trial-icon-wrap">
-                <span class="material-icons" style="font-size:1.25rem;color:#4ade80">auto_awesome</span>
-              </div>
-              <div style="position:relative;z-index:1">
-                <p style="margin:0 0 0.3rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1rem;color:#fff">
-                  14 dias com o Plano Pro, grátis
-                </p>
-                <p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);line-height:1.5">
-                  Explore agendamentos avançados, relatórios completos e todos os recursos premium durante o período de teste — sem necessidade de cartão de crédito.
-                </p>
-              </div>
-            </div>
-
-            <!-- Feature cards 2x2 -->
-            <p style="margin:0 0 0.75rem;font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.05em">O que está incluso</p>
-            <div class="d-feature-grid">
-              <div class="d-feature-card" *ngFor="let f of selectedPlan.features; let i = index"
-                   [style.animation-delay]="(0.12 + i * 0.08) + 's'">
-                <div class="d-feature-card-icon">
-                  <span class="material-icons" style="font-size:1.1rem;color:#4ade80">{{ f.icon }}</span>
-                </div>
-                <p style="margin:0 0 0.2rem;font-weight:700;font-size:0.85rem;color:#fff">{{ f.title }}</p>
-                <p style="margin:0;font-size:0.75rem;color:rgba(255,255,255,0.42);line-height:1.4">{{ f.desc }}</p>
-              </div>
-            </div>
-
-            <!-- Outros planos -->
-            <div class="d-other-section" style="animation:featureIn 0.5s 0.55s both">
-              <p style="margin:0 0 0.2rem;font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.35)">Quer mais recursos?</p>
-              <p style="margin:0 0 0.6rem;font-size:0.72rem;color:rgba(255,255,255,0.22)">Escolha um plano pago e desbloqueie quadras ilimitadas, relatórios avançados e muito mais.</p>
-              <div class="d-other-grid">
-                <div *ngFor="let p of paidPlans"
-                     class="d-other-chip"
-                     [style.cursor]="p.available ? 'pointer' : 'default'"
-                     [style.border-color]="p.available ? 'rgba(34,165,92,0.3)' : 'rgba(255,255,255,0.07)'"
-                     [style.background]="p.available ? 'rgba(34,165,92,0.06)' : 'rgba(255,255,255,0.03)'"
-                     (click)="p.available && selectPlan(p)">
-                  <div style="display:flex;align-items:center;justify-content:center;gap:0.3rem;margin-bottom:0.15rem">
-                    <span *ngIf="p.popular" class="material-icons" style="font-size:0.72rem;color:#4ade80">star</span>
-                    <span style="font-size:0.7rem;font-weight:700;"
-                          [style.color]="p.available ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.5)'">{{ p.name }}</span>
+            <!-- Header do plano -->
+            <div class="d-plan-header-card">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem">
+                <div>
+                  <div *ngIf="selectedPlan.popular" style="display:inline-flex;align-items:center;gap:0.25rem;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.35);border-radius:999px;padding:0.15rem 0.6rem;margin-bottom:0.5rem">
+                    <span class="material-icons" style="font-size:0.72rem;color:#4ade80">star</span>
+                    <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.06em">Mais popular</span>
                   </div>
-                  <span style="font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:800;"
-                        [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.65)'">{{ p.priceLabel }}</span>
-                  <span style="display:block;font-size:0.58rem;margin-top:0.25rem"
-                        [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.24)'">{{ p.available ? 'Selecionar →' : 'Em breve' }}</span>
+                  <div class="d-plan-tag">
+                    <span class="material-icons" style="font-size:0.78rem">check_circle</span>
+                    Plano selecionado
+                  </div>
+                  <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;margin:0.3rem 0 0.25rem;letter-spacing:-0.01em">
+                    {{ selectedPlan.name }}
+                  </h2>
+                  <p style="margin:0;font-size:0.78rem;color:rgba(255,255,255,0.4)">{{ selectedPlan.courts }} · gestão completa</p>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                  <div class="d-plan-price-display">{{ selectedPlan.priceLabel }}</div>
+                  <div class="d-plan-price-sub">{{ selectedPlan.price === 0 ? 'para sempre' : '/mês' }}</div>
+                </div>
+              </div>
+
+              <!-- Callout free: trial -->
+              <div *ngIf="selectedPlan.price === 0" style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.75rem;border-radius:0.65rem;background:rgba(34,165,92,0.1);border:1px solid rgba(34,165,92,0.22)">
+                <span class="material-icons" style="font-size:1rem;color:#4ade80;flex-shrink:0">auto_awesome</span>
+                <span style="font-size:0.73rem;color:rgba(255,255,255,0.65);line-height:1.4">
+                  <strong style="color:#4ade80">14 dias grátis</strong> com acesso ao Plano Pro — sem cartão de crédito
+                </span>
+              </div>
+
+              <!-- Callout pago: segurança -->
+              <div *ngIf="selectedPlan.price > 0" style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.75rem;border-radius:0.65rem;background:rgba(34,165,92,0.08);border:1px solid rgba(34,165,92,0.15)">
+                <span class="material-icons" style="font-size:1rem;color:#4ade80;flex-shrink:0">verified_user</span>
+                <span style="font-size:0.73rem;color:rgba(255,255,255,0.55);line-height:1.4">
+                  Pagamento seguro via Pagar.me · Cancele quando quiser
+                </span>
+              </div>
+            </div>
+
+            <!-- Lista de features -->
+            <p style="margin:0 0 0.6rem;font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:0.05em">O que está incluso</p>
+            <div style="margin-bottom:1rem">
+              <div class="d-plan-feat-row" *ngFor="let f of selectedPlan.features; let i = index"
+                   [style.animation-delay]="(0.1 + i * 0.07) + 's'">
+                <div class="d-plan-feat-ico">
+                  <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
+                </div>
+                <div>
+                  <p style="margin:0 0 0.1rem;font-weight:700;font-size:0.83rem;color:#fff">{{ f.title }}</p>
+                  <p *ngIf="f.desc" style="margin:0;font-size:0.72rem;color:rgba(255,255,255,0.38);line-height:1.35">{{ f.desc }}</p>
                 </div>
               </div>
             </div>
+
+            <!-- Navegação inferior entre planos -->
+            <div class="plan-nav-strip">
+              <button class="plan-nav-pill"
+                      [class.active]="selectedPlan.id === freePlan.id"
+                      (click)="selectPlan(freePlan)">
+                Free<br><span style="font-size:0.58rem;font-weight:400">Grátis</span>
+              </button>
+              <button *ngFor="let p of paidPlans"
+                      class="plan-nav-pill"
+                      [class.active]="selectedPlan.id === p.id"
+                      [class.unavail]="!p.available"
+                      (click)="p.available && selectPlan(p)">
+                {{ p.name }}<br><span style="font-size:0.58rem;font-weight:400">{{ p.priceLabel }}</span>
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1060,26 +1090,15 @@ export class LoginComponent implements OnInit {
   selectPlan(plan: PlanOption) {
     if (!plan.available) return;
     this.selectedPlan = plan;
+    this.mode = 'login';
     this.error = ''; this.success = ''; this.checkoutError = '';
-
-    if (plan.price > 0) {
-      // Plano pago → vai direto para o checkout de cartão
-      this.phase = 'payment';
-      this.landingExiting = true;
-      setTimeout(() => {
-        this.mobileStep = 'payment';
-        this.landingExiting = false;
-      }, 380);
-    } else {
-      // Plano free → mostra formulário de login/Google
-      this.mode = 'login';
-      this.phase = 'selected';
-      this.landingExiting = true;
-      setTimeout(() => {
-        this.mobileStep = 'auth';
-        this.landingExiting = false;
-      }, 380);
-    }
+    // Todos os planos → mesmo painel direito com animação slide
+    this.phase = 'selected';
+    this.landingExiting = true;
+    setTimeout(() => {
+      this.mobileStep = 'auth';
+      this.landingExiting = false;
+    }, 380);
   }
 
   clearSelection() {
@@ -1112,14 +1131,9 @@ export class LoginComponent implements OnInit {
     this.checkoutError = '';
     this.cardNumber = ''; this.cardHolder = ''; this.cardExpiry = '';
     this.cardCvv = ''; this.cardDocument = ''; this.cardPhone = '';
-    this.selectedPlan = null;
-    this.phase = 'browse';
-    this.landingExiting = false;
-    this.authExiting = true;
-    setTimeout(() => {
-      this.mobileStep = 'landing';
-      this.authExiting = false;
-    }, 320);
+    // Volta para detalhes do plano (mesmo painel, só limpa o checkout)
+    this.phase = 'selected';
+    this.mobileStep = 'auth';
   }
 
   onCardNumberInput(e: Event) {
