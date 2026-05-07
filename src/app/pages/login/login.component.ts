@@ -26,10 +26,16 @@ function featureToDisplay(key: string): { icon: string; title: string; desc: str
   return FEATURE_MAP[key] ?? { icon: 'check_circle', title: key, desc: '' };
 }
 
+const PLAN_DESCS: Record<string, string> = {
+  free:       'Para gestores que estão dando os primeiros passos na gestão esportiva.',
+  pro:        'Para arenas em crescimento com mais quadras e recursos avançados.',
+  enterprise: 'Para redes de arenas e operações profissionais de alto volume.',
+};
+
 interface PlanOption {
   id: string; name: string; priceLabel: string; price: number;
   courts: string; features: { icon: string; title: string; desc: string }[];
-  available: boolean; popular: boolean;
+  available: boolean; popular: boolean; desc?: string;
 }
 
 @Component({
@@ -632,10 +638,13 @@ interface PlanOption {
             <p style="font-size:0.82rem;color:rgba(255,255,255,0.48);margin:0 0 1.25rem;line-height:1.6">
               Centralizamos tudo — reservas online 24h, financeiro, clientes e mensalistas — em um único painel acessível de qualquer dispositivo.
             </p>
-            <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.25rem">
-              <div *ngFor="let p of sobrePilares" style="display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.75rem;border-radius:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)">
-                <span class="material-icons" style="font-size:0.9rem;color:#4ade80;flex-shrink:0">{{ p.icon }}</span>
-                <span style="font-size:0.78rem;color:rgba(255,255,255,0.55)">{{ p.text }}</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.55rem;margin-bottom:1.25rem">
+              <div *ngFor="let p of sobrePilares" style="border-radius:0.875rem;padding:0.85rem 0.85rem 1rem;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.07)">
+                <div style="width:2rem;height:2rem;border-radius:0.5rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.22);display:flex;align-items:center;justify-content:center;margin-bottom:0.5rem">
+                  <span class="material-icons" style="font-size:0.95rem;color:#4ade80">{{ p.icon }}</span>
+                </div>
+                <p style="margin:0 0 0.2rem;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.75rem;color:#fff">{{ p.title }}</p>
+                <p style="margin:0;font-size:0.67rem;color:rgba(255,255,255,0.45);line-height:1.45">{{ p.desc }}</p>
               </div>
             </div>
             <!-- Card Solve mobile -->
@@ -654,58 +663,65 @@ interface PlanOption {
 
           <!-- Planos -->
           <div class="m-section" style="padding-top:0">
-            <p class="m-section-title">Escolha seu plano</p>
+            <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.5rem">
+              <span style="width:0.42rem;height:0.42rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+              <span style="font-size:0.6rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Planos</span>
+            </div>
+            <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.45rem;color:#fff;margin:0 0 1.1rem;line-height:1.08;letter-spacing:-0.02em">
+              ESCOLHA SEU <span style="color:#4ade80">PLANO</span>
+            </h2>
 
-            <!-- Free -->
-            <div class="m-free-card">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">
-                <div>
-                  <div style="display:flex;align-items:center;gap:0.45rem;margin-bottom:0.3rem">
-                    <span style="font-size:0.65rem;font-weight:800;color:#4ade80;text-transform:uppercase;letter-spacing:0.06em">Free</span>
-                    <span style="font-size:0.6rem;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.32);color:#4ade80;padding:0.1rem 0.45rem;border-radius:2rem;font-weight:700">Disponível</span>
-                  </div>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-size:2.25rem;font-weight:900;color:#fff;line-height:1">Grátis</div>
-                  <div style="font-size:0.75rem;color:rgba(255,255,255,0.4)">para sempre</div>
-                </div>
-                <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;background:rgba(34,165,92,0.14);display:flex;align-items:center;justify-content:center">
-                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">store</span>
+            <!-- Card Free -->
+            <div (click)="selectPlan(freePlan)"
+                 style="border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:1.25rem;display:flex;flex-direction:column;margin-bottom:0.65rem;cursor:pointer">
+              <p style="margin:0 0 0.5rem;font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.07em">Free</p>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.2rem;color:#fff;line-height:1;margin-bottom:0.15rem">Grátis</div>
+              <p style="margin:0 0 0.85rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">para sempre</p>
+              <p style="margin:0 0 1rem;font-size:0.72rem;color:rgba(255,255,255,0.48);line-height:1.5">{{ freePlan.desc }}</p>
+              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.25rem">
+                <div *ngFor="let f of freePlan.features" style="display:flex;align-items:center;gap:0.5rem">
+                  <span class="material-icons" style="font-size:0.85rem;color:#4ade80;flex-shrink:0">check</span>
+                  <span style="font-size:0.75rem;color:rgba(255,255,255,0.65)">{{ f.title }}</span>
                 </div>
               </div>
-              <div style="margin-bottom:1rem">
-                <div *ngFor="let f of freePlan.features" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem">
-                  <span class="material-icons" style="font-size:0.88rem;color:#4ade80;flex-shrink:0">check_circle</span>
-                  <span style="font-size:0.8rem;color:rgba(255,255,255,0.7)">{{ f.title }}</span>
-                </div>
-              </div>
-              <div style="padding:0.7rem 0.9rem;border-radius:0.75rem;background:rgba(34,165,92,0.08);border:1px solid rgba(34,165,92,0.18);margin-bottom:1rem">
-                <div style="display:flex;align-items:center;gap:0.4rem">
-                  <span class="material-icons" style="font-size:0.9rem;color:#4ade80">auto_awesome</span>
-                  <span style="font-size:0.75rem;font-weight:700;color:#4ade80">14 dias com acesso ao Plano Pro</span>
-                </div>
-                <p style="margin:0.2rem 0 0;font-size:0.7rem;color:rgba(255,255,255,0.4)">Explore todos os recursos gratuitamente no período de teste.</p>
-              </div>
-              <button class="m-btn-free" (click)="selectPlan(freePlan)">
-                Começar com o plano Free
-                <span class="material-icons" style="font-size:1rem">arrow_forward</span>
+              <button class="m-btn-free">
+                Escolher plano
+                <span class="material-icons" style="font-size:0.9rem">arrow_forward</span>
               </button>
             </div>
 
-            <!-- Pagos -->
-            <p style="font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.05em;margin:0.25rem 0 0.5rem">Planos pagos</p>
-            <div class="m-paid-row">
-              <div class="m-paid-chip" *ngFor="let p of paidPlans"
-                   [style.cursor]="p.available ? 'pointer' : 'default'"
-                   [style.border-color]="p.available ? 'rgba(34,165,92,0.35)' : 'rgba(255,255,255,0.07)'"
-                   [style.background]="p.available ? 'rgba(34,165,92,0.07)' : 'rgba(255,255,255,0.03)'"
-                   (click)="p.available && selectPlan(p)">
-                <div [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.45)'"
-                     style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">{{ p.name }}</div>
-                <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:800;"
-                     [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.7)'">{{ p.priceLabel }}</div>
-                <div style="font-size:0.6rem;color:rgba(255,255,255,0.28);margin-top:0.1rem">/mês</div>
-                <div style="font-size:0.58rem;margin-top:0.3rem"
-                     [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.25)'">{{ p.available ? 'Selecionar' : 'Em breve' }}</div>
+            <!-- Cards pagos -->
+            <div *ngFor="let p of paidPlans"
+                 (click)="p.available && selectPlan(p)"
+                 [style.cursor]="p.available ? 'pointer' : 'default'"
+                 [style.border]="p.popular ? '1px solid rgba(34,165,92,0.4)' : '1px solid rgba(255,255,255,0.09)'"
+                 [style.background]="p.popular ? 'rgba(34,165,92,0.06)' : 'rgba(255,255,255,0.04)'"
+                 style="border-radius:1.25rem;padding:1.25rem;display:flex;flex-direction:column;margin-bottom:0.65rem;position:relative">
+              <div *ngIf="p.popular" style="position:absolute;top:-0.6rem;left:1.25rem;background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.18rem 0.7rem">
+                <span style="font-size:0.58rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.06em">Mais popular</span>
               </div>
+              <p style="margin:0 0 0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em"
+                 [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.28)'">{{ p.name }}</p>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2rem;line-height:1;margin-bottom:0.15rem"
+                   [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.4)'">{{ p.priceLabel }}</div>
+              <p style="margin:0 0 0.85rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">/mês</p>
+              <p style="margin:0 0 1rem;font-size:0.72rem;color:rgba(255,255,255,0.48);line-height:1.5">{{ p.desc || p.courts }}</p>
+              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.25rem">
+                <div *ngFor="let f of p.features" style="display:flex;align-items:center;gap:0.5rem">
+                  <span class="material-icons" style="font-size:0.85rem;flex-shrink:0"
+                        [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.2)'">check</span>
+                  <span style="font-size:0.75rem"
+                        [style.color]="p.available ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.28)'">{{ f.title }}</span>
+                </div>
+              </div>
+              <button [disabled]="!p.available"
+                      [style.background]="p.available && p.popular ? 'linear-gradient(135deg,#22a55c,#16a34a)' : 'transparent'"
+                      [style.border]="p.available ? (p.popular ? 'none' : '1px solid rgba(255,255,255,0.18)') : '1px solid rgba(255,255,255,0.08)'"
+                      [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.28)'"
+                      [style.cursor]="p.available ? 'pointer' : 'default'"
+                      style="width:100%;padding:0.7rem;border-radius:0.875rem;font-weight:700;font-size:0.82rem;font-family:'Space Grotesk',sans-serif">
+                {{ p.available ? 'Escolher plano' : 'Em breve' }}
+              </button>
             </div>
           </div>
 
@@ -796,77 +812,114 @@ interface PlanOption {
           <div class="d-mkt-scroll">
           <div class="d-mkt-inner anim-fade-up" style="padding:0">
 
-            <!-- ── Hero ─────────────────────────────── -->
-            <div style="display:flex;align-items:center;gap:2rem;padding:3rem 2.5rem 2rem;flex:1;min-height:0">
+            <!-- ══════════════════════════════════════════
+                 HERO + STATS — wrapper com imagem de fundo
+            ══════════════════════════════════════════ -->
+            <div style="position:relative;overflow:hidden">
 
-              <!-- Texto -->
-              <div style="flex:1;min-width:0">
-                <div style="display:inline-flex;align-items:center;gap:0.45rem;background:rgba(34,165,92,0.1);border:1px solid rgba(34,165,92,0.28);border-radius:2rem;padding:0.28rem 0.8rem;margin-bottom:1.5rem">
-                  <span style="width:0.42rem;height:0.42rem;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>
-                  <span style="font-size:0.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.08em">Software de Gestão Esportiva</span>
-                </div>
-                <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(2.1rem,3vw,3.4rem);color:#fff;margin:0 0 1rem;line-height:1.04;letter-spacing:-0.025em">
-                  GERENCIE<br>SUA ARENA<br><span style="color:#4ade80">COM INTELIGÊNCIA</span>
-                </h1>
-                <p style="font-size:0.875rem;color:rgba(255,255,255,0.42);margin:0 0 2rem;line-height:1.65;max-width:360px">
-                  Reservas online, gestão de quadras, mensalistas e relatórios em uma plataforma completa para sua arena esportiva.
-                </p>
-                <button (click)="selectPlan(freePlan)" style="display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,#22a55c,#16a34a);border:none;color:#fff;padding:0.8rem 1.75rem;border-radius:2rem;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.01em;box-shadow:0 6px 28px rgba(34,165,92,0.38);transition:opacity 0.2s,transform 0.15s" onmouseover="this.style.opacity='0.88';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
-                  Começar gratuitamente
-                  <span class="material-icons" style="font-size:1rem">north_east</span>
-                </button>
+              <!-- Imagem de fundo: ocupa todo o wrapper (hero + stats) -->
+              <img src="assets/hero-beach.jpg" alt=""
+                   style="position:absolute;top:0;left:0;width:100%;height:100%;
+                          object-fit:cover;object-position:center 22%;
+                          z-index:0;opacity:0.62;pointer-events:none;
+                          display:block">
+
+              <!-- Camada 1 – escurece a esquerda p/ legibilidade do texto -->
+              <div style="position:absolute;inset:0;z-index:1;pointer-events:none;
+                          background:linear-gradient(to right,
+                            rgba(5,14,9,0.92) 0%,
+                            rgba(5,14,9,0.70) 28%,
+                            rgba(5,14,9,0.20) 58%,
+                            transparent      100%)">
               </div>
 
-              <!-- Visual card -->
-              <div style="flex:0 0 auto;width:clamp(180px,24%,250px);position:relative">
-                <div style="border-radius:1.5rem;overflow:hidden;position:relative;aspect-ratio:3/4;background:linear-gradient(150deg,#0d3320 0%,#072414 50%,#040f09 100%);border:1px solid rgba(34,165,92,0.18)">
-                  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(34,165,92,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(34,165,92,0.05) 1px,transparent 1px);background-size:28px 28px"></div>
-                  <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(34,165,92,0.22),transparent 70%);filter:blur(24px)"></div>
-                  <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(34,165,92,0.12),transparent 70%);filter:blur(20px)"></div>
-                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem">
-                    <span class="material-icons" style="font-size:4.5rem;color:rgba(34,165,92,0.45)">sports_volleyball</span>
-                    <span style="font-family:'Space Grotesk',sans-serif;font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.12);text-transform:uppercase;letter-spacing:0.14em">ArenaFlow</span>
+              <!-- Camada 2 – degradê vertical: visível no topo, some completamente no fundo -->
+              <div style="position:absolute;inset:0;z-index:2;pointer-events:none;
+                          background:linear-gradient(to bottom,
+                            transparent           0%,
+                            rgba(5,14,9,0.0)     40%,
+                            rgba(5,14,9,0.55)    68%,
+                            rgba(5,14,9,0.92)    84%,
+                            #050e09              100%)">
+              </div>
+
+              <!-- Conteúdo: hero + stats em z-index:3 acima de tudo -->
+              <div style="position:relative;z-index:3">
+
+                <!-- ── Hero ──────────────────────────── -->
+                <div style="display:flex;align-items:center;gap:2rem;padding:3.5rem 2.5rem 2.5rem">
+
+                  <!-- Texto -->
+                  <div style="flex:1;min-width:0">
+                    <div style="display:inline-flex;align-items:center;gap:0.45rem;background:rgba(34,165,92,0.1);border:1px solid rgba(34,165,92,0.28);border-radius:2rem;padding:0.28rem 0.8rem;margin-bottom:1.5rem">
+                      <span style="width:0.42rem;height:0.42rem;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>
+                      <span style="font-size:0.67rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.08em">Software de Gestão Esportiva</span>
+                    </div>
+                    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(2.1rem,3vw,3.4rem);color:#fff;margin:0 0 1rem;line-height:1.04;letter-spacing:-0.025em">
+                      GERENCIE<br>SUA ARENA<br><span style="color:#4ade80">COM INTELIGÊNCIA</span>
+                    </h1>
+                    <p style="font-size:0.875rem;color:rgba(255,255,255,0.5);margin:0 0 2rem;line-height:1.65;max-width:360px">
+                      Reservas online, gestão de quadras, mensalistas e relatórios em uma plataforma completa para sua arena esportiva.
+                    </p>
+                    <button (click)="selectPlan(freePlan)" style="display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,#22a55c,#16a34a);border:none;color:#fff;padding:0.8rem 1.75rem;border-radius:2rem;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.01em;box-shadow:0 6px 28px rgba(34,165,92,0.38);transition:opacity 0.2s,transform 0.15s" onmouseover="this.style.opacity='0.88';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+                      Começar gratuitamente
+                      <span class="material-icons" style="font-size:1rem">north_east</span>
+                    </button>
                   </div>
-                  <div style="position:absolute;bottom:0;left:12%;right:12%;height:32%;border-top:1.5px solid rgba(34,165,92,0.13);border-left:1.5px solid rgba(34,165,92,0.08);border-right:1.5px solid rgba(34,165,92,0.08)"></div>
-                </div>
-                <!-- Mini card: reservas -->
-                <div style="position:absolute;top:-14px;left:-24px;background:rgba(5,14,9,0.93);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.09);border-radius:0.875rem;padding:0.5rem 0.8rem;box-shadow:0 8px 28px rgba(0,0,0,0.45);white-space:nowrap;animation:fadeUp 0.6s 0.4s both">
-                  <div style="font-size:0.52rem;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Reservas hoje</div>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.05rem;color:#4ade80">24</div>
-                </div>
-                <!-- Mini card: faturamento -->
-                <div style="position:absolute;bottom:24px;right:-28px;background:rgba(5,14,9,0.93);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.09);border-radius:0.875rem;padding:0.5rem 0.8rem;box-shadow:0 8px 28px rgba(0,0,0,0.45);white-space:nowrap;animation:fadeUp 0.6s 0.6s both">
-                  <div style="font-size:0.52rem;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Faturamento mês</div>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.05rem;color:#fff">R$ 4.800</div>
-                </div>
-              </div>
-            </div>
 
-            <!-- ── Etapa 2: Stats ─────────────────── -->
-            <div style="padding:0 2.5rem 2rem">
-              <div class="stats-strip">
-                <div class="stats-col">
-                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">emoji_events</span>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">500+</div>
-                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Arenas ativas</div>
-                </div>
-                <div class="stats-col">
-                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">schedule</span>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">24h</div>
-                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Reservas online</div>
-                </div>
-                <div class="stats-col">
-                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">verified_user</span>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">99.9%</div>
-                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Uptime garantido</div>
-                </div>
-                <div class="stats-col">
-                  <span class="material-icons" style="font-size:1.25rem;color:#4ade80">bolt</span>
-                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">14d</div>
-                  <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Trial gratuito</div>
-                </div>
-              </div>
-            </div>
+                  <!-- Visual card -->
+                  <div style="flex:0 0 auto;width:clamp(180px,24%,250px);position:relative">
+                    <div style="border-radius:1.5rem;overflow:hidden;position:relative;aspect-ratio:3/4;background:linear-gradient(150deg,#0d3320 0%,#072414 50%,#040f09 100%);border:1px solid rgba(34,165,92,0.18)">
+                      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(34,165,92,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(34,165,92,0.05) 1px,transparent 1px);background-size:28px 28px"></div>
+                      <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(34,165,92,0.22),transparent 70%);filter:blur(24px)"></div>
+                      <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(34,165,92,0.12),transparent 70%);filter:blur(20px)"></div>
+                      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem">
+                        <span class="material-icons" style="font-size:4.5rem;color:rgba(34,165,92,0.45)">sports_volleyball</span>
+                        <span style="font-family:'Space Grotesk',sans-serif;font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.12);text-transform:uppercase;letter-spacing:0.14em">ArenaFlow</span>
+                      </div>
+                      <div style="position:absolute;bottom:0;left:12%;right:12%;height:32%;border-top:1.5px solid rgba(34,165,92,0.13);border-left:1.5px solid rgba(34,165,92,0.08);border-right:1.5px solid rgba(34,165,92,0.08)"></div>
+                    </div>
+                    <!-- Mini card: reservas -->
+                    <div style="position:absolute;top:-14px;left:-24px;background:rgba(5,14,9,0.93);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.09);border-radius:0.875rem;padding:0.5rem 0.8rem;box-shadow:0 8px 28px rgba(0,0,0,0.45);white-space:nowrap;animation:fadeUp 0.6s 0.4s both">
+                      <div style="font-size:0.52rem;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Reservas hoje</div>
+                      <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.05rem;color:#4ade80">24</div>
+                    </div>
+                    <!-- Mini card: faturamento -->
+                    <div style="position:absolute;bottom:24px;right:-28px;background:rgba(5,14,9,0.93);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.09);border-radius:0.875rem;padding:0.5rem 0.8rem;box-shadow:0 8px 28px rgba(0,0,0,0.45);white-space:nowrap;animation:fadeUp 0.6s 0.6s both">
+                      <div style="font-size:0.52rem;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Faturamento mês</div>
+                      <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.05rem;color:#fff">R$ 4.800</div>
+                    </div>
+                  </div>
+                </div><!-- fim hero row -->
+
+                <!-- ── Stats ──────────────────────────── -->
+                <div style="padding:0 2.5rem 3.5rem">
+                  <div class="stats-strip">
+                    <div class="stats-col">
+                      <span class="material-icons" style="font-size:1.25rem;color:#4ade80">emoji_events</span>
+                      <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">500+</div>
+                      <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Arenas ativas</div>
+                    </div>
+                    <div class="stats-col">
+                      <span class="material-icons" style="font-size:1.25rem;color:#4ade80">schedule</span>
+                      <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">24h</div>
+                      <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Reservas online</div>
+                    </div>
+                    <div class="stats-col">
+                      <span class="material-icons" style="font-size:1.25rem;color:#4ade80">verified_user</span>
+                      <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">99.9%</div>
+                      <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Uptime garantido</div>
+                    </div>
+                    <div class="stats-col">
+                      <span class="material-icons" style="font-size:1.25rem;color:#4ade80">bolt</span>
+                      <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;line-height:1">14d</div>
+                      <div style="font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.36);text-transform:uppercase;letter-spacing:0.05em">Trial gratuito</div>
+                    </div>
+                  </div>
+                </div><!-- fim stats -->
+
+              </div><!-- fim z-index:3 -->
+            </div><!-- fim wrapper com imagem de fundo -->
 
             <!-- ── Etapa 3: Features ──────────────── -->
             <div id="section-recursos" style="padding:0 2.5rem 2rem">
@@ -927,41 +980,42 @@ interface PlanOption {
                 <span style="width:0.5rem;height:0.5rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
                 <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Sobre o ArenaFlow</span>
               </div>
-              <div style="display:flex;gap:2rem;align-items:flex-start">
 
-                <!-- Texto -->
-                <div style="flex:1;min-width:0">
-                  <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0 0 1rem;line-height:1.08;letter-spacing:-0.02em">
-                    UMA PLATAFORMA CRIADA<br>PARA QUEM <span style="color:#4ade80">GERENCIA ARENAS</span>
-                  </h2>
-                  <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0 0 0.85rem;line-height:1.65">
-                    O ArenaFlow nasceu de uma necessidade real: gestores de arenas esportivas perdiam horas gerenciando reservas por telefone, planilhas e anotações manuais. Queríamos mudar isso.
-                  </p>
-                  <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0 0 1.25rem;line-height:1.65">
-                    Nossa plataforma centraliza tudo — reservas online 24h, controle financeiro, cadastro de clientes e mensalistas — em um único painel intuitivo, acessível de qualquer dispositivo.
-                  </p>
-                  <!-- Pilares -->
-                  <div style="display:flex;flex-direction:column;gap:0.5rem">
-                    <div *ngFor="let p of sobrePilares" style="display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.75rem;border-radius:0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
-                      <span class="material-icons" style="font-size:0.9rem;color:#4ade80;flex-shrink:0">{{ p.icon }}</span>
-                      <span style="font-size:0.78rem;color:rgba(255,255,255,0.6)">{{ p.text }}</span>
+              <!-- Título + texto (largura total) -->
+              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0 0 1rem;line-height:1.08;letter-spacing:-0.02em">
+                UMA PLATAFORMA CRIADA<br>PARA QUEM <span style="color:#4ade80">GERENCIA ARENAS</span>
+              </h2>
+              <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0 0 1.25rem;line-height:1.65;max-width:680px">
+                O ArenaFlow nasceu de uma necessidade real: gestores perdiam horas com reservas por telefone e planilhas. Nossa plataforma centraliza tudo — reservas 24h, financeiro, clientes e mensalistas — em um único painel acessível de qualquer dispositivo.
+              </p>
+
+              <!-- Pilares + Card Solve alinhados na mesma linha -->
+              <div style="display:flex;gap:0.65rem;align-items:stretch">
+
+                <!-- Grid 2×2 de pilares -->
+                <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0.65rem">
+                  <div *ngFor="let p of sobrePilares" style="border-radius:1rem;padding:1rem 1rem 1.1rem;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.07);transition:border-color 0.2s,background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(34,165,92,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.035)';this.style.borderColor='rgba(255,255,255,0.07)'">
+                    <div style="width:2.25rem;height:2.25rem;border-radius:0.625rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.22);display:flex;align-items:center;justify-content:center;margin-bottom:0.65rem">
+                      <span class="material-icons" style="font-size:1.05rem;color:#4ade80">{{ p.icon }}</span>
                     </div>
+                    <p style="margin:0 0 0.25rem;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.8rem;color:#fff">{{ p.title }}</p>
+                    <p style="margin:0;font-size:0.71rem;color:rgba(255,255,255,0.45);line-height:1.5">{{ p.desc }}</p>
                   </div>
                 </div>
 
-                <!-- Card Solve -->
-                <div style="flex:0 0 200px;border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:1.5rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.75rem">
-                  <img src="assets/Solve_logo_fundo.png" alt="Solve" style="height:6rem;width:auto">
+                <!-- Card Solve — mesma altura do grid -->
+                <div style="flex:0 0 185px;border-radius:1rem;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.07);padding:1.25rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0.7rem">
+                  <img src="assets/Solve_logo_fundo.png" alt="Solve" style="height:5rem;width:auto">
                   <div style="width:2rem;height:1px;background:rgba(255,255,255,0.1)"></div>
-                  <p style="margin:0;font-size:0.72rem;color:rgba(255,255,255,0.38);line-height:1.5">
-                    Desenvolvido pela <strong style="color:rgba(255,255,255,0.65)">Solve</strong> — tecnologia acessível para pequenos e médios negócios
+                  <p style="margin:0;font-size:0.7rem;color:rgba(255,255,255,0.38);line-height:1.5">
+                    Desenvolvido pela <strong style="color:rgba(255,255,255,0.65)">Solve</strong>
                   </p>
                   <div style="display:flex;flex-direction:column;gap:0.4rem;width:100%">
-                    <a href="mailto:connectsolve.ti@gmail.com" style="display:flex;align-items:center;gap:0.4rem;color:rgba(255,255,255,0.35);font-size:0.68rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-                      <span class="material-icons" style="font-size:0.8rem">mail</span>connectsolve.ti&#64;gmail.com
+                    <a href="mailto:connectsolve.ti@gmail.com" style="display:flex;align-items:center;gap:0.4rem;color:rgba(255,255,255,0.35);font-size:0.65rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                      <span class="material-icons" style="font-size:0.75rem">mail</span>connectsolve.ti&#64;gmail.com
                     </a>
-                    <a href="https://www.instagram.com/solve.ti" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:0.4rem;color:rgba(255,255,255,0.35);font-size:0.68rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-                      <span class="material-icons" style="font-size:0.8rem">photo_camera</span>&#64;solve.ti
+                    <a href="https://www.instagram.com/solve.ti" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:0.4rem;color:rgba(255,255,255,0.35);font-size:0.65rem;text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                      <span class="material-icons" style="font-size:0.75rem">photo_camera</span>&#64;solve.ti
                     </a>
                   </div>
                 </div>
@@ -969,28 +1023,88 @@ interface PlanOption {
               </div>
             </div>
 
-            <!-- ── Planos (funcional) ─────────────── -->
+            <!-- ── Planos ─────────────────────────── -->
             <div id="section-planos" style="padding:0 2.5rem 2.5rem">
-              <p style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.22);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.75rem">Escolha seu plano</p>
-              <div class="d-plan-row">
-                <div class="d-plan-chip avail" (click)="selectPlan(freePlan)">
-                  <p style="margin:0 0 0.1rem;font-size:0.6rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.04em">Free</p>
-                  <p style="margin:0;font-size:0.9rem;font-weight:800;color:#fff;font-family:'Space Grotesk',sans-serif">Grátis</p>
-                  <p style="margin:0.1rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.38)">1 quadra</p>
-                  <span style="display:inline-block;margin-top:0.3rem;font-size:0.58rem;font-weight:700;color:#4ade80;background:rgba(34,165,92,0.14);padding:0.1rem 0.35rem;border-radius:0.25rem">Selecionar</span>
+              <div style="display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.6rem">
+                <span style="width:0.5rem;height:0.5rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+                <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Planos</span>
+              </div>
+              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0 0 1.5rem;line-height:1.08;letter-spacing:-0.02em">
+                ESCOLHA SEU <span style="color:#4ade80">PLANO</span>
+              </h2>
+
+              <!-- Grid de cards -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:0.75rem;align-items:stretch">
+
+                <!-- Card Free -->
+                <div (click)="selectPlan(freePlan)"
+                     style="border-radius:1.5rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:2rem 1.75rem;display:flex;flex-direction:column;cursor:pointer;transition:border-color 0.2s,transform 0.18s;min-height:380px"
+                     onmouseover="this.style.borderColor='rgba(255,255,255,0.22)';this.style.transform='translateY(-4px)'"
+                     onmouseout="this.style.borderColor='rgba(255,255,255,0.09)';this.style.transform='translateY(0)'">
+                  <p style="margin:0 0 0.75rem;font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.07em">Free</p>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.6rem;color:#fff;line-height:1;margin-bottom:0.2rem">Grátis</div>
+                  <p style="margin:0 0 1rem;font-size:0.67rem;color:rgba(255,255,255,0.3)">para sempre</p>
+                  <p style="margin:0 0 1.25rem;font-size:0.73rem;color:rgba(255,255,255,0.48);line-height:1.55">{{ freePlan.desc }}</p>
+                  <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.75rem">
+                    <div *ngFor="let f of freePlan.features" style="display:flex;align-items:flex-start;gap:0.55rem">
+                      <span class="material-icons" style="font-size:0.88rem;color:#4ade80;flex-shrink:0;margin-top:0.1rem">check</span>
+                      <span style="font-size:0.73rem;color:rgba(255,255,255,0.62);line-height:1.4">{{ f.title }}</span>
+                    </div>
+                  </div>
+                  <button style="width:100%;padding:0.72rem;border-radius:0.875rem;background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;font-weight:700;font-size:0.8rem;cursor:pointer;font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em;transition:background 0.2s,border-color 0.2s"
+                          onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)'"
+                          onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.2)'">
+                    Escolher plano
+                  </button>
                 </div>
-                <div *ngFor="let p of paidPlans" class="d-plan-chip" [class.avail]="p.available" (click)="p.available && selectPlan(p)">
-                  <p style="margin:0 0 0.1rem;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em" [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.32)'">{{ p.name }}</p>
-                  <p style="margin:0;font-size:0.9rem;font-weight:800;font-family:'Space Grotesk',sans-serif" [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.6)'">{{ p.priceLabel }}</p>
-                  <p style="margin:0.1rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.28)">{{ p.courts }}</p>
-                  <span style="display:inline-block;margin-top:0.3rem;font-size:0.58rem;padding:0.1rem 0.35rem;border-radius:0.25rem" [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.25)'" [style.background]="p.available ? 'rgba(34,165,92,0.14)' : 'rgba(255,255,255,0.04)'">
-                    {{ p.available ? 'Selecionar' : 'Em breve' }}
-                  </span>
+
+                <!-- Cards pagos -->
+                <div *ngFor="let p of paidPlans"
+                     (click)="p.available && selectPlan(p)"
+                     [style.cursor]="p.available ? 'pointer' : 'default'"
+                     [style.border]="p.popular ? '1px solid rgba(34,165,92,0.42)' : '1px solid rgba(255,255,255,0.09)'"
+                     [style.background]="p.popular ? 'rgba(34,165,92,0.06)' : 'rgba(255,255,255,0.04)'"
+                     style="border-radius:1.5rem;padding:2rem 1.75rem;display:flex;flex-direction:column;position:relative;transition:border-color 0.2s,transform 0.18s;min-height:380px"
+                     onmouseover="this.style.transform='translateY(-4px)'"
+                     onmouseout="this.style.transform='translateY(0)'">
+
+                  <!-- Badge popular -->
+                  <div *ngIf="p.popular" style="position:absolute;top:-0.7rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.22rem 0.85rem;white-space:nowrap;box-shadow:0 4px 14px rgba(34,165,92,0.35)">
+                    <span style="font-size:0.6rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.07em">Mais popular</span>
+                  </div>
+
+                  <p style="margin:0 0 0.75rem;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em"
+                     [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.28)'">{{ p.name }}</p>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;line-height:1;margin-bottom:0.2rem"
+                       [style.font-size]="p.priceLabel.length > 10 ? '1.7rem' : '2.2rem'"
+                       [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.4)'">{{ p.priceLabel }}</div>
+                  <p style="margin:0 0 1rem;font-size:0.67rem;color:rgba(255,255,255,0.3)">/mês</p>
+                  <p style="margin:0 0 1.25rem;font-size:0.73rem;color:rgba(255,255,255,0.48);line-height:1.55">{{ p.desc || p.courts }}</p>
+
+                  <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.75rem">
+                    <div *ngFor="let f of p.features" style="display:flex;align-items:flex-start;gap:0.55rem">
+                      <span class="material-icons" style="font-size:0.88rem;flex-shrink:0;margin-top:0.1rem"
+                            [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.2)'">check</span>
+                      <span style="font-size:0.73rem;line-height:1.4"
+                            [style.color]="p.available ? 'rgba(255,255,255,0.62)' : 'rgba(255,255,255,0.28)'">{{ f.title }}</span>
+                    </div>
+                  </div>
+
+                  <button [disabled]="!p.available"
+                          [style.background]="p.available && p.popular ? 'linear-gradient(135deg,#22a55c,#16a34a)' : 'transparent'"
+                          [style.border]="p.available ? (p.popular ? 'none' : '1px solid rgba(255,255,255,0.2)') : '1px solid rgba(255,255,255,0.08)'"
+                          [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.25)'"
+                          [style.cursor]="p.available ? 'pointer' : 'default'"
+                          [style.box-shadow]="p.available && p.popular ? '0 4px 18px rgba(34,165,92,0.3)' : 'none'"
+                          style="width:100%;padding:0.72rem;border-radius:0.875rem;font-weight:700;font-size:0.8rem;font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em;transition:opacity 0.2s">
+                    {{ p.available ? 'Escolher plano' : 'Em breve' }}
+                  </button>
                 </div>
+
               </div>
 
               <!-- Footer -->
-              <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
+              <div style="margin-top:1.75rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between">
                 <p style="font-size:0.62rem;color:rgba(255,255,255,0.18);margin:0">© 2025 Solve. Todos os direitos reservados.</p>
                 <p style="font-size:0.62rem;color:rgba(255,255,255,0.18);margin:0">ArenaFlow v1.0</p>
               </div>
@@ -1026,64 +1140,96 @@ interface PlanOption {
           <div class="d-detail-bg"></div>
           <div class="d-detail-orb"></div>
 
-          <div *ngIf="selectedPlan" class="d-detail-content">
+          <div *ngIf="selectedPlan" class="d-detail-content" style="padding:2rem 2.5rem">
 
-            <!-- Header do plano -->
-            <div class="d-plan-header-card">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem">
-                <div>
-                  <div *ngIf="selectedPlan.popular" style="display:inline-flex;align-items:center;gap:0.25rem;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.35);border-radius:999px;padding:0.15rem 0.6rem;margin-bottom:0.5rem">
-                    <span class="material-icons" style="font-size:0.72rem;color:#4ade80">star</span>
-                    <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.06em">Mais popular</span>
-                  </div>
-                  <div class="d-plan-tag">
-                    <span class="material-icons" style="font-size:0.78rem">check_circle</span>
-                    Plano selecionado
-                  </div>
-                  <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.7rem;color:#fff;margin:0.3rem 0 0.25rem;letter-spacing:-0.01em">
-                    {{ selectedPlan.name }}
-                  </h2>
-                  <p style="margin:0;font-size:0.78rem;color:rgba(255,255,255,0.4)">{{ selectedPlan.courts }} · gestão completa</p>
+            <!-- ── Hero header ────────────────────── -->
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.5rem">
+              <div>
+                <!-- Badge -->
+                <div style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.32);border-radius:2rem;padding:0.25rem 0.75rem;margin-bottom:0.75rem">
+                  <span style="width:0.45rem;height:0.45rem;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>
+                  <span style="font-size:0.62rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Plano selecionado</span>
                 </div>
-                <div style="text-align:right;flex-shrink:0">
-                  <div class="d-plan-price-display">{{ selectedPlan.priceLabel }}</div>
-                  <div class="d-plan-price-sub">{{ selectedPlan.price === 0 ? 'para sempre' : '/mês' }}</div>
+                <!-- Nome -->
+                <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(2rem,3.5vw,3rem);color:#fff;margin:0 0 0.35rem;line-height:1;letter-spacing:-0.03em">
+                  {{ selectedPlan.name }}
+                </h1>
+                <p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.38)">{{ selectedPlan.courts }} · gestão completa</p>
+              </div>
+              <!-- Preço destaque -->
+              <div style="text-align:right;flex-shrink:0">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(2rem,3.5vw,3rem);color:#fff;line-height:1;letter-spacing:-0.025em">
+                  {{ selectedPlan.priceLabel }}
                 </div>
-              </div>
-
-              <!-- Callout free: trial -->
-              <div *ngIf="selectedPlan.price === 0" style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.75rem;border-radius:0.65rem;background:rgba(34,165,92,0.1);border:1px solid rgba(34,165,92,0.22)">
-                <span class="material-icons" style="font-size:1rem;color:#4ade80;flex-shrink:0">auto_awesome</span>
-                <span style="font-size:0.73rem;color:rgba(255,255,255,0.65);line-height:1.4">
-                  <strong style="color:#4ade80">14 dias grátis</strong> com acesso ao Plano Pro — sem cartão de crédito
-                </span>
-              </div>
-
-              <!-- Callout pago: segurança -->
-              <div *ngIf="selectedPlan.price > 0" style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.75rem;border-radius:0.65rem;background:rgba(34,165,92,0.08);border:1px solid rgba(34,165,92,0.15)">
-                <span class="material-icons" style="font-size:1rem;color:#4ade80;flex-shrink:0">verified_user</span>
-                <span style="font-size:0.73rem;color:rgba(255,255,255,0.55);line-height:1.4">
-                  Pagamento seguro via Pagar.me · Cancele quando quiser
-                </span>
-              </div>
-            </div>
-
-            <!-- Lista de features -->
-            <p style="margin:0 0 0.6rem;font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:0.05em">O que está incluso</p>
-            <div style="margin-bottom:1rem">
-              <div class="d-plan-feat-row" *ngFor="let f of selectedPlan.features; let i = index"
-                   [style.animation-delay]="(0.1 + i * 0.07) + 's'">
-                <div class="d-plan-feat-ico">
-                  <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
-                </div>
-                <div>
-                  <p style="margin:0 0 0.1rem;font-weight:700;font-size:0.83rem;color:#fff">{{ f.title }}</p>
-                  <p *ngIf="f.desc" style="margin:0;font-size:0.72rem;color:rgba(255,255,255,0.38);line-height:1.35">{{ f.desc }}</p>
+                <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-top:0.2rem">{{ selectedPlan.price === 0 ? 'para sempre' : '/mês' }}</div>
+                <div *ngIf="selectedPlan.popular" style="display:inline-flex;align-items:center;gap:0.25rem;background:rgba(34,165,92,0.15);border:1px solid rgba(34,165,92,0.3);border-radius:2rem;padding:0.15rem 0.6rem;margin-top:0.4rem">
+                  <span class="material-icons" style="font-size:0.65rem;color:#4ade80">star</span>
+                  <span style="font-size:0.6rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em">Mais popular</span>
                 </div>
               </div>
             </div>
 
-            <!-- Navegação inferior entre planos -->
+            <!-- ── Callout trial / segurança ─────── -->
+            <div *ngIf="selectedPlan.price === 0"
+                 style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border-radius:1rem;background:rgba(34,165,92,0.1);border:1px solid rgba(34,165,92,0.25);margin-bottom:1.5rem">
+              <div style="width:2.25rem;height:2.25rem;border-radius:0.625rem;background:rgba(34,165,92,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80">auto_awesome</span>
+              </div>
+              <div>
+                <p style="margin:0;font-size:0.8rem;font-weight:700;color:#4ade80">14 dias grátis com o Plano Pro</p>
+                <p style="margin:0;font-size:0.7rem;color:rgba(255,255,255,0.45)">Sem cartão de crédito — explore tudo gratuitamente</p>
+              </div>
+            </div>
+            <div *ngIf="selectedPlan.price > 0"
+                 style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border-radius:1rem;background:rgba(34,165,92,0.07);border:1px solid rgba(34,165,92,0.18);margin-bottom:1.5rem">
+              <div style="width:2.25rem;height:2.25rem;border-radius:0.625rem;background:rgba(34,165,92,0.14);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80">verified_user</span>
+              </div>
+              <div>
+                <p style="margin:0;font-size:0.8rem;font-weight:700;color:#fff">Pagamento seguro via Pagar.me</p>
+                <p style="margin:0;font-size:0.7rem;color:rgba(255,255,255,0.42)">Cancele quando quiser, sem taxas ou multas</p>
+              </div>
+            </div>
+
+            <!-- ── Features em grid 2×N ──────────── -->
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.85rem">
+              <span style="width:0.45rem;height:0.45rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
+              <p style="margin:0;font-size:0.63rem;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em">O que está incluso</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;flex:1;margin-bottom:1.5rem">
+              <div *ngFor="let f of selectedPlan.features; let i = index"
+                   style="border-radius:1rem;padding:1rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:0.5rem;animation:featureIn 0.4s cubic-bezier(0.22,1,0.36,1) both"
+                   [style.animation-delay]="(i * 0.06) + 's'">
+                <div style="width:2.25rem;height:2.25rem;border-radius:0.625rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <span class="material-icons" style="font-size:1.05rem;color:#4ade80">{{ f.icon }}</span>
+                </div>
+                <div>
+                  <p style="margin:0 0 0.2rem;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.8rem;color:#fff;line-height:1.25">{{ f.title }}</p>
+                  <p *ngIf="f.desc" style="margin:0;font-size:0.68rem;color:rgba(255,255,255,0.38);line-height:1.4">{{ f.desc }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Stats strip ────────────────────── -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1.5rem">
+              <div style="border-radius:0.875rem;padding:0.85rem 0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-align:center">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80;display:block;margin-bottom:0.3rem">store</span>
+                <p style="margin:0;font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1rem;color:#fff;line-height:1">{{ selectedPlan.courts.split(' ')[0] }}</p>
+                <p style="margin:0.15rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.32);text-transform:uppercase;letter-spacing:0.04em">Quadra{{ selectedPlan.courts.split(' ')[0] !== '1' ? 's' : '' }}</p>
+              </div>
+              <div style="border-radius:0.875rem;padding:0.85rem 0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-align:center">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80;display:block;margin-bottom:0.3rem">{{ selectedPlan.price === 0 ? 'auto_awesome' : 'sync' }}</span>
+                <p style="margin:0;font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1rem;color:#fff;line-height:1">{{ selectedPlan.price === 0 ? '14 dias' : 'Mensal' }}</p>
+                <p style="margin:0.15rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.32);text-transform:uppercase;letter-spacing:0.04em">{{ selectedPlan.price === 0 ? 'Trial Pro' : 'Recorrência' }}</p>
+              </div>
+              <div style="border-radius:0.875rem;padding:0.85rem 0.75rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);text-align:center">
+                <span class="material-icons" style="font-size:1.1rem;color:#4ade80;display:block;margin-bottom:0.3rem">calendar_month</span>
+                <p style="margin:0;font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1rem;color:#fff;line-height:1">24h</p>
+                <p style="margin:0.15rem 0 0;font-size:0.58rem;color:rgba(255,255,255,0.32);text-transform:uppercase;letter-spacing:0.04em">Reservas online</p>
+              </div>
+            </div>
+
+            <!-- ── Navegação entre planos ─────────── -->
             <div class="plan-nav-strip">
               <button class="plan-nav-pill"
                       [class.active]="selectedPlan.id === freePlan.id"
@@ -1307,6 +1453,7 @@ export class LoginComponent implements OnInit {
   freePlan: PlanOption = {
     id: 'free', name: 'Free', priceLabel: 'Grátis', price: 0,
     courts: '1 quadra', available: true, popular: false,
+    desc: PLAN_DESCS['free'],
     features: [
       { icon: 'store',          title: '1 quadra cadastrada',      desc: 'Gerencie sua primeira quadra sem custo' },
       { icon: 'calendar_month', title: 'Agendamentos ilimitados',  desc: 'Sem limite de reservas por mês' },
@@ -1331,6 +1478,7 @@ export class LoginComponent implements OnInit {
             courts:     p.max_courts ? `${p.max_courts} quadra${p.max_courts > 1 ? 's' : ''}` : 'Ilimitadas',
             available:  !!p.pagarme_plan_id,   // disponível apenas quando já criado no Pagar.me
             popular:    p.slug === 'pro',
+            desc:       PLAN_DESCS[p.slug] ?? `Para arenas com ${p.max_courts ? p.max_courts + ' quadras' : 'quadras ilimitadas'}.`,
             features:   (p.features as string[]).map(featureToDisplay),
           }));
 
@@ -1358,10 +1506,10 @@ export class LoginComponent implements OnInit {
   ];
 
   sobrePilares = [
-    { icon: 'bolt',            text: 'Simplicidade: configure sua arena em minutos, sem treinamento técnico' },
-    { icon: 'groups',          text: 'Foco no gestor: cada funcionalidade foi pensada para o dia a dia da arena' },
-    { icon: 'trending_up',     text: 'Crescimento: acompanhe faturamento e ocupação em tempo real' },
-    { icon: 'verified_user',   text: 'Confiabilidade: infraestrutura segura com 99.9% de disponibilidade' },
+    { icon: 'bolt',          title: 'Simplicidade',     desc: 'Configure sua arena em minutos, sem treinamento técnico' },
+    { icon: 'groups',        title: 'Foco no gestor',   desc: 'Cada funcionalidade pensada para o dia a dia da arena' },
+    { icon: 'trending_up',   title: 'Crescimento',      desc: 'Acompanhe faturamento e ocupação em tempo real' },
+    { icon: 'verified_user', title: 'Confiabilidade',   desc: 'Infraestrutura segura com 99,9% de disponibilidade' },
   ];
 
   features = [
