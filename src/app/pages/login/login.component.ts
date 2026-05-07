@@ -939,13 +939,22 @@ interface PlanOption {
 
         <p *ngIf="checkoutError" style="font-size:0.78rem;color:#f87171;margin:0.5rem 0 0.5rem">{{ checkoutError }}</p>
 
-        <button class="btn-primary" (click)="submitPayment()" [disabled]="checkoutLoading" style="margin-top:0.5rem">
+        <button class="btn-google" (click)="submitPayment()" [disabled]="checkoutLoading" style="margin-top:0.5rem;width:100%">
           <span *ngIf="checkoutLoading" class="material-icons spin-icon" style="font-size:1rem">refresh</span>
-          {{ checkoutLoading ? 'Processando...' : 'Assinar — ' + selectedPlan?.priceLabel + '/mês' }}
+          <ng-container *ngIf="!checkoutLoading">
+            <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0">
+              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6c1.8-5.4 6.9-9.8 13.6-9.8z"/>
+              <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/>
+              <path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/>
+              <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.6 0-12.2-4.4-14.2-10.4l-7.8 6C6.6 42.6 14.6 48 24 48z"/>
+            </svg>
+            Assinar com Google — {{ selectedPlan?.priceLabel }}/mês
+          </ng-container>
+          <span *ngIf="checkoutLoading">Processando pagamento...</span>
         </button>
 
-        <button class="back-form-btn" (click)="backToAuth()" style="margin-top:0.75rem">
-          <span class="material-icons" style="font-size:1rem">arrow_back</span> Voltar
+        <button class="back-form-btn" (click)="backFromPayment()" style="margin-top:0.75rem">
+          <span class="material-icons" style="font-size:1rem">arrow_back</span> Voltar aos planos
         </button>
 
         <p style="font-size:0.65rem;text-align:center;color:rgba(255,255,255,0.18);margin-top:1rem;margin-bottom:0">
@@ -1051,16 +1060,26 @@ export class LoginComponent implements OnInit {
   selectPlan(plan: PlanOption) {
     if (!plan.available) return;
     this.selectedPlan = plan;
-    this.mode = 'login';
-    this.error = ''; this.success = '';
-    // Desktop: anima os painéis imediatamente
-    this.phase = 'selected';
-    // Mobile: fade-out da landing antes de mostrar o formulário
-    this.landingExiting = true;
-    setTimeout(() => {
-      this.mobileStep = 'auth';
-      this.landingExiting = false;
-    }, 380);
+    this.error = ''; this.success = ''; this.checkoutError = '';
+
+    if (plan.price > 0) {
+      // Plano pago → vai direto para o checkout de cartão
+      this.phase = 'payment';
+      this.landingExiting = true;
+      setTimeout(() => {
+        this.mobileStep = 'payment';
+        this.landingExiting = false;
+      }, 380);
+    } else {
+      // Plano free → mostra formulário de login/Google
+      this.mode = 'login';
+      this.phase = 'selected';
+      this.landingExiting = true;
+      setTimeout(() => {
+        this.mobileStep = 'auth';
+        this.landingExiting = false;
+      }, 380);
+    }
   }
 
   clearSelection() {
@@ -1089,12 +1108,18 @@ export class LoginComponent implements OnInit {
 
   setMode(m: Mode) { this.mode = m; this.error = ''; this.success = ''; }
 
-  backToAuth() {
-    this.phase = 'selected';
-    this.mobileStep = 'auth';
+  backFromPayment() {
     this.checkoutError = '';
     this.cardNumber = ''; this.cardHolder = ''; this.cardExpiry = '';
     this.cardCvv = ''; this.cardDocument = ''; this.cardPhone = '';
+    this.selectedPlan = null;
+    this.phase = 'browse';
+    this.landingExiting = false;
+    this.authExiting = true;
+    setTimeout(() => {
+      this.mobileStep = 'landing';
+      this.authExiting = false;
+    }, 320);
   }
 
   onCardNumberInput(e: Event) {
@@ -1121,8 +1146,21 @@ export class LoginComponent implements OnInit {
   }
 
   async submitPayment() {
+    if (!this.cardNumber || !this.cardHolder || !this.cardExpiry || !this.cardCvv || !this.cardDocument) {
+      this.checkoutError = 'Preencha todos os dados do cartão.';
+      return;
+    }
     this.checkoutError = ''; this.checkoutLoading = true;
     try {
+      // 1. Autentica com Google (abre popup)
+      await this.auth.loginWithGoogle();
+
+      // 2. Cria/recupera usuário no banco
+      await firstValueFrom(
+        this.api.post('/auth/me', { role: 'ADMIN', plan_slug: this.selectedPlan!.id })
+      );
+
+      // 3. Processa assinatura no Pagar.me
       const [expMonth, expYear] = this.cardExpiry.split('/');
       await firstValueFrom(
         this.api.post('/subscriptions', {
@@ -1138,10 +1176,15 @@ export class LoginComponent implements OnInit {
           },
         })
       );
-      this.establishmentService.setPendingPlan(this.selectedPlan!.id);
+
+      // 4. Navega para o painel
       this.router.navigate(['/']);
     } catch (e: any) {
-      this.checkoutError = e?.error?.error || 'Erro ao processar o cartão. Verifique os dados e tente novamente.';
+      if (e?.code?.startsWith('auth/')) {
+        this.checkoutError = 'Não foi possível autenticar com Google. Tente novamente.';
+      } else {
+        this.checkoutError = e?.error?.error || 'Erro ao processar o cartão. Verifique os dados e tente novamente.';
+      }
     } finally { this.checkoutLoading = false; }
   }
 
@@ -1164,22 +1207,10 @@ export class LoginComponent implements OnInit {
     this.loading = true; this.error = '';
     try {
       await this.auth.loginWithGoogle();
-      const planSlug = this.selectedPlan?.id || 'free';
-      const authRes = await firstValueFrom(
-        this.api.post<{ user: any; is_new_user: boolean; pending_plan?: string }>('/auth/me', {
-          role: 'ADMIN',
-          plan_slug: planSlug,
-        })
+      // Cria/recupera usuário no banco com plano free (ou existente)
+      await firstValueFrom(
+        this.api.post('/auth/me', { role: 'ADMIN', plan_slug: 'free' })
       );
-      // Novo usuário com plano pago → vai para checkout
-      if (authRes.is_new_user && planSlug !== 'free') {
-        this.phase = 'payment';
-        this.mobileStep = 'payment';
-        this.loading = false;
-        return;
-      }
-      // Plano free ou usuário existente → dashboard
-      if (planSlug !== 'free') this.establishmentService.setPendingPlan(planSlug);
       this.router.navigate(['/']);
     } catch (e: any) {
       this.error = 'Não foi possível entrar com Google. Tente novamente.';
