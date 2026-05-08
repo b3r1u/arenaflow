@@ -474,6 +474,14 @@ interface PlanOption {
     .forgot-btn { background:none; border:none; cursor:pointer; color:#4ade80; font-size:0.75rem; padding:0; }
     .back-form-btn { background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.45); font-size:0.875rem; padding:0; display:flex; align-items:center; gap:0.25rem; margin-bottom:0.75rem; }
     .spin-icon { animation:spin 1s linear infinite; }
+    .thin-spinner {
+      display:inline-block; flex-shrink:0;
+      width:0.95rem; height:0.95rem;
+      border-radius:50%;
+      border:1.5px solid rgba(255,255,255,0.2);
+      border-top-color:#fff;
+      animation:spin 0.65s linear infinite;
+    }
 
     /* ── Stats strip ────────────────────────────── */
     .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; overflow:hidden; }
@@ -1374,7 +1382,7 @@ interface PlanOption {
         <p *ngIf="success" style="font-size:0.78rem;color:#4ade80;margin:0.5rem 0 0">{{ success }}</p>
 
         <button class="btn-primary" (click)="submit()" [disabled]="loading">
-          <span *ngIf="loading" class="material-icons spin-icon" style="font-size:1rem">refresh</span>
+          <span *ngIf="loading" class="thin-spinner"></span>
           {{ loading ? 'Aguarde...' : submitLabel }}
         </button>
 
@@ -1472,7 +1480,7 @@ interface PlanOption {
             "
             onmouseover="if(!this.disabled){this.style.background='rgba(255,255,255,0.1)';this.style.borderColor='rgba(255,255,255,0.22)';this.style.color='#fff'}"
             onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.13)';this.style.color='rgba(255,255,255,0.75)'">
-            <span *ngIf="checkoutLoading" class="material-icons spin-icon" style="font-size:1rem">refresh</span>
+            <span *ngIf="checkoutLoading" class="thin-spinner"></span>
             <ng-container *ngIf="!checkoutLoading">
               <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0;opacity:0.85">
                 <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6c1.8-5.4 6.9-9.8 13.6-9.8z"/>
