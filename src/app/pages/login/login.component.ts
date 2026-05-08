@@ -152,13 +152,12 @@ interface PlanOption {
     }
     .m-btn-free {
       width:100%; padding:0.85rem; border-radius:0.875rem;
-      background:linear-gradient(135deg,#22a55c,#16a34a); color:#fff;
-      font-weight:700; font-size:0.9rem; border:none; cursor:pointer;
-      box-shadow:0 4px 20px rgba(34,165,92,0.4);
-      transition:opacity 0.2s,transform 0.15s;
+      background:transparent; color:#fff;
+      font-weight:700; font-size:0.9rem; border:1px solid rgba(255,255,255,0.2); cursor:pointer;
+      transition:background 0.2s,border-color 0.2s,transform 0.15s;
       display:flex; align-items:center; justify-content:center; gap:0.5rem;
     }
-    .m-btn-free:hover { opacity:0.9; transform:translateY(-1px); }
+    .m-btn-free:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.35); transform:translateY(-1px); }
     .m-paid-row { display:flex; gap:0.5rem; }
     .m-paid-chip {
       flex:1; padding:0.75rem 0.5rem; border-radius:0.875rem; text-align:center;
@@ -703,7 +702,6 @@ interface PlanOption {
               </div>
               <button class="m-btn-free">
                 Escolher plano
-                <span class="material-icons" style="font-size:0.9rem">arrow_forward</span>
               </button>
             </div>
 
@@ -732,11 +730,10 @@ interface PlanOption {
                 </div>
               </div>
               <button [disabled]="!p.available"
-                      [style.background]="p.available && p.popular ? 'linear-gradient(135deg,#22a55c,#16a34a)' : 'transparent'"
-                      [style.border]="p.available ? (p.popular ? 'none' : '1px solid rgba(255,255,255,0.18)') : '1px solid rgba(255,255,255,0.08)'"
                       [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.28)'"
                       [style.cursor]="p.available ? 'pointer' : 'default'"
-                      style="width:100%;padding:0.7rem;border-radius:0.875rem;font-weight:700;font-size:0.82rem;font-family:'Space Grotesk',sans-serif">
+                      [style.border]="p.available ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)'"
+                      style="width:100%;padding:0.7rem;border-radius:0.875rem;font-weight:700;font-size:0.82rem;font-family:'Space Grotesk',sans-serif;background:transparent">
                 {{ p.available ? 'Escolher plano' : 'Em breve' }}
               </button>
             </div>
@@ -1114,12 +1111,12 @@ interface PlanOption {
                   </div>
 
                   <button [disabled]="!p.available"
-                          [style.background]="p.available && p.popular ? 'linear-gradient(135deg,#22a55c,#16a34a)' : 'transparent'"
-                          [style.border]="p.available ? (p.popular ? 'none' : '1px solid rgba(255,255,255,0.2)') : '1px solid rgba(255,255,255,0.08)'"
                           [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.25)'"
                           [style.cursor]="p.available ? 'pointer' : 'default'"
-                          [style.box-shadow]="p.available && p.popular ? '0 4px 18px rgba(34,165,92,0.3)' : 'none'"
-                          style="width:100%;padding:0.72rem;border-radius:0.875rem;font-weight:700;font-size:0.8rem;font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em;transition:opacity 0.2s">
+                          [style.border]="p.available ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)'"
+                          style="width:100%;padding:0.72rem;border-radius:0.875rem;font-weight:700;font-size:0.8rem;font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em;transition:background 0.2s,border-color 0.2s;background:transparent"
+                          onmouseover="if(!this.disabled){this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)'}"
+                          onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.2)'">
                     {{ p.available ? 'Escolher plano' : 'Em breve' }}
                   </button>
                 </div>
