@@ -612,9 +612,6 @@ interface PlanOption {
                 <div style="position:absolute;top:0.75rem;left:0.75rem;width:2rem;height:2rem;border-radius:0.5rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:2">
                   <span class="material-icons" style="font-size:0.95rem;color:#4ade80">{{ f.icon }}</span>
                 </div>
-                <div style="position:absolute;bottom:0.65rem;right:0.65rem;width:1.4rem;height:1.4rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:2">
-                  <span class="material-icons" style="font-size:0.6rem;color:#4ade80">north_east</span>
-                </div>
                 <div style="position:relative;z-index:2">
                   <p style="margin:0 0 0.1rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.72rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em">{{ f.title }}</p>
                   <p style="margin:0;font-size:0.62rem;color:rgba(255,255,255,0.45);line-height:1.35">{{ f.desc }}</p>
@@ -971,9 +968,6 @@ interface PlanOption {
                   </div>
                   <div style="position:absolute;top:0.85rem;left:0.85rem;width:2.1rem;height:2.1rem;border-radius:0.55rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:2">
                     <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
-                  </div>
-                  <div style="position:absolute;bottom:0.75rem;right:0.75rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(34,165,92,0.18);border:1px solid rgba(34,165,92,0.3);display:flex;align-items:center;justify-content:center;z-index:2">
-                    <span class="material-icons" style="font-size:0.65rem;color:#4ade80">north_east</span>
                   </div>
                   <div style="position:relative;z-index:2">
                     <p style="margin:0 0 0.15rem;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.78rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em">{{ f.title }}</p>
