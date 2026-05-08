@@ -782,9 +782,18 @@ interface PlanOption {
             </div>
             <span class="material-icons" style="font-size:1rem;color:rgba(255,255,255,0.28)">chevron_right</span>
           </div>
-          <div *ngIf="!selectedPlan" style="width:100%;max-width:390px;margin-bottom:0.5rem">
-            <button class="back-form-btn" (click)="backToLanding()">
-              <span class="material-icons" style="font-size:1rem">arrow_back</span> Voltar
+          <div *ngIf="!selectedPlan" style="width:100%;max-width:390px;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <div style="width:1.75rem;height:1.75rem;border-radius:0.45rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center">
+                <span class="material-icons" style="font-size:1rem;color:white">sports_volleyball</span>
+              </div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.88rem;color:#fff;line-height:1">ArenaFlow</div>
+                <div style="font-size:0.55rem;color:rgba(255,255,255,0.3);line-height:1.3">por Solve</div>
+              </div>
+            </div>
+            <button (click)="backToLanding()" style="display:inline-flex;align-items:center;gap:0.3rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.7);padding:0.35rem 0.85rem;border-radius:2rem;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+              <span class="material-icons" style="font-size:0.85rem">arrow_back</span> Voltar
             </button>
           </div>
           <div class="glass-card anim-slide-r" style="margin-top:0.75rem">
