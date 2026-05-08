@@ -603,10 +603,14 @@ interface PlanOption {
               <div class="feat-card-new" *ngFor="let f of features | slice:0:4; let i = index">
                 <img *ngIf="i === 0" src="assets/reservas-quadra.jpg" alt=""
                      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                <img *ngIf="i === 1" src="assets/volei-quadra.jpg" alt=""
+                     style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                <img *ngIf="i === 2" src="assets/grafico-quadra.jpg" alt=""
+                     style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                <img *ngIf="i === 3" src="assets/jogadores-cadastro.jpg" alt=""
+                     style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
                 <div style="position:absolute;inset:0;z-index:1;pointer-events:none"
-                     [style.background]="i === 0
-                       ? 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.82) 100%)'
-                       : 'linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.72) 100%)'">
+                     [style.background]="'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.82) 100%)'">
                 </div>
                 <div style="position:absolute;top:0.75rem;left:0.75rem;width:2rem;height:2rem;border-radius:0.5rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:2">
                   <span class="material-icons" style="font-size:0.95rem;color:#4ade80">{{ f.icon }}</span>
@@ -689,7 +693,7 @@ interface PlanOption {
 
             <!-- Card Free -->
             <div (click)="selectPlan(freePlan)"
-                 style="border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:1.25rem;display:flex;flex-direction:column;margin-bottom:0.65rem;cursor:pointer">
+                 style="border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:1.25rem;display:flex;flex-direction:column;margin-bottom:1rem;cursor:pointer">
               <p style="margin:0 0 0.5rem;font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.07em">Free</p>
               <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.2rem;color:#fff;line-height:1;margin-bottom:0.15rem">Grátis</div>
               <p style="margin:0 0 0.85rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">para sempre</p>
@@ -711,9 +715,9 @@ interface PlanOption {
                  [style.cursor]="p.available ? 'pointer' : 'default'"
                  [style.border]="p.popular ? '1px solid rgba(34,165,92,0.4)' : '1px solid rgba(255,255,255,0.09)'"
                  [style.background]="p.popular ? 'rgba(34,165,92,0.06)' : 'rgba(255,255,255,0.04)'"
-                 style="border-radius:1.25rem;padding:1.25rem;display:flex;flex-direction:column;margin-bottom:0.65rem;position:relative">
-              <div *ngIf="p.popular" style="position:absolute;top:-0.6rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.18rem 0.7rem;white-space:nowrap">
-                <span style="font-size:0.58rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.06em">Mais popular</span>
+                 style="border-radius:1.25rem;padding:1.25rem;display:flex;flex-direction:column;margin-bottom:1rem;position:relative">
+              <div *ngIf="p.popular" style="position:absolute;top:-0.6rem;left:1.25rem;background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.18rem 0.7rem;white-space:nowrap;display:flex;align-items:center">
+                <span style="font-size:0.58rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.06em;line-height:1">Mais popular</span>
               </div>
               <p style="margin:0 0 0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em"
                  [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.28)'">{{ p.name }}</p>
@@ -959,11 +963,15 @@ interface PlanOption {
                   <!-- Imagem de fundo apenas no card de Reservas Online 24h (i=0) -->
                   <img *ngIf="i === 0" src="assets/reservas-quadra.jpg" alt=""
                        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                  <img *ngIf="i === 1" src="assets/volei-quadra.jpg" alt=""
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                  <img *ngIf="i === 2" src="assets/grafico-quadra.jpg" alt=""
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
+                  <img *ngIf="i === 3" src="assets/jogadores-cadastro.jpg" alt=""
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:0;opacity:0.75;pointer-events:none">
                   <!-- Overlay: sombra geral + degradê mais forte no bottom -->
                   <div style="position:absolute;inset:0;z-index:1;pointer-events:none"
-                       [style.background]="i === 0
-                         ? 'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.82) 100%)'
-                         : 'linear-gradient(180deg, transparent 35%, rgba(0,0,0,0.7) 100%)'">
+                       [style.background]="'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.82) 100%)'">
                   </div>
                   <div style="position:absolute;top:0.85rem;left:0.85rem;width:2.1rem;height:2.1rem;border-radius:0.55rem;background:rgba(34,165,92,0.14);border:1px solid rgba(34,165,92,0.25);display:flex;align-items:center;justify-content:center;z-index:2">
                     <span class="material-icons" style="font-size:1rem;color:#4ade80">{{ f.icon }}</span>
@@ -1056,7 +1064,7 @@ interface PlanOption {
               </h2>
 
               <!-- Grid de cards -->
-              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:0.75rem;align-items:stretch">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:1.25rem;align-items:stretch">
 
                 <!-- Card Free -->
                 <div (click)="selectPlan(freePlan)"
@@ -1091,8 +1099,8 @@ interface PlanOption {
                      onmouseout="this.style.transform='translateY(0)'">
 
                   <!-- Badge popular -->
-                  <div *ngIf="p.popular" style="position:absolute;top:-0.7rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.22rem 0.85rem;white-space:nowrap;box-shadow:0 4px 14px rgba(34,165,92,0.35)">
-                    <span style="font-size:0.6rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.07em">Mais popular</span>
+                  <div *ngIf="p.popular" style="position:absolute;top:-0.7rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.22rem 0.85rem;white-space:nowrap;box-shadow:0 4px 14px rgba(34,165,92,0.35);display:flex;align-items:center">
+                    <span style="font-size:0.6rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.07em;line-height:1">Mais popular</span>
                   </div>
 
                   <p style="margin:0 0 0.75rem;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em"
