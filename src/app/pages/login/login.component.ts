@@ -36,6 +36,7 @@ interface PlanOption {
   id: string; name: string; priceLabel: string; price: number;
   courts: string; features: { icon: string; title: string; desc: string }[];
   available: boolean; popular: boolean; desc?: string;
+  commission_pct: number;
 }
 
 @Component({
@@ -698,11 +699,19 @@ interface PlanOption {
               <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.2rem;color:#fff;line-height:1;margin-bottom:0.15rem">Grátis</div>
               <p style="margin:0 0 0.85rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">para sempre</p>
               <p style="margin:0 0 1rem;font-size:0.72rem;color:rgba(255,255,255,0.48);line-height:1.5">{{ freePlan.desc }}</p>
-              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.25rem">
+              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1rem">
                 <div *ngFor="let f of freePlan.features" style="display:flex;align-items:center;gap:0.5rem">
                   <span class="material-icons" style="font-size:0.85rem;color:#4ade80;flex-shrink:0">check</span>
                   <span style="font-size:0.75rem;color:rgba(255,255,255,0.65)">{{ f.title }}</span>
                 </div>
+              </div>
+              <!-- Taxa ArenaFlow -->
+              <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);border-radius:0.65rem;padding:0.45rem 0.7rem;margin-bottom:1rem">
+                <div style="display:flex;align-items:center;gap:0.4rem">
+                  <span class="material-icons" style="font-size:0.8rem;color:rgba(255,255,255,0.35)">percent</span>
+                  <span style="font-size:0.7rem;color:rgba(255,255,255,0.45)">Taxa sobre reservas</span>
+                </div>
+                <span style="font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.7)">{{ freePlan.commission_pct }}%</span>
               </div>
               <button class="m-btn-free">
                 Escolher plano
@@ -725,13 +734,28 @@ interface PlanOption {
                    [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.4)'">{{ p.priceLabel }}</div>
               <p style="margin:0 0 0.85rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">/mês</p>
               <p style="margin:0 0 1rem;font-size:0.72rem;color:rgba(255,255,255,0.48);line-height:1.5">{{ p.desc || p.courts }}</p>
-              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.25rem">
+              <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1rem">
                 <div *ngFor="let f of p.features" style="display:flex;align-items:center;gap:0.5rem">
                   <span class="material-icons" style="font-size:0.85rem;flex-shrink:0"
                         [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.2)'">check</span>
                   <span style="font-size:0.75rem"
                         [style.color]="p.available ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.28)'">{{ f.title }}</span>
                 </div>
+              </div>
+              <!-- Taxa ArenaFlow -->
+              <div style="display:flex;align-items:center;justify-content:space-between;border-radius:0.65rem;padding:0.45rem 0.7rem;margin-bottom:1rem"
+                   [style.background]="p.commission_pct === 0 ? 'rgba(34,165,92,0.12)' : 'rgba(255,255,255,0.05)'">
+                <div style="display:flex;align-items:center;gap:0.4rem">
+                  <span class="material-icons" style="font-size:0.8rem"
+                        [style.color]="p.commission_pct === 0 ? '#4ade80' : 'rgba(255,255,255,0.35)'">
+                    {{ p.commission_pct === 0 ? 'check_circle' : 'percent' }}
+                  </span>
+                  <span style="font-size:0.7rem;color:rgba(255,255,255,0.45)">Taxa sobre reservas</span>
+                </div>
+                <span style="font-size:0.7rem;font-weight:700"
+                      [style.color]="p.commission_pct === 0 ? '#4ade80' : 'rgba(255,255,255,0.7)'">
+                  {{ p.commission_pct === 0 ? 'Isento' : p.commission_pct + '%' }}
+                </span>
               </div>
               <button [disabled]="!p.available"
                       [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.28)'"
@@ -1084,11 +1108,19 @@ interface PlanOption {
                   <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.6rem;color:#fff;line-height:1;margin-bottom:0.2rem">Grátis</div>
                   <p style="margin:0 0 1rem;font-size:0.67rem;color:rgba(255,255,255,0.3)">para sempre</p>
                   <p style="margin:0 0 1.25rem;font-size:0.73rem;color:rgba(255,255,255,0.48);line-height:1.55">{{ freePlan.desc }}</p>
-                  <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.75rem">
+                  <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.25rem">
                     <div *ngFor="let f of freePlan.features" style="display:flex;align-items:flex-start;gap:0.55rem">
                       <span class="material-icons" style="font-size:0.88rem;color:#4ade80;flex-shrink:0;margin-top:0.1rem">check</span>
                       <span style="font-size:0.73rem;color:rgba(255,255,255,0.62);line-height:1.4">{{ f.title }}</span>
                     </div>
+                  </div>
+                  <!-- Taxa ArenaFlow -->
+                  <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);border-radius:0.65rem;padding:0.5rem 0.75rem;margin-bottom:1.25rem">
+                    <div style="display:flex;align-items:center;gap:0.4rem">
+                      <span class="material-icons" style="font-size:0.85rem;color:rgba(255,255,255,0.35)">percent</span>
+                      <span style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Taxa sobre reservas</span>
+                    </div>
+                    <span style="font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.7)">{{ freePlan.commission_pct }}%</span>
                   </div>
                   <button style="width:100%;padding:0.72rem;border-radius:0.875rem;background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;font-weight:700;font-size:0.8rem;cursor:pointer;font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em;transition:background 0.2s,border-color 0.2s"
                           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)'"
@@ -1120,13 +1152,29 @@ interface PlanOption {
                   <p style="margin:0 0 1rem;font-size:0.67rem;color:rgba(255,255,255,0.3)">/mês</p>
                   <p style="margin:0 0 1.25rem;font-size:0.73rem;color:rgba(255,255,255,0.48);line-height:1.55">{{ p.desc || p.courts }}</p>
 
-                  <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.75rem">
+                  <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.25rem">
                     <div *ngFor="let f of p.features" style="display:flex;align-items:flex-start;gap:0.55rem">
                       <span class="material-icons" style="font-size:0.88rem;flex-shrink:0;margin-top:0.1rem"
                             [style.color]="p.available ? '#4ade80' : 'rgba(255,255,255,0.2)'">check</span>
                       <span style="font-size:0.73rem;line-height:1.4"
                             [style.color]="p.available ? 'rgba(255,255,255,0.62)' : 'rgba(255,255,255,0.28)'">{{ f.title }}</span>
                     </div>
+                  </div>
+
+                  <!-- Taxa ArenaFlow -->
+                  <div style="display:flex;align-items:center;justify-content:space-between;border-radius:0.65rem;padding:0.5rem 0.75rem;margin-bottom:1.25rem"
+                       [style.background]="p.commission_pct === 0 ? 'rgba(34,165,92,0.12)' : 'rgba(255,255,255,0.05)'">
+                    <div style="display:flex;align-items:center;gap:0.4rem">
+                      <span class="material-icons" style="font-size:0.85rem"
+                            [style.color]="p.commission_pct === 0 ? '#4ade80' : 'rgba(255,255,255,0.35)'">
+                        {{ p.commission_pct === 0 ? 'check_circle' : 'percent' }}
+                      </span>
+                      <span style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Taxa sobre reservas</span>
+                    </div>
+                    <span style="font-size:0.72rem;font-weight:700"
+                          [style.color]="p.commission_pct === 0 ? '#4ade80' : 'rgba(255,255,255,0.7)'">
+                      {{ p.commission_pct === 0 ? 'Isento' : p.commission_pct + '%' }}
+                    </span>
                   </div>
 
                   <button [disabled]="!p.available"
@@ -1492,6 +1540,7 @@ export class LoginComponent implements OnInit {
   freePlan: PlanOption = {
     id: 'free', name: 'Free', priceLabel: 'Grátis', price: 0,
     courts: '1 quadra', available: true, popular: false,
+    commission_pct: 10,
     desc: PLAN_DESCS['free'],
     features: [
       { icon: 'store',          title: '1 quadra cadastrada',      desc: 'Gerencie sua primeira quadra sem custo' },
@@ -1515,10 +1564,11 @@ export class LoginComponent implements OnInit {
             priceLabel: p.price === 0 ? 'Grátis' : `R$ ${Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
             price:      p.price,
             courts:     p.max_courts ? `${p.max_courts} quadra${p.max_courts > 1 ? 's' : ''}` : 'Ilimitadas',
-            available:  !!p.pagarme_plan_id,   // disponível apenas quando já criado no Pagar.me
-            popular:    p.slug === 'pro',
-            desc:       PLAN_DESCS[p.slug] ?? `Para arenas com ${p.max_courts ? p.max_courts + ' quadras' : 'quadras ilimitadas'}.`,
-            features:   (p.features as string[]).map(featureToDisplay),
+            available:      !!p.pagarme_plan_id,   // disponível apenas quando já criado no Pagar.me
+            popular:        p.slug === 'pro',
+            commission_pct: Number(p.commission_pct ?? 10),
+            desc:           PLAN_DESCS[p.slug] ?? `Para arenas com ${p.max_courts ? p.max_courts + ' quadras' : 'quadras ilimitadas'}.`,
+            features:       (p.features as string[]).map(featureToDisplay),
           }));
 
         // Atualiza freePlan com dados reais se existirem
