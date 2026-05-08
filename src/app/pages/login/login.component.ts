@@ -712,7 +712,7 @@ interface PlanOption {
                  [style.border]="p.popular ? '1px solid rgba(34,165,92,0.4)' : '1px solid rgba(255,255,255,0.09)'"
                  [style.background]="p.popular ? 'rgba(34,165,92,0.06)' : 'rgba(255,255,255,0.04)'"
                  style="border-radius:1.25rem;padding:1.25rem;display:flex;flex-direction:column;margin-bottom:0.65rem;position:relative">
-              <div *ngIf="p.popular" style="position:absolute;top:-0.6rem;left:1.25rem;background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.18rem 0.7rem">
+              <div *ngIf="p.popular" style="position:absolute;top:-0.6rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#22a55c,#16a34a);border-radius:2rem;padding:0.18rem 0.7rem;white-space:nowrap">
                 <span style="font-size:0.58rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.06em">Mais popular</span>
               </div>
               <p style="margin:0 0 0.5rem;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em"
@@ -733,7 +733,9 @@ interface PlanOption {
                       [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.28)'"
                       [style.cursor]="p.available ? 'pointer' : 'default'"
                       [style.border]="p.available ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)'"
-                      style="width:100%;padding:0.7rem;border-radius:0.875rem;font-weight:700;font-size:0.82rem;font-family:'Space Grotesk',sans-serif;background:transparent">
+                      style="width:100%;padding:0.7rem;border-radius:0.875rem;font-weight:700;font-size:0.82rem;font-family:'Space Grotesk',sans-serif;background:transparent;transition:background 0.2s,border-color 0.2s,transform 0.15s"
+                      onmouseover="if(!this.disabled){this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)';this.style.transform='translateY(-1px)'}"
+                      onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.2)';this.style.transform='translateY(0)'">
                 {{ p.available ? 'Escolher plano' : 'Em breve' }}
               </button>
             </div>
@@ -1115,8 +1117,8 @@ interface PlanOption {
                           [style.cursor]="p.available ? 'pointer' : 'default'"
                           [style.border]="p.available ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.08)'"
                           style="width:100%;padding:0.72rem;border-radius:0.875rem;font-weight:700;font-size:0.8rem;font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em;transition:background 0.2s,border-color 0.2s;background:transparent"
-                          onmouseover="if(!this.disabled){this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)'}"
-                          onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.2)'">
+                          onmouseover="if(!this.disabled){this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)';this.style.transform='translateY(-1px)'}"
+                          onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,0.2)';this.style.transform='translateY(0)'">
                     {{ p.available ? 'Escolher plano' : 'Em breve' }}
                   </button>
                 </div>
