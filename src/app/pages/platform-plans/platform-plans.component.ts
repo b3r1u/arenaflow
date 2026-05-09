@@ -106,13 +106,20 @@ const FEATURE_OPTIONS = [
           </div>
 
           <!-- Pagar.me status -->
-          <div class="flex items-center gap-1.5 text-xs p-2 rounded-lg"
-               [style.background]="plan.pagarme_plan_id ? 'hsl(152,69%,40%,0.07)' : 'hsl(0,0%,50%,0.07)'">
-            <span class="material-icons" [style.color]="plan.pagarme_plan_id ? 'var(--primary)' : 'var(--muted-foreground)'"
-                  style="font-size:0.9rem">{{ plan.pagarme_plan_id ? 'check_circle' : 'radio_button_unchecked' }}</span>
-            <span [style.color]="plan.pagarme_plan_id ? 'var(--primary)' : 'var(--muted-foreground)'">
-              {{ plan.pagarme_plan_id ? plan.pagarme_plan_id : 'Não sincronizado' }}
-            </span>
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-1.5 text-xs p-2 rounded-lg"
+                 [style.background]="plan.pagarme_plan_id ? 'hsl(152,69%,40%,0.07)' : 'hsl(0,0%,50%,0.07)'">
+              <span class="material-icons" [style.color]="plan.pagarme_plan_id ? 'var(--primary)' : 'var(--muted-foreground)'"
+                    style="font-size:0.9rem">{{ plan.pagarme_plan_id ? 'check_circle' : 'radio_button_unchecked' }}</span>
+              <span class="truncate" [style.color]="plan.pagarme_plan_id ? 'var(--primary)' : 'var(--muted-foreground)'">
+                {{ plan.pagarme_plan_id ? plan.pagarme_plan_id : 'Mensal: não sincronizado' }}
+              </span>
+            </div>
+            <div *ngIf="plan.price > 0" class="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg"
+                 style="background:hsl(221,83%,53%,0.06)">
+              <span class="material-icons" style="font-size:0.8rem;color:hsl(221,83%,53%)">auto_awesome</span>
+              <span style="color:hsl(221,83%,53%)">Anual gerado automaticamente (−20%)</span>
+            </div>
           </div>
 
           <!-- Ações -->
