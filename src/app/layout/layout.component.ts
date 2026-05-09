@@ -7,8 +7,9 @@ import { ProfileService } from '../services/profile.service';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
 import { EstablishmentService } from '../services/establishment.service';
+import { ApiService } from '../services/api.service';
 import { EstablishmentProfile } from '../models/models';
-import { Subscription, filter } from 'rxjs';
+import { Subscription, filter, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
@@ -172,18 +173,32 @@ import { Subscription, filter } from 'rxjs';
             </div>
           </ng-container>
 
-          <!-- Indicador "aguardando" após envio -->
-          <div *ngIf="supportMessages.length > 0 && !supportReplied" class="support-msg support-msg--in">
+          <!-- Indicador de envio -->
+          <div *ngIf="supportSending" class="support-msg support-msg--in">
             <div class="support-msg__bubble support-typing">
               <span></span><span></span><span></span>
             </div>
           </div>
+
+          <!-- Confirmação de envio -->
+          <div *ngIf="supportSent && !supportSending" class="support-msg support-msg--in">
+            <div class="support-msg__bubble">
+              ✅ Mensagem recebida! Nossa equipe entrará em contato em breve.
+            </div>
+          </div>
+
+          <!-- Erro de envio -->
+          <div *ngIf="supportError" class="support-msg support-msg--in">
+            <div class="support-msg__bubble" style="background:hsl(0,72%,51%,0.1);color:hsl(0,72%,45%)">
+              ⚠️ {{ supportError }}
+            </div>
+          </div>
         </div>
 
-        <!-- Aviso de pré-lançamento -->
+        <!-- Aviso -->
         <div class="support-panel__notice">
-          <span class="material-icons flex-shrink-0" style="font-size:0.9rem">info</span>
-          <span>Canal em breve. Sua mensagem será registrada.</span>
+          <span class="material-icons flex-shrink-0" style="font-size:0.9rem">mail</span>
+          <span>Sua mensagem chega por e-mail para nossa equipe.</span>
         </div>
 
         <!-- Input de mensagem -->
@@ -194,9 +209,9 @@ import { Subscription, filter } from 'rxjs';
                     placeholder="Digite sua mensagem..."
                     rows="1"></textarea>
           <button class="support-panel__send"
-                  [disabled]="!supportInput.trim()"
+                  [disabled]="!supportInput.trim() || supportSending"
                   (click)="sendSupportMessage()">
-            <span class="material-icons" style="font-size:1.1rem">send</span>
+            <span class="material-icons" style="font-size:1.1rem">{{ supportSending ? 'hourglass_top' : 'send' }}</span>
           </button>
         </div>
       </div>
@@ -479,18 +494,33 @@ export class LayoutComponent implements OnInit, OnDestroy {
   // ── Suporte ──
   supportOpen    = false;
   supportInput   = '';
-  supportReplied = false;
+  supportSending = false;
+  supportSent    = false;
+  supportError   = '';
   supportMessages: { text: string; time: string }[] = [];
 
-  sendSupportMessage() {
+  async sendSupportMessage() {
     const text = this.supportInput.trim();
-    if (!text) return;
-    const now = new Date();
+    if (!text || this.supportSending) return;
+
+    const now  = new Date();
     const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     this.supportMessages.push({ text, time });
     this.supportInput   = '';
-    this.supportReplied = false;
-    // TODO: integrar com backend de chamados
+    this.supportError   = '';
+    this.supportSending = true;
+    this.supportSent    = false;
+
+    try {
+      await firstValueFrom(
+        this.api.post<{ success: boolean }>('/support/message', { message: text })
+      );
+      this.supportSent = true;
+    } catch (err: any) {
+      this.supportError = err?.error?.error || 'Não foi possível enviar. Tente novamente.';
+    } finally {
+      this.supportSending = false;
+    }
   }
 
   onSupportEnter(e: Event) {
@@ -542,6 +572,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     public themeService: ThemeService,
     private establishmentService: EstablishmentService,
+    private api: ApiService,
   ) {}
 
   async logout() {
