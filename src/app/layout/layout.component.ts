@@ -103,16 +103,6 @@ import { Subscription, filter } from 'rxjs';
             <span class="font-heading font-semibold text-sm" style="color:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
           </div>
 
-
-          <!-- Dark mode toggle -->
-          <button (click)="themeService.toggle()"
-                  class="flex items-center justify-center w-9 h-9 rounded-xl btn-ghost flex-shrink-0"
-                  [class.ml-auto]="true"
-                  [class.lg\:ml-0]="true"
-                  [title]="themeService.dark() ? 'Modo claro' : 'Modo escuro'">
-            <span *ngIf="!themeService.dark()" class="material-icons" style="font-size:1.2rem">dark_mode</span>
-            <span *ngIf="themeService.dark()" class="material-icons" style="font-size:1.2rem;color:var(--accent)">light_mode</span>
-          </button>
         </header>
 
         <!-- Page content -->
