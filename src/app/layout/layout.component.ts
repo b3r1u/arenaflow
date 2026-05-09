@@ -108,7 +108,7 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
         </header>
 
         <!-- Page content -->
-        <main class="flex-1 overflow-y-auto p-4 lg:p-6 mobile-scroll">
+        <main class="flex-1 overflow-y-auto p-4 lg:p-6 mobile-scroll" style="padding-right: 5rem">
           <router-outlet></router-outlet>
         </main>
       </div>
