@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { ToastService, ToastMessage } from '../services/toast.service';
 import { ProfileService } from '../services/profile.service';
@@ -12,7 +13,7 @@ import { Subscription, filter } from 'rxjs';
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, RouterModule, RouterLink, RouterLinkActive],
   template: `
     <div class="flex h-screen overflow-hidden" style="background-color: var(--background)">
 
@@ -126,6 +127,81 @@ import { Subscription, filter } from 'rxjs';
       <!-- Toast -->
       <div *ngIf="toast?.type === 'error'" class="toast toast-error">{{ toast!.text }}</div>
       <div *ngIf="toast?.type === 'success'" class="toast">{{ toast!.text }}</div>
+
+      <!-- ───── Botão flutuante de suporte ───── -->
+      <button class="support-fab" (click)="supportOpen = !supportOpen" [class.support-fab--active]="supportOpen" aria-label="Suporte">
+        <span class="material-icons" style="font-size:1.5rem">{{ supportOpen ? 'close' : 'chat_bubble' }}</span>
+      </button>
+
+      <!-- Painel de chamados -->
+      <div class="support-panel" [class.support-panel--open]="supportOpen">
+
+        <!-- Cabeçalho -->
+        <div class="support-panel__header">
+          <div class="flex items-center gap-3">
+            <div class="support-panel__avatar">
+              <span class="material-icons" style="font-size:1.2rem">support_agent</span>
+            </div>
+            <div>
+              <p class="font-semibold text-sm" style="color:var(--foreground)">Suporte ArenaFlow</p>
+              <p class="text-xs" style="color:var(--muted-foreground)">Resposta em até 24h</p>
+            </div>
+          </div>
+          <button class="support-panel__close" (click)="supportOpen = false">
+            <span class="material-icons" style="font-size:1.1rem">close</span>
+          </button>
+        </div>
+
+        <!-- Corpo de mensagens -->
+        <div class="support-panel__body" #chatBody>
+
+          <!-- Mensagem de boas-vindas -->
+          <div class="support-msg support-msg--in">
+            <div class="support-msg__bubble">
+              <p>Olá! 👋 Como podemos ajudar você hoje?</p>
+              <p class="mt-1" style="opacity:0.75;font-size:0.72rem">Descreva sua dúvida ou problema e nossa equipe responderá em breve.</p>
+            </div>
+            <span class="support-msg__time">Agora</span>
+          </div>
+
+          <!-- Mensagens do usuário -->
+          <ng-container *ngFor="let msg of supportMessages">
+            <div class="support-msg support-msg--out">
+              <div class="support-msg__bubble support-msg__bubble--out">{{ msg.text }}</div>
+              <span class="support-msg__time">{{ msg.time }}</span>
+            </div>
+          </ng-container>
+
+          <!-- Indicador "aguardando" após envio -->
+          <div *ngIf="supportMessages.length > 0 && !supportReplied" class="support-msg support-msg--in">
+            <div class="support-msg__bubble support-typing">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aviso de pré-lançamento -->
+        <div class="support-panel__notice">
+          <span class="material-icons flex-shrink-0" style="font-size:0.9rem">info</span>
+          <span>Canal em breve. Sua mensagem será registrada.</span>
+        </div>
+
+        <!-- Input de mensagem -->
+        <div class="support-panel__footer">
+          <textarea class="support-panel__input"
+                    [(ngModel)]="supportInput"
+                    (keydown.enter)="onSupportEnter($event)"
+                    placeholder="Digite sua mensagem..."
+                    rows="1"></textarea>
+          <button class="support-panel__send"
+                  [disabled]="!supportInput.trim()"
+                  (click)="sendSupportMessage()">
+            <span class="material-icons" style="font-size:1.1rem">send</span>
+          </button>
+        </div>
+      </div>
+      <!-- ───── fim suporte ───── -->
+
     </div>
   `,
   styles: [`
@@ -178,15 +254,249 @@ import { Subscription, filter } from 'rxjs';
     .toast-error {
       background-color: #ef4444 !important;
     }
+
+    /* ── Floating support button ── */
+    .support-fab {
+      position: fixed;
+      bottom: 5.5rem;
+      right: 1.25rem;
+      z-index: 200;
+      width: 3.25rem;
+      height: 3.25rem;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 24px rgba(34,197,94,0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+    }
+    .support-fab:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(34,197,94,0.5);
+    }
+    .support-fab--active {
+      background: var(--muted-foreground);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    @media (min-width: 1024px) {
+      .support-fab {
+        bottom: 1.5rem;
+        right: 1.5rem;
+      }
+    }
+
+    /* ── Support panel ── */
+    .support-panel {
+      position: fixed;
+      bottom: 9rem;
+      right: 1.25rem;
+      z-index: 199;
+      width: min(22rem, calc(100vw - 2rem));
+      max-height: 70vh;
+      border-radius: 1.25rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.92) translateY(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+      transform-origin: bottom right;
+    }
+    .support-panel--open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+    @media (min-width: 1024px) {
+      .support-panel {
+        bottom: 5.5rem;
+        right: 1.5rem;
+      }
+    }
+
+    .support-panel__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1rem 0.875rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      background: linear-gradient(135deg, hsl(152,69%,40%,0.06), transparent);
+    }
+    .support-panel__avatar {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), hsl(152,69%,30%));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .support-panel__close {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 50%;
+      border: none;
+      background: var(--muted);
+      color: var(--muted-foreground);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .support-panel__close:hover { background: var(--border); }
+
+    .support-panel__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .support-msg { display: flex; flex-direction: column; max-width: 85%; }
+    .support-msg--in  { align-self: flex-start; }
+    .support-msg--out { align-self: flex-end; align-items: flex-end; }
+
+    .support-msg__bubble {
+      padding: 0.55rem 0.9rem;
+      border-radius: 1rem;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      background: var(--muted);
+      color: var(--foreground);
+      border-bottom-left-radius: 0.25rem;
+    }
+    .support-msg__bubble--out {
+      background: var(--primary);
+      color: white;
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+    .support-msg__time {
+      font-size: 0.67rem;
+      color: var(--muted-foreground);
+      margin-top: 0.2rem;
+      padding: 0 0.25rem;
+    }
+
+    /* Typing indicator */
+    .support-typing {
+      display: flex !important;
+      gap: 0.3rem;
+      padding: 0.65rem 0.9rem;
+      align-items: center;
+    }
+    .support-typing span {
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: var(--muted-foreground);
+      animation: typing-dot 1.2s infinite ease-in-out;
+    }
+    .support-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .support-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing-dot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .support-panel__notice {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.7rem;
+      color: var(--muted-foreground);
+      background: hsl(38,92%,50%,0.07);
+      border-top: 1px solid hsl(38,92%,50%,0.15);
+      flex-shrink: 0;
+    }
+
+    .support-panel__footer {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .support-panel__input {
+      flex: 1;
+      resize: none;
+      border-radius: 0.75rem;
+      border: 1.5px solid var(--border);
+      background: var(--background);
+      color: var(--foreground);
+      padding: 0.55rem 0.75rem;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      max-height: 6rem;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    .support-panel__input:focus { border-color: var(--primary); }
+    .support-panel__input::placeholder { color: var(--muted-foreground); }
+    .support-panel__send {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .support-panel__send:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .support-panel__send:not(:disabled):hover { transform: scale(1.08); }
   `]
 })
 export class LayoutComponent implements OnInit, OnDestroy {
-  sidebarOpen = false;
-  isDesktop = false;
+  sidebarOpen   = false;
+  isDesktop     = false;
   toast: ToastMessage | null = null;
   currentPageLabel = '';
   profile: EstablishmentProfile = { name: 'Minha Arena' };
   private subs: Subscription[] = [];
+
+  // ── Suporte ──
+  supportOpen    = false;
+  supportInput   = '';
+  supportReplied = false;
+  supportMessages: { text: string; time: string }[] = [];
+
+  sendSupportMessage() {
+    const text = this.supportInput.trim();
+    if (!text) return;
+    const now = new Date();
+    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    this.supportMessages.push({ text, time });
+    this.supportInput   = '';
+    this.supportReplied = false;
+    // TODO: integrar com backend de chamados
+  }
+
+  onSupportEnter(e: Event) {
+    const ke = e as KeyboardEvent;
+    if (!ke.shiftKey) { e.preventDefault(); this.sendSupportMessage(); }
+  }
 
   get profileInitials(): string {
     return (this.profile?.name || 'AF').split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase();
