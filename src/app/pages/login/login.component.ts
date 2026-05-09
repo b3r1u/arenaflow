@@ -1060,21 +1060,35 @@ interface PlanOption {
                       <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(34,165,92,0.12),transparent 70%);filter:blur(20px)"></div>
                       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.65rem">
                         <svg width="92" height="92" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <!-- Semicírculo — origem, abre para a direita (forma D) -->
-                          <path d="M2.5,8 A 2,2 0 0,1 2.5,12 Z" fill="#22c55e">
-                            <animate attributeName="opacity"
-                                     values="0.18;0.75;0.18"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="0s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                          </path>
-                          <!-- Quadra 1 — primeira onda sai do semicírculo -->
+                          <!-- Semicírculo — origem, abre para a direita (centralizado para escalar a partir do próprio centro) -->
+                          <g transform="translate(2.5 10)">
+                            <path d="M0,-2 A 2,2 0 0,1 0,2 Z" fill="#22c55e">
+                              <animate attributeName="opacity"
+                                       values="0.18;0.78;0.18"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="0s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                              <animateTransform attributeName="transform" type="scale"
+                                       values="1;1.18;1"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="0s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            </path>
+                          </g>
+                          <!-- Quadra 1 — primeira onda sai do semicírculo (pulsa stroke + opacity) -->
                           <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5"
-                                fill="none" stroke="#22c55e" stroke-width="0.75"
+                                fill="none" stroke="#22c55e" stroke-width="0.7"
                                 stroke-linecap="round" stroke-linejoin="round">
                             <animate attributeName="opacity"
-                                     values="0.05;0.35;0.05"
+                                     values="0.05;0.4;0.05"
+                                     keyTimes="0;0.38;1"
+                                     dur="5s" begin="0.7s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            <animate attributeName="stroke-width"
+                                     values="0.7;1.15;0.7"
                                      keyTimes="0;0.38;1"
                                      dur="5s" begin="0.7s" repeatCount="indefinite"
                                      calcMode="spline"
@@ -1082,10 +1096,16 @@ interface PlanOption {
                           </path>
                           <!-- Quadra 2 — onda expande para o meio -->
                           <path d="M2.5,4 L13,4 L13,16 L2.5,16"
-                                fill="none" stroke="#22c55e" stroke-width="0.75"
+                                fill="none" stroke="#22c55e" stroke-width="0.7"
                                 stroke-linecap="round" stroke-linejoin="round">
                             <animate attributeName="opacity"
-                                     values="0.05;0.35;0.05"
+                                     values="0.05;0.4;0.05"
+                                     keyTimes="0;0.38;1"
+                                     dur="5s" begin="1.4s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            <animate attributeName="stroke-width"
+                                     values="0.7;1.15;0.7"
                                      keyTimes="0;0.38;1"
                                      dur="5s" begin="1.4s" repeatCount="indefinite"
                                      calcMode="spline"
@@ -1093,10 +1113,16 @@ interface PlanOption {
                           </path>
                           <!-- Quadra 3 — onda chega ao exterior -->
                           <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5"
-                                fill="none" stroke="#22c55e" stroke-width="0.75"
+                                fill="none" stroke="#22c55e" stroke-width="0.7"
                                 stroke-linecap="round" stroke-linejoin="round">
                             <animate attributeName="opacity"
-                                     values="0.05;0.35;0.05"
+                                     values="0.05;0.4;0.05"
+                                     keyTimes="0;0.38;1"
+                                     dur="5s" begin="2.1s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            <animate attributeName="stroke-width"
+                                     values="0.7;1.15;0.7"
                                      keyTimes="0;0.38;1"
                                      dur="5s" begin="2.1s" repeatCount="indefinite"
                                      calcMode="spline"
