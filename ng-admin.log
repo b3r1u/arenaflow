@@ -1,0 +1,1166 @@
+- Building...
+
+Initial chunk files | Names                    |  Raw size
+polyfills.js        | polyfills                |  88.09 kB | 
+styles.css          | styles                   |  45.33 kB | 
+main.js             | main                     |  32.60 kB | 
+chunk-UANYR2JC.js   | -                        |  13.40 kB | 
+chunk-TQHL2RZM.js   | -                        |   3.54 kB | 
+chunk-GRKD3NRZ.js   | -                        |   3.42 kB | 
+chunk-XFWDVWDF.js   | -                        |   2.26 kB | 
+chunk-BXOW425V.js   | -                        | 856 bytes | 
+
+                    | Initial total            | 189.47 kB
+
+Lazy chunk files    | Names                    |  Raw size
+chunk-GNS2TSKH.js   | login-component          | 167.75 kB | 
+chunk-YKZDLWRT.js   | financeiro-component     |  77.40 kB | 
+chunk-7TKPRECJ.js   | agendamentos-component   |  63.42 kB | 
+chunk-3ZO5QN6A.js   | planos-component         |  62.29 kB | 
+chunk-Z5RTRC23.js   | perfil-component         |  61.89 kB | 
+chunk-S42IGPJ5.js   | reservas-component       |  45.88 kB | 
+chunk-OQ72WEMC.js   | quadras-component        |  41.15 kB | 
+chunk-5CWXDPJD.js   | promocoes-component      |  37.93 kB | 
+chunk-L66FJBPE.js   | platform-plans-component |  33.06 kB | 
+chunk-4XIN7VRT.js   | mensalistas-component    |  29.91 kB | 
+chunk-HVP35XJP.js   | clientes-component       |  24.38 kB | 
+chunk-GH2VU75N.js   | relatorios-component     |  23.38 kB | 
+chunk-VSHV4KVS.js   | dashboard-component      |  22.77 kB | 
+chunk-HARVZA74.js   | -                        |  15.15 kB | 
+chunk-FBIDJOZO.js   | -                        |   3.63 kB | 
+...and 1 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [6.308 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:68:152:
+      68 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:103:105:
+      103 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Watch mode enabled. Watching for file changes...
+  ➜  Local:   http://localhost:4200/
+  ➜  press h + enter to show help
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [2.503 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:68:152:
+      68 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:103:105:
+      103 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'monthDays' does not exist on type 'FinanceiroComponent'. [plugin angular-compiler]
+
+    src/app/pages/financeiro/financeiro.component.ts:178:39:
+      178 │               <button *ngFor="let d of monthDays"
+          ╵                                        ~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                    |  Raw size
+polyfills.js        | polyfills                |  88.09 kB | 
+styles.css          | styles                   |  45.33 kB | 
+main.js             | main                     |  32.60 kB | 
+chunk-UANYR2JC.js   | -                        |  13.40 kB | 
+chunk-TQHL2RZM.js   | -                        |   3.54 kB | 
+chunk-GRKD3NRZ.js   | -                        |   3.42 kB | 
+chunk-XFWDVWDF.js   | -                        |   2.26 kB | 
+chunk-BXOW425V.js   | -                        | 856 bytes | 
+
+                    | Initial total            | 189.47 kB
+
+Lazy chunk files    | Names                    |  Raw size
+chunk-GNS2TSKH.js   | login-component          | 167.75 kB | 
+chunk-BGTMLLQI.js   | financeiro-component     |  77.86 kB | 
+chunk-7TKPRECJ.js   | agendamentos-component   |  63.42 kB | 
+chunk-3ZO5QN6A.js   | planos-component         |  62.29 kB | 
+chunk-Z5RTRC23.js   | perfil-component         |  61.89 kB | 
+chunk-S42IGPJ5.js   | reservas-component       |  45.88 kB | 
+chunk-OQ72WEMC.js   | quadras-component        |  41.15 kB | 
+chunk-5CWXDPJD.js   | promocoes-component      |  37.93 kB | 
+chunk-L66FJBPE.js   | platform-plans-component |  33.06 kB | 
+chunk-4XIN7VRT.js   | mensalistas-component    |  29.91 kB | 
+chunk-HVP35XJP.js   | clientes-component       |  24.38 kB | 
+chunk-GH2VU75N.js   | relatorios-component     |  23.38 kB | 
+chunk-VSHV4KVS.js   | dashboard-component      |  22.77 kB | 
+chunk-HARVZA74.js   | -                        |  15.15 kB | 
+chunk-FBIDJOZO.js   | -                        |   3.63 kB | 
+...and 1 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [0.784 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:68:152:
+      68 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:103:105:
+      103 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.421 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:68:152:
+      68 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:103:105:
+      103 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:131:43:
+      131 │ ...ss="support-fab" (click)="supportOpen = !supportOpen" [class.s...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:131:58:
+      131 │ ..." (click)="supportOpen = !supportOpen" [class.support-fab--act...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:131:100:
+      131 │ ..." [class.support-fab--active]="supportOpen" aria-label="Suporte">
+          ╵                                   ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:65:
+      132 │ ...yle="font-size:1.5rem">{{ supportOpen ? 'close' : 'chat_bubble...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:136:62:
+      136 │ ... class="support-panel" [class.support-panel--open]="supportOpen">
+          ╵                                                        ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:149:56:
+      149 │ ...utton class="support-panel__close" (click)="supportOpen = false">
+          ╵                                                ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:167:43:
+      167 │           <ng-container *ngFor="let msg of supportMessages">
+          ╵                                            ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:175:22:
+      175 │           <div *ngIf="supportMessages.length > 0 && !supportRepli...
+          ╵                       ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportReplied' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:175:53:
+      175 │ ...Messages.length > 0 && !supportReplied" class="support-msg sup...
+          ╵                            ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'ngModel' since it isn't a known property of 'textarea'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:191:20:
+      191 │                     [(ngModel)]="supportInput"
+          ╵                     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:191:33:
+      191 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:191:33:
+      191 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'onSupportEnter' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:37:
+      192 │                     (keydown.enter)="onSupportEnter($event)"
+          ╵                                      ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:196:31:
+      196 │                   [disabled]="!supportInput.trim()"
+          ╵                                ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'sendSupportMessage' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:197:27:
+      197 │                   (click)="sendSupportMessage()">
+          ╵                            ~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.360 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:37:107:
+      37 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:68:152:
+      68 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:103:105:
+      103 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:131:43:
+      131 │ ...ss="support-fab" (click)="supportOpen = !supportOpen" [class.s...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:131:58:
+      131 │ ..." (click)="supportOpen = !supportOpen" [class.support-fab--act...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:131:100:
+      131 │ ..." [class.support-fab--active]="supportOpen" aria-label="Suporte">
+          ╵                                   ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:65:
+      132 │ ...yle="font-size:1.5rem">{{ supportOpen ? 'close' : 'chat_bubble...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:136:62:
+      136 │ ... class="support-panel" [class.support-panel--open]="supportOpen">
+          ╵                                                        ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:149:56:
+      149 │ ...utton class="support-panel__close" (click)="supportOpen = false">
+          ╵                                                ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:167:43:
+      167 │           <ng-container *ngFor="let msg of supportMessages">
+          ╵                                            ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:175:22:
+      175 │           <div *ngIf="supportMessages.length > 0 && !supportRepli...
+          ╵                       ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportReplied' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:175:53:
+      175 │ ...Messages.length > 0 && !supportReplied" class="support-msg sup...
+          ╵                            ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'ngModel' since it isn't a known property of 'textarea'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:191:20:
+      191 │                     [(ngModel)]="supportInput"
+          ╵                     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:191:33:
+      191 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:191:33:
+      191 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'onSupportEnter' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:37:
+      192 │                     (keydown.enter)="onSupportEnter($event)"
+          ╵                                      ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:196:31:
+      196 │                   [disabled]="!supportInput.trim()"
+          ╵                                ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'sendSupportMessage' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:197:27:
+      197 │                   (click)="sendSupportMessage()">
+          ╵                            ~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.343 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:38:107:
+      38 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:69:152:
+      69 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:104:105:
+      104 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:43:
+      132 │ ...ss="support-fab" (click)="supportOpen = !supportOpen" [class.s...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:58:
+      132 │ ..." (click)="supportOpen = !supportOpen" [class.support-fab--act...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:100:
+      132 │ ..." [class.support-fab--active]="supportOpen" aria-label="Suporte">
+          ╵                                   ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:133:65:
+      133 │ ...yle="font-size:1.5rem">{{ supportOpen ? 'close' : 'chat_bubble...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:137:62:
+      137 │ ... class="support-panel" [class.support-panel--open]="supportOpen">
+          ╵                                                        ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:150:56:
+      150 │ ...utton class="support-panel__close" (click)="supportOpen = false">
+          ╵                                                ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:168:43:
+      168 │           <ng-container *ngFor="let msg of supportMessages">
+          ╵                                            ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:176:22:
+      176 │           <div *ngIf="supportMessages.length > 0 && !supportRepli...
+          ╵                       ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportReplied' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:176:53:
+      176 │ ...Messages.length > 0 && !supportReplied" class="support-msg sup...
+          ╵                            ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'ngModel' since it isn't a known property of 'textarea'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:20:
+      192 │                     [(ngModel)]="supportInput"
+          ╵                     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:33:
+      192 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:33:
+      192 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'onSupportEnter' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:193:37:
+      193 │                     (keydown.enter)="onSupportEnter($event)"
+          ╵                                      ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:197:31:
+      197 │                   [disabled]="!supportInput.trim()"
+          ╵                                ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'sendSupportMessage' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:198:27:
+      198 │                   (click)="sendSupportMessage()">
+          ╵                            ~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.331 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:38:107:
+      38 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:69:152:
+      69 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:104:105:
+      104 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:43:
+      132 │ ...ss="support-fab" (click)="supportOpen = !supportOpen" [class.s...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:58:
+      132 │ ..." (click)="supportOpen = !supportOpen" [class.support-fab--act...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:132:100:
+      132 │ ..." [class.support-fab--active]="supportOpen" aria-label="Suporte">
+          ╵                                   ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:133:65:
+      133 │ ...yle="font-size:1.5rem">{{ supportOpen ? 'close' : 'chat_bubble...
+          ╵                              ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:137:62:
+      137 │ ... class="support-panel" [class.support-panel--open]="supportOpen">
+          ╵                                                        ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportOpen' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:150:56:
+      150 │ ...utton class="support-panel__close" (click)="supportOpen = false">
+          ╵                                                ~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:168:43:
+      168 │           <ng-container *ngFor="let msg of supportMessages">
+          ╵                                            ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportMessages' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:176:22:
+      176 │           <div *ngIf="supportMessages.length > 0 && !supportRepli...
+          ╵                       ~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportReplied' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:176:53:
+      176 │ ...Messages.length > 0 && !supportReplied" class="support-msg sup...
+          ╵                            ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:33:
+      192 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:192:33:
+      192 │                     [(ngModel)]="supportInput"
+          ╵                                  ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'onSupportEnter' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:193:37:
+      193 │                     (keydown.enter)="onSupportEnter($event)"
+          ╵                                      ~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'supportInput' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:197:31:
+      197 │                   [disabled]="!supportInput.trim()"
+          ╵                                ~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'sendSupportMessage' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:198:27:
+      198 │                   (click)="sendSupportMessage()">
+          ╵                            ~~~~~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.591 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:38:107:
+      38 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:69:152:
+      69 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:104:105:
+      104 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG5: Argument of type 'Event' is not assignable to parameter of type 'KeyboardEvent'.
+  Type 'Event' is missing the following properties from type 'KeyboardEvent': altKey, charCode, code, ctrlKey, and 17 more. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:193:52:
+      193 │                     (keydown.enter)="onSupportEnter($event)"
+          ╵                                                     ~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                    |  Raw size
+polyfills.js        | polyfills                |  88.09 kB | 
+main.js             | main                     |  45.77 kB | 
+styles.css          | styles                   |  45.40 kB | 
+chunk-UANYR2JC.js   | -                        |  13.40 kB | 
+chunk-TQHL2RZM.js   | -                        |   3.54 kB | 
+chunk-GRKD3NRZ.js   | -                        |   3.42 kB | 
+chunk-XFWDVWDF.js   | -                        |   2.26 kB | 
+chunk-BXOW425V.js   | -                        | 856 bytes | 
+
+                    | Initial total            | 202.71 kB
+
+Lazy chunk files    | Names                    |  Raw size
+chunk-GNS2TSKH.js   | login-component          | 167.75 kB | 
+chunk-BGTMLLQI.js   | financeiro-component     |  77.86 kB | 
+chunk-7TKPRECJ.js   | agendamentos-component   |  63.42 kB | 
+chunk-3ZO5QN6A.js   | planos-component         |  62.29 kB | 
+chunk-Z5RTRC23.js   | perfil-component         |  61.89 kB | 
+chunk-S42IGPJ5.js   | reservas-component       |  45.88 kB | 
+chunk-OQ72WEMC.js   | quadras-component        |  41.15 kB | 
+chunk-5CWXDPJD.js   | promocoes-component      |  37.93 kB | 
+chunk-L66FJBPE.js   | platform-plans-component |  33.06 kB | 
+chunk-4XIN7VRT.js   | mensalistas-component    |  29.91 kB | 
+chunk-HVP35XJP.js   | clientes-component       |  24.38 kB | 
+chunk-GH2VU75N.js   | relatorios-component     |  23.38 kB | 
+chunk-VSHV4KVS.js   | dashboard-component      |  22.77 kB | 
+chunk-HARVZA74.js   | -                        |  15.15 kB | 
+chunk-FBIDJOZO.js   | -                        |   3.63 kB | 
+...and 1 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [0.444 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:38:107:
+      38 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:69:152:
+      69 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:104:105:
+      104 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 45.77 kB | 
+
+Application bundle generation complete. [0.534 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.766 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'supportReplied' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:177:53:
+      177 │ ...Messages.length > 0 && !supportReplied" class="support-msg sup...
+          ╵                            ~~~~~~~~~~~~~~
+
+
+X [ERROR] TS2339: Property 'api' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:502:13:
+      502 │         this.api.post<{ success: boolean }>('/support/message', {...
+          ╵              ~~~
+
+
+- Changes detected. Rebuilding...
+
+Application bundle generation failed. [0.486 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+X [ERROR] NG9: Property 'supportReplied' does not exist on type 'LayoutComponent'. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:177:53:
+      177 │ ...Messages.length > 0 && !supportReplied" class="support-msg sup...
+          ╵                            ~~~~~~~~~~~~~~
+
+
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names                    |  Raw size
+polyfills.js        | polyfills                |  88.09 kB | 
+main.js             | main                     |  47.40 kB | 
+styles.css          | styles                   |  45.40 kB | 
+chunk-UANYR2JC.js   | -                        |  13.40 kB | 
+chunk-TQHL2RZM.js   | -                        |   3.54 kB | 
+chunk-GRKD3NRZ.js   | -                        |   3.42 kB | 
+chunk-XFWDVWDF.js   | -                        |   2.26 kB | 
+chunk-BXOW425V.js   | -                        | 856 bytes | 
+
+                    | Initial total            | 204.33 kB
+
+Lazy chunk files    | Names                    |  Raw size
+chunk-GNS2TSKH.js   | login-component          | 167.75 kB | 
+chunk-BGTMLLQI.js   | financeiro-component     |  77.86 kB | 
+chunk-7TKPRECJ.js   | agendamentos-component   |  63.42 kB | 
+chunk-3ZO5QN6A.js   | planos-component         |  62.29 kB | 
+chunk-Z5RTRC23.js   | perfil-component         |  61.89 kB | 
+chunk-S42IGPJ5.js   | reservas-component       |  45.88 kB | 
+chunk-OQ72WEMC.js   | quadras-component        |  41.15 kB | 
+chunk-5CWXDPJD.js   | promocoes-component      |  37.93 kB | 
+chunk-L66FJBPE.js   | platform-plans-component |  33.06 kB | 
+chunk-4XIN7VRT.js   | mensalistas-component    |  29.91 kB | 
+chunk-HVP35XJP.js   | clientes-component       |  24.38 kB | 
+chunk-GH2VU75N.js   | relatorios-component     |  23.38 kB | 
+chunk-VSHV4KVS.js   | dashboard-component      |  22.77 kB | 
+chunk-HARVZA74.js   | -                        |  15.15 kB | 
+chunk-FBIDJOZO.js   | -                        |   3.63 kB | 
+...and 1 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [0.358 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 47.54 kB | 
+
+Application bundle generation complete. [0.452 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 47.12 kB | 
+
+Application bundle generation complete. [0.550 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 48.03 kB | 
+
+Application bundle generation complete. [0.675 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 48.06 kB | 
+
+Application bundle generation complete. [0.357 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 46.55 kB | 
+
+Application bundle generation complete. [0.357 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 46.55 kB | 
+
+Application bundle generation complete. [0.431 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 46.53 kB | 
+
+Application bundle generation complete. [0.313 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names | Raw size
+main.js             | main  | 46.51 kB | 
+
+Application bundle generation complete. [0.359 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).
+- Changes detected. Rebuilding...
+
+Initial chunk files | Names  | Raw size
+main.js             | main   | 46.50 kB | 
+styles.css          | styles | 45.43 kB | 
+
+Application bundle generation complete. [0.317 seconds]
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:39:107:
+      39 │ ...r(--sidebar-foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+         ╵                                         ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:70:152:
+      70 │ ...ogleUser()?.displayName || profile?.name || 'Minha Arena' }}</div>
+         ╵                                        ~~~~
+
+
+▲ [WARNING] NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. [plugin angular-compiler]
+
+    src/app/layout/layout.component.ts:105:105:
+      105 │ ...olor:var(--foreground)">{{ profile?.name || 'ArenaFlow' }}</span>
+          ╵                                        ~~~~
+
+
+Page reload sent to client(s).

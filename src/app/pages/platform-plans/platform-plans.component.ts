@@ -47,9 +47,15 @@ const FEATURE_OPTIONS = [
       </div>
 
       <!-- Loading -->
-      <div *ngIf="loading" class="text-center py-16" style="color:var(--muted-foreground)">
-        <span class="material-icons" style="font-size:2.5rem;animation:spin 1s linear infinite">refresh</span>
-        <p class="mt-3 text-sm">Carregando planos...</p>
+      <div *ngIf="loading" class="flex flex-col items-center py-16 gap-4">
+        <svg style="width:3rem;height:3rem" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" opacity="0.1"/>
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" opacity="0.1"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1 138.2" opacity="0.65" style="transform-origin:50px 50px;animation:sp-ccw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="5" fill="var(--primary)" style="animation:sp-pulse 1.3s ease-in-out infinite"/>
+        </svg>
+        <p class="text-sm" style="color:var(--muted-foreground)">Carregando planos...</p>
       </div>
 
       <!-- Grid de planos -->
@@ -237,7 +243,10 @@ const FEATURE_OPTIONS = [
             <button class="btn-outline flex-1" (click)="closeModal()">Cancelar</button>
             <button class="btn-primary flex-1" (click)="save()"
                     [disabled]="!form.slug || !form.name || form.price === null || saving">
-              <span *ngIf="saving" class="material-icons" style="font-size:1rem;animation:spin 1s linear infinite">refresh</span>
+              <svg *ngIf="saving" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+                <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+              </svg>
               {{ saving ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Criar plano') }}
             </button>
           </div>

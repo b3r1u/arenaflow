@@ -414,3 +414,12 @@ body {
 
 [data-theme="dark"] .badge-accent { color: hsl(36, 90%, 65%); }
 [data-theme="dark"] .badge-primary { background-color: hsl(152,60%,45%,0.15); }
+
+/* ── Dual-ring spinner keyframes (globais) ───────────────── */
+@keyframes sp-cw   { to { transform: rotate(360deg);  } }
+@keyframes sp-ccw  { to { transform: rotate(-360deg); } }
+@keyframes sp-pulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1;    }
+}
+@keyframes spin    { to { transform: rotate(360deg);  } }

@@ -200,10 +200,12 @@ interface ThemeOption {
               <input class="input info-input" [value]="cep" placeholder="00000-000" maxlength="9"
                      style="padding-right:2rem"
                      (input)="onCepInput($event)" />
-              <span *ngIf="cepLoading" class="material-icons"
-                    style="position:absolute;right:0.7rem;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--muted-foreground);animation:spin 1s linear infinite">
-                refresh
-              </span>
+              <svg *ngIf="cepLoading"
+                   style="position:absolute;right:0.7rem;top:50%;transform:translateY(-50%);width:1rem;height:1rem"
+                   viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="8" opacity="0.2"/>
+                <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="8" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+              </svg>
             </div>
             <p *ngIf="cepError" class="text-xs mt-1" style="color:var(--destructive)">{{ cepError }}</p>
           </div>
@@ -342,7 +344,10 @@ interface ThemeOption {
           <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl"
                   [disabled]="savingInfo"
                   (click)="saveInfo()">
-            <span *ngIf="savingInfo" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite;vertical-align:middle;margin-right:4px">refresh</span>
+            <svg *ngIf="savingInfo" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+              <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            </svg>
             {{ savingInfo ? 'Salvando...' : 'Salvar informações' }}
           </button>
         </div>
@@ -428,7 +433,10 @@ interface ThemeOption {
           <button class="btn-primary px-6 py-2 text-sm font-medium rounded-xl"
                   [disabled]="savingPolicy"
                   (click)="saveCancelPolicy()">
-            <span *ngIf="savingPolicy" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite;vertical-align:middle;margin-right:4px">refresh</span>
+            <svg *ngIf="savingPolicy" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+              <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            </svg>
             {{ savingPolicy ? 'Salvando...' : 'Salvar política' }}
           </button>
         </div>

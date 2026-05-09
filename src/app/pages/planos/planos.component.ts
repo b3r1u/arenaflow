@@ -353,8 +353,11 @@ interface Plan {
               <input class="sub-input" [value]="subCity" readonly
                      style="background:var(--muted);color:var(--muted-foreground)">
             </div>
-            <p *ngIf="cepLoading" class="text-xs mt-1 mb-2" style="color:var(--muted-foreground)">
-              <span class="material-icons" style="font-size:0.8rem;vertical-align:middle;animation:spin 1s linear infinite">sync</span>
+            <p *ngIf="cepLoading" class="text-xs mt-1 mb-2" style="color:var(--muted-foreground);display:flex;align-items:center;gap:0.3rem">
+              <svg style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="8" opacity="0.2"/>
+                <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="8" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+              </svg>
               Consultando CEP...
             </p>
 
@@ -379,7 +382,10 @@ interface Plan {
                       class="flex-1 py-2.5 rounded-xl font-heading font-semibold text-sm flex items-center justify-center gap-1.5"
                       style="background:var(--primary);color:white;border:none;cursor:pointer;transition:opacity 0.2s"
                       [style.opacity]="subscribeLoading ? '0.7' : '1'">
-                <span *ngIf="subscribeLoading" class="material-icons" style="font-size:1rem;animation:spin 1s linear infinite">sync</span>
+                <svg *ngIf="subscribeLoading" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+                  <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+                  <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+                </svg>
                 {{ subscribeLoading ? 'Processando...' : 'Confirmar assinatura' }}
               </button>
             </div>
@@ -453,7 +459,10 @@ interface Plan {
                     class="flex-1 py-2.5 rounded-xl font-heading font-semibold text-sm transition-all duration-150 flex items-center justify-center gap-1.5"
                     style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25)"
                     onmouseover="this.style.background='rgba(239,68,68,0.22)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
-              <span *ngIf="cancelLoading" class="material-icons" style="font-size:1rem;animation:spin 1s linear infinite">sync</span>
+              <svg *ngIf="cancelLoading" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="36" stroke="rgba(239,68,68,0.3)" stroke-width="9"/>
+                <circle cx="50" cy="50" r="36" stroke="#f87171" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+              </svg>
               <span *ngIf="!cancelLoading" class="material-icons" style="font-size:0.9rem">cancel</span>
               {{ cancelLoading ? 'Cancelando...' : 'Sim, cancelar' }}
             </button>

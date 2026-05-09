@@ -45,8 +45,14 @@ import { Court } from '../../models/models';
       <!-- ═══════════════════════════════════════════════════════════
            Estado: inicializando (aguarda POST /auth/me)
       ════════════════════════════════════════════════════════════ -->
-      <div *ngIf="!establishment.initialized()" class="flex flex-col items-center justify-center py-24">
-        <span class="material-icons mb-3" style="font-size:3rem;color:var(--border);animation:spin 1s linear infinite">refresh</span>
+      <div *ngIf="!establishment.initialized()" class="flex flex-col items-center justify-center py-24 gap-4">
+        <svg style="width:3rem;height:3rem" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" opacity="0.1"/>
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" opacity="0.1"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1 138.2" opacity="0.65" style="transform-origin:50px 50px;animation:sp-ccw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="5" fill="var(--primary)" style="animation:sp-pulse 1.3s ease-in-out infinite"/>
+        </svg>
         <p class="text-sm" style="color:var(--muted-foreground)">Carregando...</p>
       </div>
 
@@ -158,8 +164,14 @@ import { Court } from '../../models/models';
         </div>
 
         <!-- Loading quadras -->
-        <div *ngIf="courts.loading()" class="text-center py-16">
-          <span class="material-icons mb-3 block" style="font-size:3rem;color:var(--border);animation:spin 1s linear infinite">refresh</span>
+        <div *ngIf="courts.loading()" class="flex flex-col items-center py-16 gap-4">
+          <svg style="width:3rem;height:3rem" viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" opacity="0.1"/>
+            <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" opacity="0.1"/>
+            <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1 138.2" opacity="0.65" style="transform-origin:50px 50px;animation:sp-ccw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            <circle cx="50" cy="50" r="5" fill="var(--primary)" style="animation:sp-pulse 1.3s ease-in-out infinite"/>
+          </svg>
           <p class="text-sm" style="color:var(--muted-foreground)">Carregando quadras...</p>
         </div>
 
@@ -306,13 +318,19 @@ import { Court } from '../../models/models';
                   style="border-color:var(--destructive);color:var(--destructive)"
                   [disabled]="courts.saving()"
                   (click)="deleteCourt()">
-            <span *ngIf="courts.saving()" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+            <svg *ngIf="courts.saving()" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="36" stroke="rgba(239,68,68,0.3)" stroke-width="9"/>
+              <circle cx="50" cy="50" r="36" stroke="#f87171" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            </svg>
             <span *ngIf="!courts.saving()">Excluir</span>
           </button>
           <button class="btn-primary flex-1"
                   [disabled]="!form.name || courts.saving()"
                   (click)="saveCourt()">
-            <span *ngIf="courts.saving()" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+            <svg *ngIf="courts.saving()" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+              <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            </svg>
             <span *ngIf="!courts.saving()">{{ editingId ? 'Salvar' : 'Criar Quadra' }}</span>
           </button>
         </div>

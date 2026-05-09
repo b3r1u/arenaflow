@@ -18,7 +18,13 @@ import { ToastService } from '../../services/toast.service';
 
       <!-- Loading -->
       <div *ngIf="financialService.loading()" class="flex items-center justify-center py-24">
-        <span class="material-icons" style="font-size:2.5rem;color:var(--border);animation:spin 1s linear infinite">refresh</span>
+        <svg style="width:3rem;height:3rem" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" opacity="0.1"/>
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" opacity="0.1"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1 138.2" opacity="0.65" style="transform-origin:50px 50px;animation:sp-ccw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="5" fill="var(--primary)" style="animation:sp-pulse 1.3s ease-in-out infinite"/>
+        </svg>
       </div>
 
       <!-- Aviso genérico -->
@@ -211,7 +217,10 @@ import { ToastService } from '../../services/toast.service';
           <button class="btn-primary w-full"
                   [disabled]="transferSaving"
                   (click)="saveTransferSettings()">
-            <span *ngIf="transferSaving" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+            <svg *ngIf="transferSaving" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+              <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+            </svg>
             <span *ngIf="!transferSaving" class="material-icons" style="font-size:0.9rem">save</span>
             {{ transferSaving ? 'Salvando...' : 'Salvar configuração de saque' }}
           </button>
@@ -466,7 +475,10 @@ import { ToastService } from '../../services/toast.service';
             <button class="btn-primary flex-1"
                     [disabled]="!canSave() || saving"
                     (click)="save()">
-              <span *ngIf="saving" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+              <svg *ngIf="saving" style="width:0.85rem;height:0.85rem;flex-shrink:0" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="36" stroke="rgba(255,255,255,0.25)" stroke-width="9"/>
+                <circle cx="50" cy="50" r="36" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+              </svg>
               <span *ngIf="!saving">{{ financialService.hasFinancial() ? 'Atualizar dados' : 'Salvar e ativar recebimentos' }}</span>
             </button>
           </div>

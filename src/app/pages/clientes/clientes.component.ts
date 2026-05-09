@@ -51,7 +51,13 @@ interface ApiClient {
 
       <!-- Loading -->
       <div *ngIf="loading" class="flex items-center justify-center py-16">
-        <span class="material-icons" style="font-size:2rem;color:var(--muted-foreground);animation:spin 1s linear infinite">refresh</span>
+        <svg style="width:3rem;height:3rem" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" opacity="0.1"/>
+          <circle cx="50" cy="50" r="36" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-dasharray="169.6 226.2" style="transform-origin:50px 50px;animation:sp-cw 1.3s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" opacity="0.1"/>
+          <circle cx="50" cy="50" r="22" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1 138.2" opacity="0.65" style="transform-origin:50px 50px;animation:sp-ccw 0.9s cubic-bezier(0.4,0,0.2,1) infinite"/>
+          <circle cx="50" cy="50" r="5" fill="var(--primary)" style="animation:sp-pulse 1.3s ease-in-out infinite"/>
+        </svg>
       </div>
 
       <!-- Two-column layout -->
