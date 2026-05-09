@@ -36,6 +36,13 @@ export class ApiService {
     return this.http.post<T>(`${this.baseUrl}${path}`, body);
   }
 
+  /** POST silencioso — não dispara o loading global */
+  postSilent<T>(path: string, body: unknown): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${path}`, body, {
+      context: new HttpContext().set(SILENT_REQUEST, true),
+    });
+  }
+
   put<T>(path: string, body: unknown): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${path}`, body);
   }

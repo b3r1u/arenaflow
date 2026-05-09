@@ -522,7 +522,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
     try {
       await firstValueFrom(
-        this.api.post<{ success: boolean }>('/support/message', { message: text })
+        this.api.postSilent<{ success: boolean }>('/support/message', { message: text })
       );
       this.supportSent = true;
       this.saveSupportHistory();
