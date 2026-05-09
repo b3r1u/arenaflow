@@ -37,12 +37,6 @@ const FEATURE_OPTIONS = [
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="material-icons text-xs px-2 py-0.5 rounded-full font-medium"
-                  style="font-size:0.7rem;background:hsl(36,95%,55%,0.15);color:hsl(36,75%,40%)">
-              PLATFORM ADMIN
-            </span>
-          </div>
           <h1 class="font-heading font-bold text-2xl lg:text-3xl" style="color:var(--foreground)">Gestão de Planos</h1>
           <p class="text-sm mt-1" style="color:var(--muted-foreground)">Crie e gerencie os planos do ArenaFlow SaaS</p>
         </div>
