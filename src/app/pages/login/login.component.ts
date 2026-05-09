@@ -37,6 +37,7 @@ interface PlanOption {
   courts: string; features: { icon: string; title: string; desc: string }[];
   available: boolean; popular: boolean; desc?: string;
   commission_pct: number;
+  annualTotal?: number; // preço total anual (price * 12), presente apenas em planos anuais
 }
 
 @Component({
@@ -165,6 +166,11 @@ interface PlanOption {
       background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
     }
 
+    /* Mobile: responsividade dos cards de plano */
+    @media (max-width:480px) {
+      .m-section { padding-left:1rem; padding-right:1rem; }
+    }
+
     /* Mobile: footer */
     .m-footer {
       padding: 1rem 1.5rem 1.25rem;
@@ -256,7 +262,7 @@ interface PlanOption {
 
     /* Desktop: marketing inner */
     .d-mkt-inner {
-      padding: 2.5rem 3rem; flex: 1;
+      padding: 2.5rem 2rem; flex: 1;
       display: flex; flex-direction: column; gap: 0;
     }
 
@@ -506,6 +512,44 @@ interface PlanOption {
     /* ── CTA block ──────────────────────────────── */
     .cta-block { border-radius:1.5rem; background:linear-gradient(135deg,#1c9e54,#127838); padding:2.5rem; position:relative; overflow:hidden; }
     @media (max-width:1023px) { .cta-block { padding:1.75rem 1.5rem; border-radius:1.25rem; } }
+
+    /* ── Toggle mensal/anual ────────────────────── */
+    .billing-toggle {
+      display:inline-flex; align-items:center; flex-wrap:wrap; gap:0.25rem;
+      background:rgba(255,255,255,0.06); border-radius:2rem;
+      padding:0.25rem; margin-bottom:1.25rem;
+    }
+    .billing-toggle-btn {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.38rem 1rem; border-radius:2rem; border:none; cursor:pointer;
+      font-size:0.8rem; font-weight:600; font-family:'Space Grotesk',sans-serif;
+      background:transparent; color:rgba(255,255,255,0.45);
+      transition:background 0.2s,color 0.2s;
+    }
+    .billing-toggle-btn.active {
+      background:rgba(255,255,255,0.14); color:#fff;
+    }
+    .billing-toggle-badge {
+      display:inline-flex; align-items:center;
+      background:rgba(34,165,92,0.22); color:#4ade80;
+      font-size:0.62rem; font-weight:800; border-radius:2rem;
+      padding:0.1rem 0.45rem; letter-spacing:0.03em; line-height:1.4;
+    }
+    .annual-sub {
+      font-size:0.65rem; color:rgba(255,255,255,0.38);
+      margin:0.15rem 0 0; font-weight:400;
+    }
+
+    /* ── Plan grid (desktop) ─────────────────────── */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.9rem;
+      align-items: stretch;
+    }
+    @media (min-width: 1300px) {
+      .plan-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    }
   `],
   template: `
     <div class="login-root">
@@ -696,9 +740,17 @@ interface PlanOption {
               <span style="width:0.42rem;height:0.42rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
               <span style="font-size:0.6rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Planos</span>
             </div>
-            <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.45rem;color:#fff;margin:0 0 1.1rem;line-height:1.08;letter-spacing:-0.02em">
+            <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:1.45rem;color:#fff;margin:0 0 1rem;line-height:1.08;letter-spacing:-0.02em">
               ESCOLHA SEU <span style="color:#4ade80">PLANO</span>
             </h2>
+
+            <!-- Toggle mensal/anual (mobile) -->
+            <div class="billing-toggle">
+              <button class="billing-toggle-btn" [class.active]="!annualMode" (click)="annualMode = false">Mensal</button>
+              <button class="billing-toggle-btn" [class.active]="annualMode" (click)="annualMode = true">
+                Anual <span class="billing-toggle-badge">-20%</span>
+              </button>
+            </div>
 
             <!-- Card Free -->
             <div (click)="selectPlan(freePlan)"
@@ -727,7 +779,7 @@ interface PlanOption {
             </div>
 
             <!-- Cards pagos -->
-            <div *ngFor="let p of paidPlans"
+            <div *ngFor="let p of displayedPlans"
                  (click)="p.available && selectPlan(p)"
                  [style.cursor]="p.available ? 'pointer' : 'default'"
                  [style.border]="p.popular ? '1px solid rgba(34,165,92,0.4)' : '1px solid rgba(255,255,255,0.09)'"
@@ -741,6 +793,9 @@ interface PlanOption {
               <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2rem;line-height:1;margin-bottom:0.15rem"
                    [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.4)'">{{ p.priceLabel }}</div>
               <p style="margin:0 0 0.85rem;font-size:0.65rem;color:rgba(255,255,255,0.3)">/mês</p>
+              <p *ngIf="annualMode && p.annualTotal" class="annual-sub" style="margin:0 0 0.85rem">
+                Cobrado R$ {{ p.annualTotal!.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}/ano
+              </p>
               <p style="margin:0 0 1rem;font-size:0.72rem;color:rgba(255,255,255,0.48);line-height:1.5">{{ p.desc || p.courts }}</p>
               <div style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1rem">
                 <div *ngFor="let f of p.features" style="display:flex;align-items:center;gap:0.5rem">
@@ -1100,12 +1155,20 @@ interface PlanOption {
                 <span style="width:0.5rem;height:0.5rem;background:#4ade80;border-radius:2px;display:inline-block"></span>
                 <span style="font-size:0.63rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em">Planos</span>
               </div>
-              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0 0 1.5rem;line-height:1.08;letter-spacing:-0.02em">
+              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:clamp(1.35rem,2vw,1.8rem);color:#fff;margin:0 0 1rem;line-height:1.08;letter-spacing:-0.02em">
                 ESCOLHA SEU <span style="color:#4ade80">PLANO</span>
               </h2>
 
+              <!-- Toggle mensal/anual (desktop) -->
+              <div class="billing-toggle">
+                <button class="billing-toggle-btn" [class.active]="!annualMode" (click)="annualMode = false">Mensal</button>
+                <button class="billing-toggle-btn" [class.active]="annualMode" (click)="annualMode = true">
+                  Anual <span class="billing-toggle-badge">-20%</span>
+                </button>
+              </div>
+
               <!-- Grid de cards -->
-              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:1.25rem;align-items:stretch">
+              <div class="plan-grid">
 
                 <!-- Card Free -->
                 <div (click)="selectPlan(freePlan)"
@@ -1138,7 +1201,7 @@ interface PlanOption {
                 </div>
 
                 <!-- Cards pagos -->
-                <div *ngFor="let p of paidPlans"
+                <div *ngFor="let p of displayedPlans"
                      (click)="p.available && selectPlan(p)"
                      [style.cursor]="p.available ? 'pointer' : 'default'"
                      [style.border]="p.popular ? '1px solid rgba(34,165,92,0.42)' : '1px solid rgba(255,255,255,0.09)'"
@@ -1158,6 +1221,9 @@ interface PlanOption {
                        [style.font-size]="p.priceLabel.length > 10 ? '1.7rem' : '2.2rem'"
                        [style.color]="p.available ? '#fff' : 'rgba(255,255,255,0.4)'">{{ p.priceLabel }}</div>
                   <p style="margin:0 0 1rem;font-size:0.67rem;color:rgba(255,255,255,0.3)">/mês</p>
+                  <p *ngIf="annualMode && p.annualTotal" class="annual-sub" style="margin:-0.5rem 0 1rem">
+                    Cobrado R$ {{ p.annualTotal!.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}/ano
+                  </p>
                   <p style="margin:0 0 1.25rem;font-size:0.73rem;color:rgba(255,255,255,0.48);line-height:1.55">{{ p.desc || p.courts }}</p>
 
                   <div style="display:flex;flex-direction:column;gap:0.55rem;flex:1;margin-bottom:1.25rem">
@@ -1331,9 +1397,9 @@ interface PlanOption {
                       (click)="selectPlan(freePlan)">
                 Free<br><span style="font-size:0.58rem;font-weight:400">Grátis</span>
               </button>
-              <button *ngFor="let p of paidPlans"
+              <button *ngFor="let p of monthlyPlans"
                       class="plan-nav-pill"
-                      [class.active]="selectedPlan.id === p.id"
+                      [class.active]="selectedPlan.id === p.id || selectedPlan.id === p.id + '-anual'"
                       [class.unavail]="!p.available"
                       (click)="p.available && selectPlan(p)">
                 {{ p.name }}<br><span style="font-size:0.58rem;font-weight:400">{{ p.priceLabel }}</span>
@@ -1558,34 +1624,60 @@ export class LoginComponent implements OnInit {
     ],
   };
 
-  paidPlans: PlanOption[] = [];
+  monthlyPlans: PlanOption[] = [];
+  annualPlans: PlanOption[] = [];
+  annualMode = false;
+
+  get displayedPlans(): PlanOption[] {
+    return this.annualMode ? this.annualPlans : this.monthlyPlans;
+  }
 
   ngOnInit(): void {
     this.api.get<{ plans: any[] }>('/plans').subscribe({
       next: ({ plans }) => {
-        this.paidPlans = plans
-          .filter(p => p.slug !== 'free' && p.active !== false)
+        const mapPlan = (p: any): PlanOption => ({
+          id:             p.slug,
+          name:           p.name,
+          priceLabel:     p.price === 0 ? 'Grátis' : `R$ ${Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+          price:          p.price,
+          courts:         p.max_courts ? `${p.max_courts} quadra${p.max_courts > 1 ? 's' : ''}` : 'Ilimitadas',
+          available:      !!p.pagarme_plan_id,
+          popular:        p.slug === 'pro',
+          commission_pct: Number(p.commission_pct ?? 10),
+          desc:           PLAN_DESCS[p.slug] ?? `Para arenas com ${p.max_courts ? p.max_courts + ' quadras' : 'quadras ilimitadas'}.`,
+          features:       (p.features as string[]).map(featureToDisplay),
+        });
+
+        // Planos mensais: sem free, sem -anual
+        this.monthlyPlans = plans
+          .filter(p => p.slug !== 'free' && !p.slug.endsWith('-anual') && p.active !== false)
           .sort((a, b) => a.price - b.price)
-          .map(p => ({
-            id:         p.slug,
-            name:       p.name,
-            priceLabel: p.price === 0 ? 'Grátis' : `R$ ${Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            price:      p.price,
-            courts:     p.max_courts ? `${p.max_courts} quadra${p.max_courts > 1 ? 's' : ''}` : 'Ilimitadas',
-            available:      !!p.pagarme_plan_id,   // disponível apenas quando já criado no Pagar.me
-            popular:        p.slug === 'pro',
-            commission_pct: Number(p.commission_pct ?? 10),
-            desc:           PLAN_DESCS[p.slug] ?? `Para arenas com ${p.max_courts ? p.max_courts + ' quadras' : 'quadras ilimitadas'}.`,
-            features:       (p.features as string[]).map(featureToDisplay),
-          }));
+          .map(mapPlan);
+
+        // Planos anuais: para cada mensal, busca o correspondente -anual
+        this.annualPlans = this.monthlyPlans.map(monthly => {
+          const annualSlug = `${monthly.id}-anual`;
+          const annualRaw = plans.find(p => p.slug === annualSlug);
+          if (!annualRaw) return monthly; // fallback ao mensal se não existir
+          const monthly_equiv = Number(annualRaw.price); // preço já é o mensal equivalente (price * 0.8)
+          const annual_total  = monthly_equiv * 12;
+          return {
+            ...mapPlan(annualRaw),
+            id:          annualRaw.slug,
+            priceLabel:  `R$ ${monthly_equiv.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            price:       monthly_equiv,
+            annualTotal: annual_total,
+          } as PlanOption;
+        });
 
         // Atualiza freePlan com dados reais se existirem
         const free = plans.find(p => p.slug === 'free');
         if (free) {
           this.freePlan = {
             ...this.freePlan,
-            name:    free.name,
-            courts:  free.max_courts ? `${free.max_courts} quadra` : '1 quadra',
+            name:           free.name,
+            courts:         free.max_courts ? `${free.max_courts} quadra` : '1 quadra',
+            commission_pct: Number(free.commission_pct ?? 10),
             features: free.features?.length
               ? (free.features as string[]).map(featureToDisplay)
               : this.freePlan.features,
