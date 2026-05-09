@@ -487,12 +487,39 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
 
   // ── Suporte ──
+  private readonly SUPPORT_STORAGE_KEY = 'af_support_chat';
+  private readonly SUPPORT_TTL_MS      = 48 * 60 * 60 * 1000; // 48 horas
+
   supportOpen    = false;
   supportInput   = '';
   supportSending = false;
   supportSent    = false;
   supportError   = '';
   supportMessages: { text: string; time: string }[] = [];
+
+  private loadSupportHistory(): void {
+    try {
+      const raw = localStorage.getItem(this.SUPPORT_STORAGE_KEY);
+      if (!raw) return;
+      const data: { messages: { text: string; time: string }[]; savedAt: number } = JSON.parse(raw);
+      const age = Date.now() - (data.savedAt || 0);
+      if (age >= this.SUPPORT_TTL_MS) {
+        localStorage.removeItem(this.SUPPORT_STORAGE_KEY);
+        return;
+      }
+      this.supportMessages = data.messages || [];
+      if (this.supportMessages.length > 0) this.supportSent = true;
+    } catch { localStorage.removeItem(this.SUPPORT_STORAGE_KEY); }
+  }
+
+  private saveSupportHistory(): void {
+    try {
+      localStorage.setItem(this.SUPPORT_STORAGE_KEY, JSON.stringify({
+        messages: this.supportMessages,
+        savedAt:  Date.now(),
+      }));
+    } catch { /* quota exceeded — ignora */ }
+  }
 
   async sendSupportMessage() {
     const text = this.supportInput.trim();
@@ -511,7 +538,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
         this.api.post<{ success: boolean }>('/support/message', { message: text })
       );
       this.supportSent = true;
+      this.saveSupportHistory();
     } catch (err: any) {
+      this.supportMessages.pop(); // remove da UI se falhou
       this.supportError = err?.error?.error || 'Não foi possível enviar. Tente novamente.';
     } finally {
       this.supportSending = false;
@@ -578,6 +607,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.checkDesktop();
+    this.loadSupportHistory();
     this.profile = this.profileService.getProfile();
     // Registra usuário no banco e verifica estabelecimento
     this.establishmentService.init();
