@@ -141,7 +141,7 @@ interface Plan {
       </div>
 
       <!-- Cards de planos -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;max-width:72rem;margin:0 auto">
         <div *ngFor="let plan of plans"
              class="relative flex flex-col rounded-2xl p-6 transition-all duration-200"
              [style.background]="plan.highlight ? 'var(--sidebar-background)' : 'var(--card)'"
@@ -217,9 +217,9 @@ interface Plan {
                     [style.color]="plan.commission_pct === 0 ? 'var(--primary)' : (plan.highlight ? 'rgba(255,255,255,0.5)' : 'var(--muted-foreground)')">
                 {{ plan.commission_pct === 0 ? 'check_circle' : 'percent' }}
               </span>
-              <span class="text-xs"
+              <span class="text-xs" style="white-space:nowrap"
                     [style.color]="plan.highlight ? 'rgba(255,255,255,0.6)' : 'var(--muted-foreground)'">
-                Taxa sobre reservas
+                Taxa s/ reservas
               </span>
             </div>
             <span class="text-xs font-bold"
@@ -768,28 +768,33 @@ export class PlanosComponent implements OnInit {
 
   faqs = [
     {
-      question: 'Posso cancelar a qualquer momento?',
-      answer: 'Sim. Você pode cancelar sua assinatura a qualquer momento sem multa. O acesso continua ativo até o fim do período pago.',
+      question: 'O que é a taxa sobre reservas?',
+      answer: 'Em cada reserva paga pelos seus clientes através do app, o ArenaFlow retém uma porcentagem do valor como taxa de plataforma. Free: 10%, Essencial: 7%, Pro: 4%, Business: isento. Esse desconto é aplicado automaticamente no momento do pagamento via Pix.',
       open: false
     },
     {
-      question: 'O que acontece com meus dados se eu cancelar?',
-      answer: 'Seus dados ficam armazenados por 30 dias após o cancelamento. Nesse período você pode exportar tudo ou reativar o plano.',
+      question: 'O que acontece quando cancelo a assinatura?',
+      answer: 'Ao cancelar, sua conta é rebaixada imediatamente para o plano Free. Você perde acesso às funcionalidades pagas (quadras extras, agendamento online público, etc.), mas todos os seus dados e reservas existentes são mantidos.',
       open: false
     },
     {
-      question: 'Posso migrar de plano depois?',
-      answer: 'Sim, você pode fazer upgrade ou downgrade a qualquer momento. No upgrade o novo plano é cobrado imediatamente com desconto proporcional.',
+      question: 'Como faço para mudar de plano?',
+      answer: 'Para trocar de plano, cancele o plano atual (botão "Cancelar assinatura" acima) e assine o novo plano na mesma tela. A mudança é refletida imediatamente após a confirmação do pagamento pelo Pagar.me.',
       open: false
     },
     {
       question: 'O plano anual tem desconto?',
-      answer: 'Sim, ao assinar o plano anual você garante 20% de desconto em relação ao valor mensal, além de travar o preço por 12 meses.',
+      answer: 'Sim. Ao assinar o plano anual você garante 20% de desconto em relação ao valor mensal, cobrado como uma única parcela anual via cartão de crédito pelo Pagar.me.',
       open: false
     },
     {
       question: 'Posso adicionar mais quadras sem trocar de plano?',
-      answer: 'Sim! Nos planos Pro e Business você pode adicionar quadras extras por R$ 39/quadra/mês, sem precisar fazer upgrade. É a forma mais flexível de crescer no seu ritmo.',
+      answer: 'Sim! Nos planos Pro e Business você pode cadastrar quadras extras por R$ 39/quadra/mês diretamente no painel, sem precisar fazer upgrade de plano.',
+      open: false
+    },
+    {
+      question: 'Meu pagamento é seguro?',
+      answer: 'Sim. Todos os pagamentos são processados pelo Pagar.me, gateway homologado pelo Banco Central. O ArenaFlow nunca armazena dados do seu cartão — eles são tokenizados diretamente no Pagar.me.',
       open: false
     }
   ];
