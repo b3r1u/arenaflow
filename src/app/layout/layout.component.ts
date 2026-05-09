@@ -148,8 +148,8 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
           <!-- Mensagem de boas-vindas -->
           <div class="support-msg support-msg--in">
             <div class="support-msg__bubble">
-              <p>Olá! 👋 Como podemos ajudar você hoje?</p>
-              <p class="mt-1" style="opacity:0.75;font-size:0.72rem">Descreva sua dúvida ou problema e nossa equipe responderá em breve.</p>
+              <p>Olá! 👋</p>
+              <p class="mt-1">Descreva o que está enfrentando. Seu chamado será recebido e analisado por nossa equipe de desenvolvedores, que em breve irá solucionar.</p>
             </div>
             <span class="support-msg__time">Agora</span>
           </div>
@@ -172,7 +172,7 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
           <!-- Confirmação de envio -->
           <div *ngIf="supportSent && !supportSending" class="support-msg support-msg--in">
             <div class="support-msg__bubble">
-              ✅ Mensagem recebida! Nossa equipe entrará em contato em breve.
+              ✅ Chamado aberto com sucesso! Obrigado pela paciência, nossa equipe já está ciente e irá solucionar em breve.
             </div>
           </div>
 
