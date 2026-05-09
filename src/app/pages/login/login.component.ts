@@ -550,6 +550,50 @@ interface PlanOption {
     @media (min-width: 1300px) {
       .plan-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
     }
+
+    /* ── Skeleton shimmer ───────────────────────── */
+    .sk-card {
+      border-radius: 1.5rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 2rem 1.75rem;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      min-height: 380px; overflow: hidden; position: relative;
+    }
+    .sk-card--mobile {
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      min-height: 260px;
+      margin-bottom: 1rem;
+    }
+    .sk-line {
+      border-radius: 0.4rem;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.05) 25%,
+        rgba(255,255,255,0.13) 50%,
+        rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: sk-shimmer 1.6s ease-in-out infinite;
+    }
+    .sk-line--sm  { height: 0.55rem; width: 40%; }
+    .sk-line--md  { height: 0.75rem; width: 65%; }
+    .sk-line--lg  { height: 2.8rem;  width: 70%; border-radius: 0.5rem; }
+    .sk-line--xl  { height: 1rem;    width: 90%; }
+    .sk-line--full{ height: 0.65rem; width: 100%; }
+    .sk-btn {
+      margin-top: auto;
+      height: 2.6rem; border-radius: 0.875rem;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.05) 25%,
+        rgba(255,255,255,0.13) 50%,
+        rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: sk-shimmer 1.6s ease-in-out infinite;
+    }
+    @keyframes sk-shimmer {
+      0%   { background-position:  200% 0; }
+      100% { background-position: -200% 0; }
+    }
   `],
   template: `
     <div class="login-root">
@@ -752,8 +796,22 @@ interface PlanOption {
               </button>
             </div>
 
+            <!-- Skeletons mobile -->
+            <ng-container *ngIf="plansLoading">
+              <div *ngFor="let i of [1,2,3,4]" class="sk-card sk-card--mobile">
+                <div class="sk-line sk-line--sm"></div>
+                <div class="sk-line sk-line--lg"></div>
+                <div class="sk-line sk-line--sm" style="width:30%"></div>
+                <div class="sk-line sk-line--md"></div>
+                <div class="sk-line sk-line--full"></div>
+                <div class="sk-line sk-line--full"></div>
+                <div class="sk-line sk-line--xl"></div>
+                <div class="sk-btn"></div>
+              </div>
+            </ng-container>
+
             <!-- Card Free -->
-            <div (click)="selectPlan(freePlan)"
+            <div *ngIf="!plansLoading" (click)="selectPlan(freePlan)"
                  style="border-radius:1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:1.25rem;display:flex;flex-direction:column;margin-bottom:1rem;cursor:pointer">
               <p style="margin:0 0 0.5rem;font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.07em">Free</p>
               <div style="font-family:'Space Grotesk',sans-serif;font-weight:900;font-size:2.2rem;color:#fff;line-height:1;margin-bottom:0.15rem">Grátis</div>
@@ -778,8 +836,9 @@ interface PlanOption {
               </button>
             </div>
 
-            <!-- Cards pagos -->
+            <!-- Cards pagos mobile -->
             <div *ngFor="let p of displayedPlans"
+                 [hidden]="plansLoading"
                  (click)="p.available && selectPlan(p)"
                  [style.cursor]="p.available ? 'pointer' : 'default'"
                  [style.border]="p.popular ? '1px solid rgba(34,165,92,0.4)' : '1px solid rgba(255,255,255,0.09)'"
@@ -1170,8 +1229,24 @@ interface PlanOption {
               <!-- Grid de cards -->
               <div class="plan-grid">
 
+                <!-- Skeletons desktop -->
+                <ng-container *ngIf="plansLoading">
+                  <div *ngFor="let i of [1,2,3,4]" class="sk-card">
+                    <div class="sk-line sk-line--sm"></div>
+                    <div class="sk-line sk-line--lg"></div>
+                    <div class="sk-line sk-line--sm" style="width:28%"></div>
+                    <div class="sk-line sk-line--md"></div>
+                    <div class="sk-line sk-line--full"></div>
+                    <div class="sk-line sk-line--full"></div>
+                    <div class="sk-line sk-line--xl"></div>
+                    <div class="sk-line sk-line--md"></div>
+                    <div class="sk-line sk-line--full"></div>
+                    <div class="sk-btn"></div>
+                  </div>
+                </ng-container>
+
                 <!-- Card Free -->
-                <div (click)="selectPlan(freePlan)"
+                <div *ngIf="!plansLoading" (click)="selectPlan(freePlan)"
                      style="border-radius:1.5rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:2rem 1.75rem;display:flex;flex-direction:column;cursor:pointer;transition:border-color 0.2s,transform 0.18s;min-height:380px"
                      onmouseover="this.style.borderColor='rgba(255,255,255,0.22)';this.style.transform='translateY(-4px)'"
                      onmouseout="this.style.borderColor='rgba(255,255,255,0.09)';this.style.transform='translateY(0)'">
@@ -1200,8 +1275,9 @@ interface PlanOption {
                   </button>
                 </div>
 
-                <!-- Cards pagos -->
+                <!-- Cards pagos desktop -->
                 <div *ngFor="let p of displayedPlans"
+                     [hidden]="plansLoading"
                      (click)="p.available && selectPlan(p)"
                      [style.cursor]="p.available ? 'pointer' : 'default'"
                      [style.border]="p.popular ? '1px solid rgba(34,165,92,0.42)' : '1px solid rgba(255,255,255,0.09)'"
@@ -1624,6 +1700,7 @@ export class LoginComponent implements OnInit {
     ],
   };
 
+  plansLoading = true;
   monthlyPlans: PlanOption[] = [];
   annualPlans: PlanOption[] = [];
   annualMode = false;
@@ -1633,7 +1710,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.api.get<{ plans: any[] }>('/plans').subscribe({
+    this.api.getSilent<{ plans: any[] }>('/plans').subscribe({
       next: ({ plans }) => {
         const mapPlan = (p: any): PlanOption => ({
           id:             p.slug,
@@ -1683,8 +1760,9 @@ export class LoginComponent implements OnInit {
               : this.freePlan.features,
           };
         }
+        this.plansLoading = false;
       },
-      error: () => { /* mantém os valores padrão em caso de falha */ }
+      error: () => { this.plansLoading = false; }
     });
   }
 
