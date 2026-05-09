@@ -195,11 +195,6 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
           </div>
         </div>
 
-        <!-- Aviso -->
-        <div class="support-panel__notice">
-          <span class="material-icons flex-shrink-0" style="font-size:0.9rem">mail</span>
-          <span>Sua mensagem chega por e-mail para nossa equipe.</span>
-        </div>
 
         <!-- Input de mensagem -->
         <div class="support-panel__footer">
