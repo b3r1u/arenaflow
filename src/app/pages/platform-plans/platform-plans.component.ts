@@ -90,7 +90,7 @@ const FEATURE_OPTIONS = [
           </div>
 
           <!-- Features -->
-          <div class="flex flex-wrap gap-1 flex-1">
+          <div class="flex flex-wrap gap-1 flex-1 content-start">
             <span *ngFor="let f of plan.features"
                   class="px-1.5 py-0.5 rounded"
                   style="font-size:0.65rem;line-height:1.3;white-space:nowrap;background:hsl(152,69%,40%,0.08);color:var(--primary)">
