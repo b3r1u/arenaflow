@@ -613,7 +613,12 @@ interface PlanOption {
           <div class="m-topbar">
             <div style="display:flex;align-items:center;gap:0.5rem">
               <div style="width:1.75rem;height:1.75rem;border-radius:0.45rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center">
-                <span class="material-icons" style="font-size:1rem;color:white">sports_volleyball</span>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="2.5" cy="10" r="1.8" fill="white"/>
+                  <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.38"/>
+                  <path d="M2.5,4 L13,4 L13,16 L2.5,16" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+                  <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
               <div>
                 <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.88rem;color:#fff;line-height:1">ArenaFlow</div>
@@ -931,7 +936,12 @@ interface PlanOption {
           <div *ngIf="!selectedPlan" style="width:100%;max-width:390px;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between">
             <div style="display:flex;align-items:center;gap:0.5rem">
               <div style="width:1.75rem;height:1.75rem;border-radius:0.45rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center">
-                <span class="material-icons" style="font-size:1rem;color:white">sports_volleyball</span>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="2.5" cy="10" r="1.8" fill="white"/>
+                  <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.38"/>
+                  <path d="M2.5,4 L13,4 L13,16 L2.5,16" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+                  <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
               <div>
                 <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.88rem;color:#fff;line-height:1">ArenaFlow</div>
@@ -966,7 +976,12 @@ interface PlanOption {
           <nav style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;z-index:10;background:rgba(5,14,9,0.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,0.05)">
             <div style="display:flex;align-items:center;gap:0.55rem">
               <div style="width:2rem;height:2rem;border-radius:0.5rem;background:linear-gradient(135deg,#22a55c,#16a34a);display:flex;align-items:center;justify-content:center">
-                <span class="material-icons" style="font-size:1.1rem;color:#fff">sports_volleyball</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="2.5" cy="10" r="1.8" fill="white"/>
+                  <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.38"/>
+                  <path d="M2.5,4 L13,4 L13,16 L2.5,16" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+                  <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
               <div>
                 <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:0.92rem;color:#fff;line-height:1">ArenaFlow</div>
