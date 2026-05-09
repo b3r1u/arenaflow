@@ -1060,22 +1060,47 @@ interface PlanOption {
                       <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(34,165,92,0.12),transparent 70%);filter:blur(20px)"></div>
                       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.65rem">
                         <svg width="92" height="92" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <!-- Dot — pulsa primeiro, é a origem do fluxo -->
-                          <circle cx="2.5" cy="10" r="1.8" fill="#22c55e">
-                            <animate attributeName="r"       values="1.5;2.5;1.5" dur="2.8s" begin="0s"   repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>
-                            <animate attributeName="opacity" values="0.5;1;0.5"   dur="2.8s" begin="0s"   repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>
+                          <!-- Dot — origem da onda -->
+                          <circle cx="2.5" cy="10" r="1.6" fill="#22c55e">
+                            <animate attributeName="opacity"
+                                     values="0.25;0.85;0.3;0.25"
+                                     keyTimes="0;0.1;0.5;1"
+                                     dur="4s" begin="0s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
                           </circle>
-                          <!-- Quadra 1 — menor, onda sai do dot -->
-                          <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                            <animate attributeName="opacity" values="0.15;0.55;0.15" dur="2.8s" begin="0.42s" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>
+                          <!-- Quadra 1 — onda chega aqui primeiro -->
+                          <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5"
+                                fill="none" stroke="#22c55e" stroke-width="0.85"
+                                stroke-linecap="round" stroke-linejoin="round">
+                            <animate attributeName="opacity"
+                                     values="0.06;0.38;0.09;0.06"
+                                     keyTimes="0;0.1;0.5;1"
+                                     dur="4s" begin="0.48s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
                           </path>
-                          <!-- Quadra 2 — média, onda continua se expandindo -->
-                          <path d="M2.5,4 L13,4 L13,16 L2.5,16" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                            <animate attributeName="opacity" values="0.15;0.65;0.15" dur="2.8s" begin="0.84s" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>
+                          <!-- Quadra 2 — onda passa pelo meio -->
+                          <path d="M2.5,4 L13,4 L13,16 L2.5,16"
+                                fill="none" stroke="#22c55e" stroke-width="0.85"
+                                stroke-linecap="round" stroke-linejoin="round">
+                            <animate attributeName="opacity"
+                                     values="0.06;0.38;0.09;0.06"
+                                     keyTimes="0;0.1;0.5;1"
+                                     dur="4s" begin="0.96s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
                           </path>
-                          <!-- Quadra 3 — maior, onda chega ao exterior -->
-                          <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                            <animate attributeName="opacity" values="0.15;0.9;0.15" dur="2.8s" begin="1.26s" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>
+                          <!-- Quadra 3 — onda chega ao exterior -->
+                          <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5"
+                                fill="none" stroke="#22c55e" stroke-width="0.85"
+                                stroke-linecap="round" stroke-linejoin="round">
+                            <animate attributeName="opacity"
+                                     values="0.06;0.38;0.09;0.06"
+                                     keyTimes="0;0.1;0.5;1"
+                                     dur="4s" begin="1.44s" repeatCount="indefinite"
+                                     calcMode="spline"
+                                     keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
                           </path>
                         </svg>
                         <div style="display:flex;flex-direction:column;align-items:center;gap:0">
