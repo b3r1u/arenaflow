@@ -1077,57 +1077,63 @@ interface PlanOption {
                                        keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
                             </path>
                           </g>
-                          <!-- Quadra 1 — primeira onda sai do semicírculo (pulsa stroke + opacity) -->
-                          <path d="M2.5,6.5 L8,6.5 L8,13.5 L2.5,13.5"
-                                fill="none" stroke="#22c55e" stroke-width="0.7"
-                                stroke-linecap="round" stroke-linejoin="round">
-                            <animate attributeName="opacity"
-                                     values="0.05;0.4;0.05"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="0.7s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                            <animate attributeName="stroke-width"
-                                     values="0.7;1.15;0.7"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="0.7s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                          </path>
-                          <!-- Quadra 2 — onda expande para o meio -->
-                          <path d="M2.5,4 L13,4 L13,16 L2.5,16"
-                                fill="none" stroke="#22c55e" stroke-width="0.7"
-                                stroke-linecap="round" stroke-linejoin="round">
-                            <animate attributeName="opacity"
-                                     values="0.05;0.4;0.05"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="1.4s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                            <animate attributeName="stroke-width"
-                                     values="0.7;1.15;0.7"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="1.4s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                          </path>
-                          <!-- Quadra 3 — onda chega ao exterior -->
-                          <path d="M2.5,1.5 L18,1.5 L18,18.5 L2.5,18.5"
-                                fill="none" stroke="#22c55e" stroke-width="0.7"
-                                stroke-linecap="round" stroke-linejoin="round">
-                            <animate attributeName="opacity"
-                                     values="0.05;0.4;0.05"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="2.1s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                            <animate attributeName="stroke-width"
-                                     values="0.7;1.15;0.7"
-                                     keyTimes="0;0.38;1"
-                                     dur="5s" begin="2.1s" repeatCount="indefinite"
-                                     calcMode="spline"
-                                     keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
-                          </path>
+                          <!-- Quadra 1 — escala a partir do próprio centro (5.25, 10) -->
+                          <g transform="translate(5.25 10)">
+                            <path d="M-2.75,-3.5 L2.75,-3.5 L2.75,3.5 L-2.75,3.5"
+                                  fill="none" stroke="#22c55e" stroke-width="0.7"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                              <animate attributeName="opacity"
+                                       values="0.08;0.55;0.08"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="0.7s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                              <animateTransform attributeName="transform" type="scale"
+                                       values="1;1.22;1"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="0.7s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            </path>
+                          </g>
+                          <!-- Quadra 2 — escala a partir do próprio centro (7.75, 10) -->
+                          <g transform="translate(7.75 10)">
+                            <path d="M-5.25,-6 L5.25,-6 L5.25,6 L-5.25,6"
+                                  fill="none" stroke="#22c55e" stroke-width="0.7"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                              <animate attributeName="opacity"
+                                       values="0.08;0.55;0.08"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="1.4s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                              <animateTransform attributeName="transform" type="scale"
+                                       values="1;1.18;1"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="1.4s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            </path>
+                          </g>
+                          <!-- Quadra 3 — escala a partir do próprio centro (10.25, 10) -->
+                          <g transform="translate(10.25 10)">
+                            <path d="M-7.75,-8.5 L7.75,-8.5 L7.75,8.5 L-7.75,8.5"
+                                  fill="none" stroke="#22c55e" stroke-width="0.7"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                              <animate attributeName="opacity"
+                                       values="0.08;0.55;0.08"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="2.1s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                              <animateTransform attributeName="transform" type="scale"
+                                       values="1;1.14;1"
+                                       keyTimes="0;0.38;1"
+                                       dur="5s" begin="2.1s" repeatCount="indefinite"
+                                       calcMode="spline"
+                                       keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+                            </path>
+                          </g>
                         </svg>
                         <div style="display:flex;flex-direction:column;align-items:center;gap:0">
                           <span style="font-family:'Space Grotesk',sans-serif;font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.45);line-height:1.15;letter-spacing:0.02em">Arena</span>
