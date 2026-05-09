@@ -174,19 +174,21 @@ import { ToastService } from '../../services/toast.service';
           <!-- Seletor de dia (Mensal) -->
           <div *ngIf="transferInterval === 'Monthly'" class="mb-5">
             <label class="block text-sm font-semibold mb-3" style="color:var(--foreground)">Dia do mês</label>
-            <div class="flex gap-2 items-center">
-              <input type="number" min="1" max="31"
-                     class="input text-center font-heading font-bold text-xl"
-                     style="width:5rem;padding:0.5rem"
-                     [(ngModel)]="transferDay"
-                     (change)="clampMonthDay()">
-              <div class="text-sm" style="color:var(--muted-foreground)">
-                <p style="margin:0">de cada mês</p>
-                <p class="text-xs mt-0.5" style="margin:0;color:var(--muted-foreground)">
-                  Se o dia cair em fim de semana ou feriado, o saque ocorre no próximo dia útil
-                </p>
-              </div>
+            <div class="flex flex-wrap gap-1.5">
+              <button *ngFor="let d of monthDays"
+                      (click)="transferDay = d"
+                      class="rounded-xl border-2 font-semibold transition-all duration-150"
+                      style="width:2.6rem;height:2.6rem;font-size:0.78rem"
+                      [style.border-color]="transferDay === d ? 'var(--primary)' : 'var(--border)'"
+                      [style.background]="transferDay === d ? 'hsl(152,69%,40%,0.1)' : 'var(--card)'"
+                      [style.color]="transferDay === d ? 'var(--primary)' : 'var(--muted-foreground)'">
+                {{ d }}
+              </button>
             </div>
+            <p class="text-xs mt-3" style="color:var(--muted-foreground)">
+              <span class="material-icons" style="font-size:0.8rem;vertical-align:middle">info</span>
+              Se o dia cair em fim de semana ou feriado, o saque ocorre no próximo dia útil
+            </p>
           </div>
 
           <!-- Resumo da configuração atual -->
@@ -527,6 +529,8 @@ export class FinanceiroComponent implements OnInit, OnDestroy {
     { label: 'Qui', value: 4 },
     { label: 'Sex', value: 5 },
   ];
+
+  monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
 
   selectTransferInterval(val: 'Daily' | 'Weekly' | 'Monthly') {
     this.transferInterval = val;
