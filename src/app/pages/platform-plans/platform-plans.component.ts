@@ -93,7 +93,7 @@ const FEATURE_OPTIONS = [
           <div class="flex flex-wrap gap-1 flex-1">
             <span *ngFor="let f of plan.features"
                   class="px-1.5 py-0.5 rounded"
-                  style="font-size:0.65rem;line-height:1.3;background:hsl(152,69%,40%,0.08);color:var(--primary)">
+                  style="font-size:0.65rem;line-height:1.3;white-space:nowrap;background:hsl(152,69%,40%,0.08);color:var(--primary)">
               {{ featureLabel(f) }}
             </span>
             <span *ngIf="plan.features.length === 0" style="font-size:0.7rem;color:var(--muted-foreground)">Sem features</span>
