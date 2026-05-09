@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, NgZone, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { ToastService } from '../../services/toast.service';
 import { EstablishmentService } from '../../services/establishment.service';
+import { ThemeService } from '../../services/theme.service';
 import { EstablishmentProfile, ThemeId, CancellationPolicy } from '../../models/models';
 
 interface ThemeOption {
@@ -78,8 +79,37 @@ interface ThemeOption {
 
       <!-- Theme section -->
       <div class="card p-6">
-        <h2 class="font-heading font-semibold text-base mb-1" style="color:var(--foreground)">Tema de Cores</h2>
-        <p class="text-xs mb-4" style="color:var(--muted-foreground)">Escolha o esquema de cores do sistema</p>
+        <h2 class="font-heading font-semibold text-base mb-1" style="color:var(--foreground)">Aparência</h2>
+        <p class="text-xs mb-5" style="color:var(--muted-foreground)">Personalize o visual do painel</p>
+
+        <!-- Modo claro/escuro -->
+        <div class="flex items-center justify-between rounded-xl px-4 py-3 mb-5"
+             style="background:var(--muted);border:1px solid var(--border)">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                 style="background:hsl(152,69%,40%,0.1)">
+              <span class="material-icons" style="font-size:1.1rem;color:var(--primary)">
+                {{ themeService.dark() ? 'dark_mode' : 'light_mode' }}
+              </span>
+            </div>
+            <div>
+              <p class="text-sm font-semibold" style="color:var(--foreground);margin:0">
+                {{ themeService.dark() ? 'Modo escuro' : 'Modo claro' }}
+              </p>
+              <p class="text-xs" style="color:var(--muted-foreground);margin:0">
+                {{ themeService.dark() ? 'Interface em tons escuros' : 'Interface em tons claros' }}
+              </p>
+            </div>
+          </div>
+          <button class="toggle-btn flex-shrink-0"
+                  [class.toggle-on]="themeService.dark()"
+                  (click)="themeService.toggle()">
+            <span class="toggle-knob"></span>
+          </button>
+        </div>
+
+        <!-- Paleta de cores -->
+        <p class="text-xs font-semibold mb-3" style="color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em">Esquema de cores</p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <button *ngFor="let t of themes"
                   (click)="selectTheme(t.id)"
@@ -623,6 +653,8 @@ interface ThemeOption {
 export class PerfilComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput')     fileInputRef!: ElementRef<HTMLInputElement>;
   @ViewChild('timelineTrack') trackRef!: ElementRef<HTMLDivElement>;
+
+  readonly themeService = inject(ThemeService);
 
   profile!: EstablishmentProfile;
   form: Omit<EstablishmentProfile, 'logoUrl' | 'theme'> = { name: '', phone: '', email: '', address: '', neighborhood: '', city: '' };
