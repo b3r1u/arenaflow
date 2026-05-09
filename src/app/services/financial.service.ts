@@ -14,6 +14,8 @@ export interface FinancialInfo {
   bank_registered: boolean;
   status: 'PENDING_REVIEW' | 'ACTIVE' | 'SUSPENDED';
   lgpd_consent_at: string;
+  transfer_interval: 'Daily' | 'Weekly' | 'Monthly';
+  transfer_day: number;
   created_at: string;
   updated_at: string;
 }
@@ -163,6 +165,17 @@ export class FinancialService {
       this.api.get<{ form: FinancialFormData | null }>('/financial/me/form')
     );
     return res.form;
+  }
+
+  async updateTransferSettings(interval: 'Daily' | 'Weekly' | 'Monthly', day: number): Promise<void> {
+    await firstValueFrom(
+      this.api.put<{ success: boolean; interval: string; day: number }>('/financial/transfer-settings', { interval, day })
+    );
+    // Atualiza o signal local sem recarregar tudo
+    const current = this._financial();
+    if (current) {
+      this._financial.set({ ...current, transfer_interval: interval, transfer_day: day });
+    }
   }
 
   reset(): void {

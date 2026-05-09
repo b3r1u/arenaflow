@@ -103,6 +103,118 @@ import { ToastService } from '../../services/toast.service';
         </div>
 
 
+        <!-- ── Configuração de Saque (visível apenas quando conta ativa) ── -->
+        <div *ngIf="financialService.hasFinancial() && !editing && resolvedStatus === 'active'"
+             class="card p-6 mb-6">
+
+          <!-- Header -->
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                 style="background:hsl(152,69%,40%,0.1)">
+              <span class="material-icons" style="font-size:1.1rem;color:var(--primary)">account_balance</span>
+            </div>
+            <div>
+              <h2 class="font-heading font-semibold text-base leading-tight" style="color:var(--foreground)">Configuração de Saque</h2>
+              <p class="text-xs" style="color:var(--muted-foreground)">Defina quando seu saldo é transferido automaticamente</p>
+            </div>
+          </div>
+
+          <!-- Taxa Pagar.me -->
+          <div class="flex items-center gap-3 px-4 py-3 rounded-xl mb-5"
+               style="background:hsl(38,92%,50%,0.07);border:1px solid hsl(38,92%,50%,0.2)">
+            <span class="material-icons flex-shrink-0" style="font-size:1rem;color:hsl(38,75%,45%)">info</span>
+            <div class="flex-1">
+              <p class="text-xs font-medium" style="color:var(--foreground);margin:0">Taxa por transferência cobrada pelo Pagar.me</p>
+              <p class="text-xs mt-0.5" style="color:var(--muted-foreground);margin:0">Incide sobre cada saque realizado para sua conta bancária</p>
+            </div>
+            <span class="font-heading font-bold text-sm flex-shrink-0" style="color:hsl(38,75%,45%)">R$ 3,67</span>
+          </div>
+
+          <!-- Seletor de frequência -->
+          <div class="mb-5">
+            <label class="block text-sm font-semibold mb-3" style="color:var(--foreground)">Frequência de saque</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button *ngFor="let opt of transferOptions"
+                      (click)="selectTransferInterval(opt.value)"
+                      class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-150"
+                      [style.border-color]="transferInterval === opt.value ? 'var(--primary)' : 'var(--border)'"
+                      [style.background]="transferInterval === opt.value ? 'hsl(152,69%,40%,0.07)' : 'var(--card)'">
+                <span class="material-icons" style="font-size:1.2rem"
+                      [style.color]="transferInterval === opt.value ? 'var(--primary)' : 'var(--muted-foreground)'">
+                  {{ opt.icon }}
+                </span>
+                <span class="text-xs font-semibold"
+                      [style.color]="transferInterval === opt.value ? 'var(--primary)' : 'var(--foreground)'">
+                  {{ opt.label }}
+                </span>
+                <span class="text-xs" style="color:var(--muted-foreground);text-align:center">{{ opt.desc }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Seletor de dia (Semanal) -->
+          <div *ngIf="transferInterval === 'Weekly'" class="mb-5">
+            <label class="block text-sm font-semibold mb-3" style="color:var(--foreground)">Dia da semana</label>
+            <div class="flex gap-2">
+              <button *ngFor="let d of weekDays"
+                      (click)="transferDay = d.value"
+                      class="flex-1 py-2.5 rounded-xl border-2 text-xs font-semibold transition-all duration-150"
+                      [style.border-color]="transferDay === d.value ? 'var(--primary)' : 'var(--border)'"
+                      [style.background]="transferDay === d.value ? 'hsl(152,69%,40%,0.07)' : 'var(--card)'"
+                      [style.color]="transferDay === d.value ? 'var(--primary)' : 'var(--muted-foreground)'">
+                {{ d.label }}
+              </button>
+            </div>
+            <p class="text-xs mt-2" style="color:var(--muted-foreground)">
+              <span class="material-icons" style="font-size:0.8rem;vertical-align:middle">info</span>
+              Saques ocorrem apenas em dias úteis
+            </p>
+          </div>
+
+          <!-- Seletor de dia (Mensal) -->
+          <div *ngIf="transferInterval === 'Monthly'" class="mb-5">
+            <label class="block text-sm font-semibold mb-3" style="color:var(--foreground)">Dia do mês</label>
+            <div class="flex gap-2 items-center">
+              <input type="number" min="1" max="31"
+                     class="input text-center font-heading font-bold text-xl"
+                     style="width:5rem;padding:0.5rem"
+                     [(ngModel)]="transferDay"
+                     (change)="clampMonthDay()">
+              <div class="text-sm" style="color:var(--muted-foreground)">
+                <p style="margin:0">de cada mês</p>
+                <p class="text-xs mt-0.5" style="margin:0;color:var(--muted-foreground)">
+                  Se o dia cair em fim de semana ou feriado, o saque ocorre no próximo dia útil
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumo da configuração atual -->
+          <div class="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-5"
+               style="background:var(--muted)">
+            <span class="material-icons flex-shrink-0" style="font-size:0.9rem;color:var(--muted-foreground)">schedule</span>
+            <p class="text-xs" style="color:var(--muted-foreground);margin:0">
+              Configuração atual:
+              <strong style="color:var(--foreground)">{{ currentTransferSummary() }}</strong>
+            </p>
+          </div>
+
+          <!-- Erro / sucesso -->
+          <div *ngIf="transferError" class="mb-3 px-3 py-2 rounded-lg text-xs"
+               style="background:hsl(0,72%,51%,0.1);color:hsl(0,72%,51%)">{{ transferError }}</div>
+          <div *ngIf="transferSuccess" class="mb-3 px-3 py-2 rounded-lg text-xs"
+               style="background:hsl(152,69%,40%,0.1);color:var(--primary)">{{ transferSuccess }}</div>
+
+          <!-- Ação -->
+          <button class="btn-primary w-full"
+                  [disabled]="transferSaving"
+                  (click)="saveTransferSettings()">
+            <span *ngIf="transferSaving" class="material-icons" style="font-size:0.9rem;animation:spin 1s linear infinite">refresh</span>
+            <span *ngIf="!transferSaving" class="material-icons" style="font-size:0.9rem">save</span>
+            {{ transferSaving ? 'Salvando...' : 'Salvar configuração de saque' }}
+          </button>
+        </div>
+
         <!-- Formulário (cadastro ou edição) -->
         <div *ngIf="!financialService.hasFinancial() || editing" class="card p-6">
           <h2 class="font-heading font-semibold text-base mb-5" style="color:var(--foreground)">
@@ -395,6 +507,66 @@ export class FinanceiroComponent implements OnInit, OnDestroy {
     lgpd_consent:   false,
   };
 
+  // ── Transfer settings ────────────────────────────────────────
+  transferInterval: 'Daily' | 'Weekly' | 'Monthly' = 'Daily';
+  transferDay      = 0;
+  transferSaving   = false;
+  transferError:   string | null = null;
+  transferSuccess: string | null = null;
+
+  transferOptions = [
+    { value: 'Daily',   label: 'Diário',  icon: 'today',        desc: 'Dias úteis' },
+    { value: 'Weekly',  label: 'Semanal', icon: 'view_week',    desc: 'Escolha o dia' },
+    { value: 'Monthly', label: 'Mensal',  icon: 'calendar_month', desc: 'Escolha o dia' },
+  ] as const;
+
+  weekDays = [
+    { label: 'Seg', value: 1 },
+    { label: 'Ter', value: 2 },
+    { label: 'Qua', value: 3 },
+    { label: 'Qui', value: 4 },
+    { label: 'Sex', value: 5 },
+  ];
+
+  selectTransferInterval(val: 'Daily' | 'Weekly' | 'Monthly') {
+    this.transferInterval = val;
+    this.transferDay = val === 'Weekly' ? 1 : val === 'Monthly' ? 5 : 0;
+  }
+
+  clampMonthDay() {
+    if (this.transferDay < 1)  this.transferDay = 1;
+    if (this.transferDay > 31) this.transferDay = 31;
+  }
+
+  currentTransferSummary(): string {
+    const f = this.financialService.financial();
+    if (!f) return '—';
+    const interval = f.transfer_interval ?? 'Daily';
+    const day      = f.transfer_day      ?? 0;
+    if (interval === 'Daily')   return 'Diário (dias úteis)';
+    if (interval === 'Weekly') {
+      const names = ['', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+      return `Semanal — toda ${names[day] ?? day}`;
+    }
+    if (interval === 'Monthly') return `Mensal — dia ${day} de cada mês`;
+    return '—';
+  }
+
+  async saveTransferSettings() {
+    this.transferSaving = true;
+    this.transferError  = null;
+    this.transferSuccess = null;
+    try {
+      await this.financialService.updateTransferSettings(this.transferInterval, this.transferDay);
+      this.transferSuccess = '✅ Configuração de saque salva com sucesso!';
+      setTimeout(() => this.transferSuccess = null, 4000);
+    } catch (e: any) {
+      this.transferError = e?.error?.error || 'Erro ao salvar configuração. Tente novamente.';
+    } finally {
+      this.transferSaving = false;
+    }
+  }
+
   private _pollTimer: any = null;
 
   constructor(
@@ -405,6 +577,11 @@ export class FinanceiroComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.financialService.load().then(() => {
       this.startPollingIfNeeded();
+      const f = this.financialService.financial();
+      if (f) {
+        this.transferInterval = (f.transfer_interval as any) ?? 'Daily';
+        this.transferDay      = f.transfer_day ?? 0;
+      }
     });
   }
 
