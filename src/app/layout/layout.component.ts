@@ -56,7 +56,7 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
         </nav>
 
         <!-- Footer -->
-        <div class="px-3 pb-20 lg:pb-5" style="border-top:1px solid var(--sidebar-border);padding-top:0.75rem">
+        <div class="px-3 pb-5" style="border-top:1px solid var(--sidebar-border);padding-top:0.75rem">
           <a routerLink="/perfil"
              class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs transition-all duration-150 cursor-pointer nav-item"
              (click)="sidebarOpen = false">
@@ -113,17 +113,6 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
         </main>
       </div>
 
-      <!-- Bottom navigation (mobile only) -->
-      <nav class="bottom-nav lg:hidden">
-        <a *ngFor="let item of bottomNavItems"
-           [routerLink]="item.path"
-           class="bottom-nav-item"
-           [class.active]="isActive(item.path)"
-           (click)="sidebarOpen = false">
-          <span class="material-icons icon">{{ item.icon }}</span>
-          <span>{{ item.shortLabel }}</span>
-        </a>
-      </nav>
 
       <!-- Toast -->
       <div *ngIf="toast?.type === 'error'" class="toast toast-error">{{ toast!.text }}</div>
@@ -268,7 +257,7 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
     /* ── Floating support button ── */
     .support-fab {
       position: fixed;
-      bottom: 5.5rem;
+      bottom: 1.5rem;
       right: 1.25rem;
       z-index: 200;
       width: 3.25rem;
@@ -294,7 +283,6 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
     }
     @media (min-width: 1024px) {
       .support-fab {
-        bottom: 1.5rem;
         right: 1.5rem;
       }
     }
@@ -302,7 +290,7 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
     /* ── Support panel ── */
     .support-panel {
       position: fixed;
-      bottom: 9rem;
+      bottom: 5rem;
       right: 1.25rem;
       z-index: 199;
       width: min(22rem, calc(100vw - 2rem));
@@ -327,7 +315,6 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
     }
     @media (min-width: 1024px) {
       .support-panel {
-        bottom: 5.5rem;
         right: 1.5rem;
       }
     }
