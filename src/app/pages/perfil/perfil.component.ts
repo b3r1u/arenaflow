@@ -442,9 +442,125 @@ interface ThemeOption {
         </div>
       </div>
 
+      <!-- Termos e Privacidade -->
+      <div class="card p-5 mb-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+               style="background:hsl(152,69%,40%,0.1)">
+            <span class="material-icons" style="font-size:1.15rem;color:var(--primary)">gavel</span>
+          </div>
+          <div>
+            <h2 class="font-heading font-semibold text-base leading-tight" style="color:var(--foreground)">Documentos Legais</h2>
+            <p class="text-xs mt-0.5" style="color:var(--muted-foreground)">Termos de uso e política de privacidade da plataforma</p>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <button class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors text-left"
+                  style="background:var(--muted);border:none;cursor:pointer;color:var(--foreground)"
+                  (click)="legalOpen=true;legalTab='terms'">
+            <span class="material-icons" style="font-size:1.1rem;color:var(--primary)">description</span>
+            <span class="flex-1 font-medium">Termos de Uso</span>
+            <span class="material-icons" style="font-size:1rem;color:var(--muted-foreground)">chevron_right</span>
+          </button>
+          <button class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors text-left"
+                  style="background:var(--muted);border:none;cursor:pointer;color:var(--foreground)"
+                  (click)="legalOpen=true;legalTab='privacy'">
+            <span class="material-icons" style="font-size:1.1rem;color:var(--primary)">shield</span>
+            <span class="flex-1 font-medium">Política de Privacidade (LGPD)</span>
+            <span class="material-icons" style="font-size:1rem;color:var(--muted-foreground)">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal: Termos / Privacidade -->
+      <div *ngIf="legalOpen" class="legal-overlay" (click)="legalOpen=false">
+        <div class="legal-modal" (click)="$event.stopPropagation()">
+          <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem">
+            <button class="legal-tab" [class.active]="legalTab==='terms'"   (click)="legalTab='terms'">Termos de Uso</button>
+            <button class="legal-tab" [class.active]="legalTab==='privacy'" (click)="legalTab='privacy'">Política de Privacidade</button>
+            <button (click)="legalOpen=false" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted-foreground);font-size:1.4rem;padding:0 0.25rem;line-height:1">×</button>
+          </div>
+          <div *ngIf="legalTab==='terms'" class="legal-body">
+            <h2>Termos de Uso — ArenaFlow</h2>
+            <p class="legal-updated">Última atualização: maio de 2025</p>
+            <h3>1. Aceitação</h3>
+            <p>Ao utilizar o painel ArenaFlow, você declara ter lido e concordado com estes Termos de Uso.</p>
+            <h3>2. O Serviço</h3>
+            <p>O ArenaFlow é uma plataforma de gestão e intermediação para estabelecimentos esportivos. O gestor é responsável pela veracidade dos dados do estabelecimento e pela condução dos atendimentos.</p>
+            <h3>3. Conta e Responsabilidades</h3>
+            <p>Você é responsável por todas as ações realizadas com suas credenciais. Não compartilhe seu acesso. Em caso de suspeita de uso indevido, notifique imediatamente o suporte.</p>
+            <h3>4. Pagamentos e Comissões</h3>
+            <p>O ArenaFlow cobra uma comissão sobre reservas conforme o plano contratado. O repasse ao estabelecimento é realizado pelo Pagar.me conforme as configurações de saque cadastradas.</p>
+            <h3>5. Cancelamento do Plano</h3>
+            <p>O cancelamento pode ser solicitado a qualquer momento. O acesso permanece ativo até o fim do período pago. Não há reembolso proporcional de períodos não utilizados.</p>
+            <h3>6. Alterações</h3>
+            <p>Podemos atualizar estes Termos a qualquer momento. Notificaremos por e-mail sobre mudanças relevantes.</p>
+            <h3>7. Contato</h3>
+            <p>Suporte: <strong>connectsolve.ti&#64;gmail.com</strong></p>
+          </div>
+          <div *ngIf="legalTab==='privacy'" class="legal-body">
+            <h2>Política de Privacidade — ArenaFlow</h2>
+            <p class="legal-updated">Última atualização: maio de 2025 · Conforme LGPD (Lei nº 13.709/2018)</p>
+            <h3>1. Controlador dos Dados</h3>
+            <p>Solve Tecnologia ("ArenaFlow") é a controladora dos seus dados. Contato: <strong>connectsolve.ti&#64;gmail.com</strong></p>
+            <h3>2. Dados Coletados</h3>
+            <p><strong>Dados do gestor:</strong> nome, e-mail, CPF/CNPJ, telefone, dados bancários (criptografados).<br><strong>Dados do estabelecimento:</strong> nome, endereço, quadras, horários, preços.<br><strong>Dados de clientes:</strong> coletados e processados em nome do estabelecimento.</p>
+            <h3>3. Finalidade e Base Legal</h3>
+            <p><strong>Execução do contrato (Art. 7º, V):</strong> gestão de reservas, repasse de pagamentos.<br><strong>Obrigação legal (Art. 7º, II):</strong> dados bancários para compliance do Pagar.me.</p>
+            <h3>4. Compartilhamento</h3>
+            <p>Dados compartilhados apenas com: Firebase/Google (autenticação), Pagar.me (pagamentos e recebimentos), Resend (e-mails). Dados bancários são criptografados antes do armazenamento.</p>
+            <h3>5. Retenção</h3>
+            <p>Dados mantidos enquanto a conta estiver ativa e pelo prazo legal após encerramento (mínimo 5 anos para dados financeiros conforme legislação fiscal).</p>
+            <h3>6. Seus Direitos (LGPD)</h3>
+            <p>Acesso, correção, exclusão e portabilidade dos seus dados pessoais. Solicite em: <strong>connectsolve.ti&#64;gmail.com</strong> com assunto "LGPD – [pedido]".</p>
+            <h3>7. Segurança</h3>
+            <p>Criptografia em trânsito (HTTPS/TLS), dados financeiros sensíveis criptografados em repouso, acesso restrito por Firebase Authentication.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   `,
   styles: [`
+    /* ── Modal legal ── */
+    .legal-overlay {
+      position: fixed; inset: 0; z-index: 9000;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    .legal-modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      width: calc(100% - 2rem); max-width: 560px;
+      max-height: 78vh;
+      display: flex; flex-direction: column;
+      padding: 1.25rem 1.25rem 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .legal-tab {
+      flex: 1; background: none; border: none; cursor: pointer;
+      padding: 0.6rem 0; font-size: 0.8rem; font-weight: 600;
+      color: var(--muted-foreground);
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .legal-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .legal-body {
+      overflow-y: auto; flex: 1; padding-right: 0.25rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .legal-body h2 { font-size: 1rem; font-weight: 700; color: var(--foreground); margin: 0.5rem 0 0.25rem; }
+    .legal-body h3 { font-size: 0.72rem; font-weight: 700; color: var(--primary); margin: 1rem 0 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .legal-body p, .legal-body li { font-size: 0.78rem; color: var(--muted-foreground); line-height: 1.65; margin: 0 0 0.4rem; }
+    .legal-body ul { padding-left: 1.1rem; margin: 0.3rem 0 0.6rem; }
+    .legal-updated { font-size: 0.68rem !important; color: var(--border) !important; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
     .drag-over {
       border-color: var(--primary) !important;
       background-color: rgba(34,197,94,0.05);
@@ -678,6 +794,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   cancelPolicy: CancellationPolicy & { enabled: boolean } = { enabled: false, limit_hours: 0, fee_percent: 0 };
   savingPolicy = false;
+
+  legalOpen = false;
+  legalTab: 'terms' | 'privacy' = 'terms';
 
   // Displays formatados para os inputs de máscara
   limitHoursDisplay = '00:00:00';
