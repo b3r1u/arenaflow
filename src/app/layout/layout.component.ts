@@ -108,7 +108,7 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
         </header>
 
         <!-- Page content -->
-        <main class="flex-1 overflow-y-auto p-4 lg:p-6 mobile-scroll" style="padding-right: 5rem">
+        <main class="flex-1 overflow-y-auto p-4 lg:p-6 mobile-scroll">
           <router-outlet></router-outlet>
         </main>
       </div>
@@ -257,12 +257,12 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
     /* ── Floating support button ── */
     .support-fab {
       position: fixed;
-      bottom: 1.5rem;
-      right: 1.25rem;
+      bottom: 1rem;
+      right: 0;
       z-index: 200;
       width: 3.25rem;
       height: 3.25rem;
-      border-radius: 50%;
+      border-radius: 50% 0 0 50%;
       background: var(--primary);
       color: white;
       border: none;
@@ -270,35 +270,31 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 24px rgba(34,197,94,0.4);
+      box-shadow: -4px 6px 24px rgba(34,197,94,0.4);
       transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
     }
     .support-fab:hover {
       transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 10px 30px rgba(34,197,94,0.5);
+      box-shadow: -4px 10px 30px rgba(34,197,94,0.5);
     }
     .support-fab--active {
       background: var(--muted-foreground);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    }
-    @media (min-width: 1024px) {
-      .support-fab {
-        right: 1.5rem;
-      }
+      box-shadow: -4px 4px 16px rgba(0,0,0,0.2);
     }
 
     /* ── Support panel ── */
     .support-panel {
       position: fixed;
       bottom: 5rem;
-      right: 1.25rem;
+      right: 0;
       z-index: 199;
       width: min(22rem, calc(100vw - 2rem));
       max-height: 70vh;
-      border-radius: 1.25rem;
+      border-radius: 1.25rem 0 0 1.25rem;
       background: var(--card);
       border: 1px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      border-right: none;
+      box-shadow: -8px 20px 60px rgba(0,0,0,0.18);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -312,11 +308,6 @@ import { Subscription, filter, firstValueFrom } from 'rxjs';
       transform: scale(1) translateY(0);
       opacity: 1;
       pointer-events: all;
-    }
-    @media (min-width: 1024px) {
-      .support-panel {
-        right: 1.5rem;
-      }
     }
 
     .support-panel__header {
