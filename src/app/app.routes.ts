@@ -21,6 +21,7 @@ export const routes: Routes = [
       { path: 'planos', loadComponent: () => import('./pages/planos/planos.component').then(m => m.PlanosComponent) },
       { path: 'financeiro', loadComponent: () => import('./pages/financeiro/financeiro.component').then(m => m.FinanceiroComponent) },
       { path: 'platform/plans', loadComponent: () => import('./pages/platform-plans/platform-plans.component').then(m => m.PlatformPlansComponent) },
+      { path: 'assinatura', loadChildren: () => import('subscription-panel/SubscriptionModule').then(m => m.SubscriptionModule) },
     ]
   },
   { path: '**', redirectTo: '' }
