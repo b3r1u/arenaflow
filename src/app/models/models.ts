@@ -11,7 +11,7 @@ export interface Court {
 export interface BookingPaymentSplit {
   id: string;
   player_name: string;
-  amount: number;      // centavos
+  amount: number;      
   status: 'PENDENTE' | 'PAGO' | 'EXPIRADO';
   pix_expires_at: string | null;
 }
