@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
 import { authGuard } from './guards/auth.guard';
+import { platformAdminGuard } from './guards/platform-admin.guard';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
@@ -21,7 +22,7 @@ export const routes: Routes = [
       { path: 'planos', loadComponent: () => import('./pages/planos/planos.component').then(m => m.PlanosComponent) },
       { path: 'financeiro', loadComponent: () => import('./pages/financeiro/financeiro.component').then(m => m.FinanceiroComponent) },
       { path: 'platform/plans', loadComponent: () => import('./pages/platform-plans/platform-plans.component').then(m => m.PlatformPlansComponent) },
-      { path: 'assinatura', loadChildren: () => import('subscription-panel/SubscriptionModule').then(m => m.SubscriptionModule) },
+      { path: 'assinatura', canActivate: [platformAdminGuard], loadChildren: () => import('subscription-panel/SubscriptionModule').then(m => m.SubscriptionModule) },
     ]
   },
   { path: '**', redirectTo: '' }

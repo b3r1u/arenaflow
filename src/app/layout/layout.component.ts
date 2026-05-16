@@ -554,6 +554,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     ];
     if (isPlatformAdmin) {
       items.push({ label: 'Gestão de Planos', path: '/platform/plans', icon: 'admin_panel_settings', accent: false, locked: false });
+      items.push({ label: 'Assinaturas',      path: '/assinatura',     icon: 'workspace_premium',    accent: false, locked: false });
     }
     return items;
   });
