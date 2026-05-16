@@ -64,14 +64,11 @@ const FEATURE_OPTIONS = [
              class="card p-5 flex flex-col gap-3"
              [style.opacity]="plan.active ? '1' : '0.55'">
 
-          <!-- Topo: slug badge + assinantes -->
+          <!-- Topo: slug badge -->
           <div class="flex items-start justify-between">
             <span class="text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wide"
                   [style.background]="slugBg(plan.slug)" [style.color]="slugColor(plan.slug)">
               {{ plan.slug }}
-            </span>
-            <span class="text-xs" style="color:var(--muted-foreground)">
-              {{ plan._count?.subscriptions || 0 }} assinantes
             </span>
           </div>
 
