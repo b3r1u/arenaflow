@@ -1,0 +1,40 @@
+<aside class="ds-sidebar">
+
+  <div class="ds-sidebar__logo">
+    <div class="ds-sidebar__logo-icon">
+      <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="ds-sidebar__logo-img" />
+      <span *ngIf="!logoUrl">{{ establishmentInitials }}</span>
+    </div>
+    <span class="ds-sidebar__logo-name">{{ establishmentName }}</span>
+  </div>
+
+  <nav class="ds-sidebar__nav">
+    <a *ngFor="let item of navItems"
+       class="ds-sidebar__nav-item"
+       [class.ds-sidebar__nav-item--active]="item.active"
+       [class.ds-sidebar__nav-item--accent]="item.accent"
+       [class.ds-sidebar__nav-item--locked]="item.locked">
+      <span class="material-icons ds-sidebar__nav-icon">{{ item.icon }}</span>
+      <span class="ds-sidebar__nav-label">{{ item.label }}</span>
+      <span *ngIf="item.locked" class="material-icons ds-sidebar__nav-lock">lock</span>
+    </a>
+  </nav>
+
+  <div class="ds-sidebar__footer">
+    <div class="ds-sidebar__user">
+      <div class="ds-sidebar__user-avatar">
+        <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" alt="Avatar" class="ds-sidebar__logo-img" />
+        <span *ngIf="!user.avatarUrl">{{ user.initials }}</span>
+      </div>
+      <div class="ds-sidebar__user-info">
+        <span class="ds-sidebar__user-name">{{ user.name }}</span>
+        <span class="ds-sidebar__user-email">{{ user.email }}</span>
+      </div>
+    </div>
+    <button class="ds-sidebar__logout">
+      <span class="material-icons" style="font-size:1rem">logout</span>
+      <span>Sair</span>
+    </button>
+  </div>
+
+</aside>

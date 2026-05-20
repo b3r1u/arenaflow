@@ -1,0 +1,18 @@
+.ds-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  line-height: 1;
+}
+
+.ds-icon--sm  { font-size: 1rem; }
+.ds-icon--md  { font-size: 1.25rem; }
+.ds-icon--lg  { font-size: 1.5rem; }
+.ds-icon--xl  { font-size: 2rem; }
+
+.ds-icon--default    { color: currentColor; }
+.ds-icon--primary    { color: var(--primary); }
+.ds-icon--muted      { color: var(--muted-foreground); }
+.ds-icon--accent     { color: var(--accent); }
+.ds-icon--destructive{ color: var(--destructive); }

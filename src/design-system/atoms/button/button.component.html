@@ -1,0 +1,4 @@
+<button [class]="classes" [disabled]="disabled || loading">
+  <span *ngIf="loading" class="ds-btn__spinner"></span>
+  <span *ngIf="!loading">{{ label }}</span>
+</button>

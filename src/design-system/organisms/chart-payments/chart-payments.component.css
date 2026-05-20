@@ -1,0 +1,34 @@
+.ds-chart-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+
+.ds-chart-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.ds-chart-card__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.ds-chart-card__subtitle {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin: 0.25rem 0 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.ds-chart-card__subtitle strong {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--primary);
+}

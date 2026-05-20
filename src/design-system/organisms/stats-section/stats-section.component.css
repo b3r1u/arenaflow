@@ -1,0 +1,11 @@
+.ds-stats-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .ds-stats-section {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

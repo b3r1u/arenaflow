@@ -1,0 +1,4 @@
+<div [class]="classes">
+  <img *ngIf="imageUrl" [src]="imageUrl" alt="Avatar" class="ds-avatar__img" />
+  <span *ngIf="!imageUrl" class="ds-avatar__initials">{{ initials }}</span>
+</div>

@@ -1,0 +1,10 @@
+<div class="ds-stats-section">
+  <ds-stat-card
+    *ngFor="let stat of stats"
+    [label]="stat.label"
+    [value]="stat.value"
+    [hint]="stat.hint"
+    [icon]="stat.icon"
+    [iconColor]="stat.iconColor">
+  </ds-stat-card>
+</div>

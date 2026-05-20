@@ -1,0 +1,29 @@
+.ds-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.ds-page-header__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.75rem;
+  color: var(--foreground);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ds-page-header__subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0.25rem 0 0;
+}
+
+.ds-page-header__action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}

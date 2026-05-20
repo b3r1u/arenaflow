@@ -1,0 +1,13 @@
+<div class="ds-stat-card">
+  <div class="ds-stat-card__header">
+    <span class="ds-stat-card__label">{{ label }}</span>
+    <div class="ds-stat-card__icon" [ngStyle]="iconBgStyle">
+      <span class="material-icons">{{ icon }}</span>
+    </div>
+  </div>
+  <div class="ds-stat-card__value">{{ value }}</div>
+  <div *ngIf="hint" class="ds-stat-card__hint">
+    <span class="ds-stat-card__dot" [style.background]="dotColor"></span>
+    {{ hint }}
+  </div>
+</div>

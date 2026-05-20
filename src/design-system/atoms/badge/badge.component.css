@@ -1,0 +1,17 @@
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.ds-badge--primary    { background-color: hsl(152,69%,40%,0.12); color: var(--primary); }
+.ds-badge--accent     { background-color: hsl(36,95%,55%,0.12);  color: hsl(36,80%,38%); }
+.ds-badge--destructive{ background-color: hsl(0,84%,60%,0.12);   color: var(--destructive); }
+.ds-badge--muted      { background-color: var(--muted);          color: var(--muted-foreground); }
+.ds-badge--blue       { background-color: hsl(221,83%,53%,0.12); color: hsl(221,83%,45%); }
